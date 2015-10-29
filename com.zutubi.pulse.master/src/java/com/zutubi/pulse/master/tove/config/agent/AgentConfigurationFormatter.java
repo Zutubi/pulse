@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.Host;
-import com.zutubi.pulse.master.agent.HostManager;
+import com.zutubi.pulse.master.agent.HostLocationFormatter;
 import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.util.EnumUtils;
 
@@ -14,18 +14,24 @@ import com.zutubi.util.EnumUtils;
 public class AgentConfigurationFormatter
 {
     private AgentManager agentManager;
-    private HostManager hostManager;
 
     public String getLocation(AgentConfiguration configuration)
     {
-        Host host = hostManager.getHostForAgent(configuration);
-        return host.getLocation();
+        return HostLocationFormatter.format(configuration);
     }
 
     public String getStatus(AgentConfiguration configuration)
     {
-        Agent agent = agentManager.getAgent(configuration);
-        return getStatus(agent);
+        if (configuration.isConcrete())
+        {
+            Agent agent = agentManager.getAgent(configuration);
+            if (agent != null)
+            {
+                return getStatus(agent);
+            }
+        }
+
+        return null;
     }
 
     public String getStatus(Agent agent)
@@ -64,10 +70,5 @@ public class AgentConfigurationFormatter
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    public void setHostManager(HostManager hostManager)
-    {
-        this.hostManager = hostManager;
     }
 }

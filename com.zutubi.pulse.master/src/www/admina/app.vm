@@ -37,7 +37,7 @@
 </div>
 
 <script>
-    Zutubi.admin.init();
+    Zutubi.admin.init($admin, $projectCreateAllowed, $agentCreateAllowed);
 
     $(document).ready(function()
     {

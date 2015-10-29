@@ -11,7 +11,8 @@
         init: function (options)
         {
             var that = this,
-                composite = options.composite;
+                composite = options.composite,
+                writable = that._canWrite(composite);
 
             that.options = options;
 
@@ -47,13 +48,13 @@
                 structure: composite.type.form,
                 values: composite.properties,
                 dirtyChecking: composite.keyed,
+                readOnly: !writable,
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");
 
             that.form.bind("buttonClicked", jQuery.proxy(that._submitClicked, that));
 
-            // FIXME kendo if the composite is not writable, don't show this
-            if (composite.type.checkType)
+            if (writable && composite.type.checkType)
             {
                 $("#composite-checkwrapper").show();
 
@@ -89,6 +90,24 @@
         {
             // FIXME moar destruction?
             this.view.destroy();
+        },
+
+        _canWrite: function(composite)
+        {
+            var i;
+
+            if (composite.actions)
+            {
+                for (i = 0; i < composite.actions.length; i++)
+                {
+                    if (composite.actions[i].action === "write")
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         },
 
         _submitClicked: function(e)

@@ -93,11 +93,14 @@
                 this._appendField(fieldOptions);
             }
 
-            this.tableBodyElement.append('<tr><td class="submit" colspan="2"></td></tr>');
-            submitCell = this.tableBodyElement.find(".submit");
-            for (i = 0; i < submits.length; i++)
+            if (!this.options.readOnly)
             {
-                this._addSubmit(submits[i], submitCell);
+                this.tableBodyElement.append('<tr><td class="submit" colspan="2"></td></tr>');
+                submitCell = this.tableBodyElement.find(".submit");
+                for (i = 0; i < submits.length; i++)
+                {
+                    this._addSubmit(submits[i], submitCell);
+                }
             }
 
             if (this.options.values)
@@ -148,10 +151,17 @@
                     }).data(fieldType);
 
                     fieldElement.on(KEYUP, jQuery.proxy(this._keyUp, this));
-                    if (this.options.dirtyChecking)
+                    if (this.options.readOnly)
                     {
-                        fieldElement.on(CLICK, jQuery.proxy(this._updateButtons, this));
-                        field.bind("change", jQuery.proxy(this._updateButtons, this));
+                        field.enable(false);
+                    }
+                    else
+                    {
+                        if (this.options.dirtyChecking)
+                        {
+                            fieldElement.on(CLICK, jQuery.proxy(this._updateButtons, this));
+                            field.bind("change", jQuery.proxy(this._updateButtons, this));
+                        }
                     }
 
                     this.fields.push(field);

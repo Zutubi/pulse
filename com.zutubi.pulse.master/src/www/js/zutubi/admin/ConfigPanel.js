@@ -296,7 +296,7 @@
         {
             var action = e.action;
 
-            if (action.action === "view")
+            if (action.action === "view" || action.action === "write")
             {
                 this._openPath(e.path);
             }

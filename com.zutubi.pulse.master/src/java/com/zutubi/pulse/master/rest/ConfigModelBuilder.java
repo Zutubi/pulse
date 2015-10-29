@@ -84,7 +84,7 @@ public class ConfigModelBuilder
             }
             else
             {
-                model = createCompositeModel(path, compositeType, label, parentType.hasSignificantKeys(), record, filters);
+                model = createCompositeModel(path, compositeType, label, parentType != null && parentType.hasSignificantKeys(), record, filters);
             }
         }
 

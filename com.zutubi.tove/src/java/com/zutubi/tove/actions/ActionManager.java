@@ -34,6 +34,7 @@ public class ActionManager
     static
     {
         SIMPLE_COMMON_ACTIONS.add(AccessManager.ACTION_VIEW);
+        SIMPLE_COMMON_ACTIONS.add(AccessManager.ACTION_WRITE);
         SIMPLE_COMMON_ACTIONS.add(AccessManager.ACTION_DELETE);
     }
     // Complex actions need an input argument.
@@ -64,6 +65,11 @@ public class ActionManager
                 if (configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW))
                 {
                     result.add(AccessManager.ACTION_VIEW);
+                }
+
+                if (configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE))
+                {
+                    result.add(AccessManager.ACTION_WRITE);
                 }
 
                 if (includeNonSimple)

@@ -7,11 +7,11 @@ package com.zutubi.tove.security;
  */
 public interface AccessManager
 {
-    public static final String ACTION_ADMINISTER = "administer";
-    public static final String ACTION_CREATE = "create";
-    public static final String ACTION_DELETE = "delete";
-    public static final String ACTION_VIEW = "view";
-    public static final String ACTION_WRITE = "write";
+    String ACTION_ADMINISTER = "administer";
+    String ACTION_CREATE = "create";
+    String ACTION_DELETE = "delete";
+    String ACTION_VIEW = "view";
+    String ACTION_WRITE = "write";
 
     /**
      * Returns the currently-applicable actor, or null if there is no such

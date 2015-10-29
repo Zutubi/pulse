@@ -31,32 +31,40 @@
 
         _updateDependents: function()
         {
-            var value = this.getValue(),
-                structure = this.structure,
-                enable = jQuery.inArray(value, structure.enableSet) !== -1,
-                fieldNames = structure.dependentFields,
+            var value,
+                structure,
+                enable,
+                fieldNames,
                 form = this.parentForm,
                 fields,
                 i,
                 field;
 
-            if (fieldNames && fieldNames.length > 0)
+            if (!form.options.readOnly)
             {
-                for (i = 0; i < fieldNames.length; i++)
+                value = this.getValue();
+                structure = this.structure;
+                enable = jQuery.inArray(value, structure.enableSet) !== -1;
+                fieldNames = structure.dependentFields;
+
+                if (fieldNames && fieldNames.length > 0)
                 {
-                    field = form.getFieldNamed(fieldNames[i]);
-                    if (field)
+                    for (i = 0; i < fieldNames.length; i++)
                     {
-                        field.enable(enable);
+                        field = form.getFieldNamed(fieldNames[i]);
+                        if (field)
+                        {
+                            field.enable(enable);
+                        }
                     }
                 }
-            }
-            else
-            {
-                fields = form.getFields();
-                for (i = 0; i < fields.length; i++)
+                else
                 {
-                    fields[i].enable(enable);
+                    fields = form.getFields();
+                    for (i = 0; i < fields.length; i++)
+                    {
+                        fields[i].enable(enable);
+                    }
                 }
             }
         }

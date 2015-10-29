@@ -176,9 +176,9 @@ if (window.Zutubi.admin === undefined)
             window.show();
         }
 
-        function _createNavbar()
+        function _createNavbar(options)
         {
-            var navbar = $("#navbar").kendoZaNavbar().data("kendoZaNavbar");
+            var navbar = $("#navbar").kendoZaNavbar(options).data("kendoZaNavbar");
             navbar.bind("scope-selected", function(e)
             {
                 if (e.scope === "projects" || e.scope === "agents")
@@ -274,11 +274,15 @@ if (window.Zutubi.admin === undefined)
                 "status": "heartbeat"
             },
 
-            init: function()
+            init: function(isAdmin, projectCreateAllowed, agentCreateAllowed)
             {
                 app.notificationWidget = _createNotificationWidget();
                 app.router = _createRouter();
-                app.navbar = _createNavbar();
+                app.navbar = _createNavbar({
+                    isAdmin: isAdmin,
+                    projectCreateAllowed: projectCreateAllowed,
+                    agentCreateAllowed: agentCreateAllowed
+                });
             },
 
             start: function()

@@ -6,8 +6,7 @@
         Widget = ui.Widget,
         SELECT = "select",
         ADD = "add",
-        SCOPE_SELECTED = "scope-selected",
-        TEMPLATED_SCOPES = ["projects", "agents"];
+        SCOPE_SELECTED = "scope-selected";
 
     Zutubi.admin.ScopeSelector = Widget.extend({
         init: function(element, options)
@@ -29,7 +28,8 @@
 
         _create: function()
         {
-            var that = this;
+            var that = this,
+                i;
 
             that.selected = "projects";
 
@@ -41,7 +41,18 @@
 
             that.element.append(that.outer);
 
-            that.popupEl = $("<ul class='selector-popup'><li>projects</li><li>agents</li><li>settings</li><li>users</li><li>groups</li><li>plugins</li></ul>");
+            that.scopes = ["projects", "agents"];
+            if (that.options.isAdmin)
+            {
+                that.scopes.push("settings", "users", "groups", "plugins");
+            }
+
+            that.popupEl = $("<ul class='selector-popup'></ul>");
+            for (i = 0; i < that.scopes.length; i++)
+            {
+                that.popupEl.append("<li>" + that.scopes[i] + "</li>");
+            }
+
             that.popup = that.popupEl.kendoPopup({
                 anchor: that.element,
                 origin: "top left",
@@ -110,6 +121,16 @@
 
             Widget.fn.init.call(this, element, options);
 
+            that.createAllowed = [];
+            if (options.projectCreateAllowed)
+            {
+                that.createAllowed.push("projects");
+            }
+            if (options.agentCreateAllowed)
+            {
+                that.createAllowed.push("agents");
+            }
+
             that._create();
         },
 
@@ -132,7 +153,9 @@
             that.list.append(that.pulseLink);
 
             that.scopeSelectorItem = $('<li></li>');
-            that.scopeSelector = that.scopeSelectorItem.kendoZaScopeSelector({}).data("kendoZaScopeSelector");
+            that.scopeSelector = that.scopeSelectorItem.kendoZaScopeSelector({
+                isAdmin: that.options.isAdmin
+            }).data("kendoZaScopeSelector");
             that.scopeSelector.bind(SELECT, function(e)
             {
                 that._updateAddButton();
@@ -163,7 +186,7 @@
                 that.addButton = that.addButtonItem = null;
             }
 
-            if (TEMPLATED_SCOPES.indexOf(scope) >= 0)
+            if (that.createAllowed.indexOf(scope) >= 0)
             {
                 that.addButtonItem = $('<li><button class="k-primary"><span class="fa fa-plus-circle"></span> add new ' + scope.substring(0, scope.length - 1) + '</li>');
                 that.addButton = that.addButtonItem.find("button").kendoButton().data("kendoButton");

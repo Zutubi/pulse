@@ -39,25 +39,30 @@
 
         _updateDependents: function()
         {
-            var checked = !this.inputElement.prop("disabled") && this.getValue(),
+            var checked,
                 fields,
                 field,
                 i;
 
-            if (this._hasFields(this.options.structure.checkedFields) || this._hasFields(this.options.structure.uncheckedFields))
+            if (!this.options.parentForm.options.readOnly)
             {
-                this._updateFields(this.options.structure.checkedFields, checked);
-                this._updateFields(this.options.structure.uncheckedFields, !checked);
-            }
-            else
-            {
-                fields = this.options.parentForm.getFields();
-                for (i = 0; i < fields.length; i++)
+                checked = !this.inputElement.prop("disabled") && this.getValue();
+
+                if (this._hasFields(this.options.structure.checkedFields) || this._hasFields(this.options.structure.uncheckedFields))
                 {
-                    field = fields[i];
-                    if (field !== this && field.enable)
+                    this._updateFields(this.options.structure.checkedFields, checked);
+                    this._updateFields(this.options.structure.uncheckedFields, !checked);
+                }
+                else
+                {
+                    fields = this.options.parentForm.getFields();
+                    for (i = 0; i < fields.length; i++)
                     {
-                        field.enable(checked);
+                        field = fields[i];
+                        if (field !== this && field.enable)
+                        {
+                            field.enable(checked);
+                        }
                     }
                 }
             }

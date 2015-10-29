@@ -79,12 +79,13 @@
                     });
                 }
 
-                if (data.actions && (data.actions.length > 1 || data.actions[0].action !== "view"))
+                that.actions = that._filteredActions(data.actions);
+                if (that.actions.length > 0)
                 {
-                    data.actions.sort(_actionCompare);
+                    that.actions.sort(_actionCompare);
 
                     element = $('<div class="context-content"></div>');
-                    that._renderActions(element, data.actions, "action");
+                    that._renderActions(element, that.actions, "action");
                     panels.push({
                         text: "actions",
                         expanded: true,
@@ -114,6 +115,19 @@
             {
                 that.contentElement.html("");
             }
+        },
+
+        _filteredActions: function(actions)
+        {
+            if (!actions)
+            {
+                return [];
+            }
+
+            return jQuery.grep(actions, function(action)
+            {
+                return action.action !== "view" && action.action !== "write";
+            });
         },
 
         beginNavigation: function()
@@ -165,15 +179,12 @@
             for (i = 0; i < actions.length; i++)
             {
                 action = actions[i];
-                if (action.action !== "view")
-                {
-                    list.append(this.actionTemplate({
-                        baseUrl: window.baseUrl,
-                        id: prefix + "-" + action.action + "-" + i,
-                        icon: this._getIcon(action.action, Zutubi.admin.ACTION_ICONS),
-                        label: action.label
-                    }));
-                }
+                list.append(this.actionTemplate({
+                    baseUrl: window.baseUrl,
+                    id: prefix + "-" + action.action + "-" + i,
+                    icon: this._getIcon(action.action, Zutubi.admin.ACTION_ICONS),
+                    label: action.label
+                }));
             }
 
             element.append(list);
@@ -204,7 +215,7 @@
                 id = item.attr("id");
                 index = parseInt(id.substring(id.lastIndexOf("-") + 1), 10);
                 descendant = id.indexOf("descendant") === 0;
-                action = descendant ? this.data.descendantActions[index] : this.data.actions[index];
+                action = descendant ? this.data.descendantActions[index] : this.actions[index];
 
                 this.trigger(ACTION, {
                     path: this.path,
