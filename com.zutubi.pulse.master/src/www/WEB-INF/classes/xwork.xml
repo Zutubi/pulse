@@ -304,56 +304,6 @@
     </package>
 
     <package name="admin" namespace="/admin" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="hibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.HibernateStatisticsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">hibernate-statistics.vm</result>
-            <result name="toggled" type="redirect">actions?hibernateStatistics=execute&amp;_dc=${random}</result>
-        </action>
-
-        <action name="triggerBackup" class="com.zutubi.pulse.master.xwork.actions.admin.debug.TriggerBackupAction">
-            <interceptor-ref name="defaultReadOnlySideEffectStack"/>
-            <result name="success" type="redirect">/admin/settings/</result>
-        </action>
-
-        <action name="configCheck" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ConfigurationCheckAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="redirect">/admin/settings/</result>
-        </action>
-
-        <action name="addSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doAdd">
-            <interceptor-ref name="completeSideEffectStack"/>
-            <result name="success" type="redirect">/admin/settings/</result>
-        </action>
-        
-        <action name="removeSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doRemove">
-            <interceptor-ref name="completeSideEffectStack"/>
-            <result name="success" type="redirect">/admin/settings/</result>
-        </action>
-
-        <action name="installPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.InstallPluginAction">
-            <interceptor-ref name="completeSideEffectStack"/>
-            <result name="input" type="velocity">addplugin.vm</result>
-            <result name="error" type="velocity">addplugin.vm</result>
-            <result name="success" type="redirect">/admin/plugins/</result>
-            <result name="cancel" type="redirect">/admin/plugins/</result>
-        </action>
-
-        <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayScopeAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="config" type="velocity">scope.vm</result>
-            <result name="template" type="velocity">templated-scope.vm</result>
-            <!-- FIXME: replace this and related code in the action with an interceptor -->
-            <result name="guest" type="redirect">/browse/projects/</result>
-        </action>
-
-        <action name="plugins" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginsAction">
-            <result name="success" type="velocity">plugins.vm</result>
-        </action>
-    </package>
-
-    <package name="admina" namespace="/admina" extends="webwork-default-package">
         <default-interceptor-ref name="defaultReadOnlyStack"/>
 
         <action name="app" class="com.zutubi.pulse.master.xwork.actions.admin.AdminAppAction">
@@ -847,32 +797,6 @@
 
         <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayTemplateAction">
             <result name="success" type="velocity">template.vm</result>
-        </action>
-    </package>
-
-    <package name="adminAjax" namespace="/ajax/admin" extends="admin">
-        <default-interceptor-ref name="ajaxSideEffectStack"/>
-
-        <action name="allPlugins" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginsAction">
-            <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/ajax/all-plugins.vm</result>
-        </action>
-
-        <action name="viewPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.ViewPluginAction">
-            <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/ajax/view-plugin.vm</result>
-        </action>
-
-        <action name="uninstallPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.UnInstallPluginAction">
-            <result name="success" type="httpheader">200</result>
-        </action>
-
-        <action name="enablePlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.EnablePluginAction">
-            <result name="success" type="httpheader">200</result>
-        </action>
-
-        <action name="disablePlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.DisablePluginAction">
-            <result name="success" type="httpheader">200</result>
         </action>
     </package>
 

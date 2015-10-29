@@ -41,7 +41,7 @@ Zutubi.pulse.agent.AgentsPanel = Ext.extend(Zutubi.ActivePanel, {
                     xtype: 'xzinvalidlist',
                     id: this.id + '-invalidAgents',
                     blurb: 'The following agents are invalid, and cannot be used for building until rectified:',
-                    scopeUrl: window.baseUrl + '/admin/agents/'
+                    scopeUrl: window.baseUrl + '/admin/hierarchy/agents/'
                 }, {
                     xtype: 'xzagentsummarytable',
                     id: this.id + '-agents',

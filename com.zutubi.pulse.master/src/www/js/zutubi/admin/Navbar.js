@@ -36,7 +36,7 @@
             that.outer = $('<div class="k-split-container"></div>');
             that.mainButton = $('<a class="k-split-button">projects</a>');
             that.outer.append(that.mainButton);
-            that.arrowButton = $('<a class="k-split-button-arrow"><span class="k-icon k-i-arrow-s"></span></a>');
+            that.arrowButton = $('<a class="k-split-button-arrow"><span class="fa fa-caret-down"></span></a>');
             that.outer.append(that.arrowButton);
 
             that.element.append(that.outer);
@@ -54,7 +54,7 @@
             }
 
             that.popup = that.popupEl.kendoPopup({
-                anchor: that.element,
+                anchor: that.element.closest(".navitem"),
                 origin: "top left",
                 position: "bottom left",
                 animation: {
@@ -147,12 +147,12 @@
         {
             var that = this;
 
-            that.list = $('<ul class="navlist"></ul>');
+            that.list = $('<div class="navlist"></div>');
             that.element.append(that.list);
-            that.pulseLink = $('<li><a href="' + window.baseUrl + '/admina/">:: pulse admin ::</a></li>');
+            that.pulseLink = $('<span class="navitem"><a href="' + window.baseUrl + '/admin/">:: pulse admin ::</a></span>');
             that.list.append(that.pulseLink);
 
-            that.scopeSelectorItem = $('<li></li>');
+            that.scopeSelectorItem = $('<span class="navitem"></span>');
             that.scopeSelector = that.scopeSelectorItem.kendoZaScopeSelector({
                 isAdmin: that.options.isAdmin
             }).data("kendoZaScopeSelector");
@@ -164,6 +164,11 @@
 
             that.list.append(that.scopeSelectorItem);
 
+            that.addButtonItem = $('<span class="navitem"></span>');
+            that.list.append(that.addButtonItem);
+
+            that.exitLink = $('<span class="navitem navright"><a href="' + window.baseUrl + '/dashboard/"><span class="fa fa-dashboard"></span> dashboard</a></span>');
+            that.list.append(that.exitLink);
         },
 
         selectScope: function(scope)
@@ -180,18 +185,18 @@
             if (that.addButton)
             {
                 that.addButton.destroy();
-                kendo.destroy(that.addButtonItem);
-                that.addButtonItem.remove();
+                kendo.destroy(that.addButtonElement);
+                that.addButtonElement.remove();
 
-                that.addButton = that.addButtonItem = null;
+                that.addButton = that.addButtonElement = null;
             }
 
             if (that.createAllowed.indexOf(scope) >= 0)
             {
-                that.addButtonItem = $('<li><button class="k-primary"><span class="fa fa-plus-circle"></span> add new ' + scope.substring(0, scope.length - 1) + '</li>');
-                that.addButton = that.addButtonItem.find("button").kendoButton().data("kendoButton");
+                that.addButtonElement = $('<button class="k-primary"><span class="fa fa-plus-circle"></span> add new ' + scope.substring(0, scope.length - 1) + '</button>');
+                that.addButtonItem.append(that.addButtonElement);
+                that.addButton = that.addButtonElement.kendoButton().data("kendoButton");
                 that.addButton.bind("click", jQuery.proxy(that._addClicked, that));
-                that.list.append(that.addButtonItem);
             }
         },
 

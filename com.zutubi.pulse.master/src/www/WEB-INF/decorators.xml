@@ -3,7 +3,7 @@
 <decorators defaultdir="/decorators">
     <!-- No decorator -->
     <excludes>
-        <pattern>/admina/*</pattern>
+        <pattern>/admin/*</pattern>
         <pattern>/ajax/*</pattern>
         <pattern>/api/*</pattern>
         <pattern>/personal/*</pattern>

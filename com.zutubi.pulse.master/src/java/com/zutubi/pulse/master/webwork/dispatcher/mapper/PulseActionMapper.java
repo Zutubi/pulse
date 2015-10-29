@@ -73,25 +73,16 @@ public class PulseActionMapper implements ActionMapper
         String path;
         String fullPath = request.getServletPath();
         String pathInfo = request.getPathInfo();
-        if (pathInfo != null && fullPath.contains("/"))
-        {
-            // FIXME kendo this funky part can hopefully be dropped along with the multi-element
-            // namespaces defined in web.xml.
-            namespace = fullPath;
-            path = PathUtils.normalisePath(pathInfo);
-        }
-        else
-        {
-            if (pathInfo != null)
-            {
-                fullPath = PathUtils.getPath(fullPath, pathInfo);
-            }
 
-            fullPath = PathUtils.normalisePath(fullPath);
-
-            namespace = "/" + PathUtils.getElement(fullPath, 0);
-            path = PathUtils.getSuffix(fullPath, 1);
+        if (pathInfo != null)
+        {
+            fullPath = PathUtils.getPath(fullPath, pathInfo);
         }
+
+        fullPath = PathUtils.normalisePath(fullPath);
+
+        namespace = "/" + PathUtils.getElement(fullPath, 0);
+        path = PathUtils.getSuffix(fullPath, 1);
 
         // Is this a request for one of the setup paths?
         if (isSetupRequest(request) && webManager.isMainDeployed())
@@ -128,14 +119,9 @@ public class PulseActionMapper implements ActionMapper
         }
         else if(ADMIN_NAMESPACE.equals(namespace))
         {
-            mapping = getAdminMapping(path, request);
-        }
-        // FIXME kendo
-        else if("/admina".equals(namespace))
-        {
             Map<String, String> params = Maps.newHashMap();
             params.put("path", path);
-            mapping = new ActionMapping("app", "/admina", null, params);
+            mapping = new ActionMapping("app", ADMIN_NAMESPACE, null, params);
         }
 
         if(mapping == null)
@@ -387,56 +373,6 @@ public class PulseActionMapper implements ActionMapper
         }
 
         return new ActionMapping(actionResolver.getAction(), namespace, null, parameters);
-    }
-
-    private ActionMapping getAdminMapping(String path, HttpServletRequest request)
-    {
-        path = normalise(path);
-        if(path.startsWith("actions"))
-        {
-            // /admin/actions?action=method takes your to:
-            //   <action>!<method>
-            // for example:  http://..../admin/actions?hibernateStatistics=execute
-            if(StringUtils.stringSet(request.getQueryString()))
-            {
-                String query = stripRandomParam(request.getQueryString());
-                String[] pieces = query.split("=", 2);
-                return new ActionMapping(pieces[0], ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
-            }
-
-            return null;
-        }
-        else if(path.startsWith("plugins"))
-        {
-            // /admin/plugins?<action>=<method> takes you to:
-            //   <action>Plugin.action!<method>
-            if(StringUtils.stringSet(request.getQueryString()))
-            {
-                String[] pieces = request.getQueryString().split("=", 2);
-                return new ActionMapping(pieces[0] + "Plugin", ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
-            }
-
-            // /admin/plugins/<id> takes you to the plugins view, selecting a
-            // plugin with the given id if any is specified.
-            Map<String, String> params = new HashMap<>();
-            String[] pathElements = PathUtils.getPathElements(path);
-            if(pathElements.length > 1)
-            {
-                params.put("path", PathUtils.getPath(1, pathElements));
-            }
-
-            return new ActionMapping(pathElements[0], ADMIN_NAMESPACE, null, params);
-        }
-        else if (path.equals(""))
-        {
-            // if no scope is specified, go to the projects tab.
-            return getConfigMapping(ADMIN_NAMESPACE, "projects", request.getQueryString());
-        }
-        else
-        {
-            // All other admin paths are config views.
-            return getConfigMapping(ADMIN_NAMESPACE, path, request.getQueryString());
-        }
     }
 
     public String getUriFromActionMapping(ActionMapping mapping)

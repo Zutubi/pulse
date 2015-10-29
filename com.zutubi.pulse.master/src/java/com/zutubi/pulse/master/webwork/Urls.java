@@ -562,9 +562,19 @@ public class Urls
         return base() + "admin/";
     }
 
+    public String adminConfig()
+    {
+        return admin() + "config/";
+    }
+
+    public String adminHierarchy()
+    {
+        return admin() + "hierarchy/";
+    }
+
     public String adminProjects()
     {
-        return admin() + "projects/";
+        return adminHierarchy() + "projects/";
     }
 
     public String adminProject(Object project)
@@ -574,7 +584,7 @@ public class Urls
 
     public String adminAgents()
     {
-        return admin() + "agents/";
+        return adminHierarchy() + "agents/";
     }
 
     public String adminAgent(Object agent)
@@ -584,12 +594,12 @@ public class Urls
 
     public String adminSettings()
     {
-        return admin() + "settings/";
+        return adminConfig() + "settings/";
     }
 
     public String adminGroups()
     {
-        return admin() + "groups/";
+        return adminConfig() + "groups/";
     }
 
     public String adminGroup(String group)
@@ -599,7 +609,7 @@ public class Urls
 
     public String adminUsers()
     {
-        return admin() + "users/";
+        return adminConfig() + "users/";
     }
 
     public String adminUser(String user)

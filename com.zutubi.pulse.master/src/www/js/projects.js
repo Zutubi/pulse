@@ -190,7 +190,7 @@ Zutubi.ConcreteProject.prototype = {
                 image: 'script.gif'
             }, {
                 id: 'configuration',
-                url: 'admin/projects/' + encodedName + '/',
+                url: 'admin/hierarchy/projects/' + encodedName + '/',
                 image: 'pencil.gif'
             }];
 

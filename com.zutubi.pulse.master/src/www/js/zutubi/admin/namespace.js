@@ -75,7 +75,7 @@ if (window.Zutubi.admin === undefined)
         function _createRouter()
         {
             var router = new kendo.Router({
-                root: baseUrl + "/admina",
+                root: baseUrl + "/admin",
                 pushState: true,
                 routeMissing: function(e)
                 {

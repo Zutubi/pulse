@@ -13,24 +13,33 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 39px;
+    height: 34px;
     background-color: #7ea700;
     border-bottom: solid 1px #eee;
 }
 
-ul.navlist {
-    height: 30px;
-    padding: 4px;
+.navlist {
+    height: 34px;
+    padding: 0 4px;
+    display: flex;
+    align-items: baseline;
 }
 
-.navlist li {
-    display: inline-block;
-    height: 30px;
-    line-height: 30px;
+.navitem {
+    line-height: 34px;
     margin-right: 8px;
 }
 
-.navlist a {
+.navitem .k-button {
+    line-height: 30px;
+    padding: 0 4px;
+}
+
+.navright {
+    margin-left: auto;
+}
+
+.navitem a {
     text-decoration: none;
     font-weight: bold;
     color: #ffffff;
@@ -40,20 +49,34 @@ ul.navlist {
     cursor: pointer;
 }
 
+.k-split-button-arrow {
+    cursor: pointer;
+}
+
+.navitem .k-split-button-arrow .fa {
+    vertical-align: middle;
+}
+
+.selector-popup {
+    margin-top: 4px;
+    border-top: none;
+}
+
 .selector-popup li {
-    padding: 4px 12px;
+    padding: 0 12px;
     cursor: pointer;
 }
 
 .selector-popup li:hover {
-    background-color: #eee;
+    color: #fff;
+    background-color: #8ebc00;
 }
 
 /* Main content area (between nav and footer */
 
 #content {
     position: fixed;
-    top: 40px;
+    top: 34px;
     bottom: 20px;
     left: 0;
     right: 0;

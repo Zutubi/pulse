@@ -86,6 +86,11 @@ Nav bar
     list-style: none;
 }
 
+#nav li.admin-tab
+{
+    float: right;
+}
+
 #nav a
 {
     float: left;
@@ -93,6 +98,13 @@ Nav bar
     text-decoration: none;
     border-bottom: none;
     color: #fff;
+}
+
+#nav .admin-tab a
+{
+    float: right;
+    font: bold 16px Times;
+    padding: 5px 8px;
 }
 
 #nav a:hover, #nav a.active
@@ -103,6 +115,11 @@ Nav bar
 #nav a.active
 {
     font-weight: bold;
+}
+
+#nav .admin-tab a:hover, #nav .admin-tab a.active
+{
+    background: #7ea700;
 }
 
 #tabbar

@@ -162,7 +162,7 @@
             links.splice(0, 0, {
                 name: "config",
                 label: "configuration",
-                url: "admina/config/" + this.scope + "/" + this.name
+                url: "admin/config/" + this.scope + "/" + this.name
             });
 
             // Deliberately pick out the subset of data we want to show in the scope view.

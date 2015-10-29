@@ -52,7 +52,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             
             result.push({
                 id: 'configuration',
-                url: 'admin/agents/' + encodedName + '/',
+                url: 'admin/hierarchy/agents/' + encodedName + '/',
                 image: 'pencil.gif'
             });
             

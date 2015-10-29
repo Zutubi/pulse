@@ -1,7 +1,0 @@
-<html>
-<body>
-
-    #pwizard("path=$action.path" "namespace=admin")
-
-</body>
-</html>

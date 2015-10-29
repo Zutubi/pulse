@@ -214,30 +214,6 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    <!-- These mappings where the namespace part has multiple paths are hopefully a legacy we
-         can soon remove.  They are included so the PulseActionMapper can sensibly find the
-         namespace portion (by default it just uses the first path element).  As they are all part
-         of the admin UI I hope they will die as part of FIXME kendo -->
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/config/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/help/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/action/*.action</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/template/*</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>display</servlet-name>
         <url-pattern>/display/*</url-pattern>
