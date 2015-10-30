@@ -39,7 +39,10 @@
                 propertyTypes: type.type.simpleProperties
             }; });
 
-            this.valuesByType = jQuery.map(config.types, function() { return {}; });
+            this.valuesByType = jQuery.map(config.types, function(type)
+            {
+                return type.type.simplePropertyDefaults || {};
+            });
         }
         else
         {
@@ -70,7 +73,7 @@
         options: {
             name: "ZaWizard",
             template: '<ul class="k-wizard-step-index"></ul>' +
-                      '<div class="k-wizard-type-select"><input></div>' +
+                      '<div class="k-wizard-type-select">Select type: <input></div>' +
                       '<div class="k-wizard-form"></div>',
             stepIndexTemplate: '<li>#: label #</li>'
         },
@@ -205,6 +208,7 @@
             if (types.length > 1)
             {
                 labels = jQuery.map(types, function(type) { return type.label; });
+                labels.sort();
                 dropDown.setDataSource(labels);
                 this.typeSelectWrapper.show();
             }

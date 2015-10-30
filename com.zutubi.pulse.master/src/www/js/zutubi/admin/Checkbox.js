@@ -41,6 +41,15 @@
 
         bindValue: function(value)
         {
+            // FIXME kendo this is hackish
+            if (value === "true")
+            {
+                value = true;
+            }
+            else if (value === "false")
+            {
+                value = false;
+            }
             this.inputElement.prop("checked", value);
         },
 

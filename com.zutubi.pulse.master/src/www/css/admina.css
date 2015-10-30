@@ -350,7 +350,7 @@ ul.validation-errors {
 
 /* Wizards */
 
-.k-wizard-step-index {
+.k-wizard-step-index, .k-wizard-type-select {
     margin-bottom: 0.6em;
     border-bottom: solid 1px #dbdbdb;
 }
@@ -363,6 +363,10 @@ ul.validation-errors {
 
 .k-wizard-step-index li.active {
     border-bottom: solid 3px #8ebc00;
+}
+
+.k-wizard-type-select  {
+    padding-bottom: 0.6em;
 }
 
 /* Drag and drop in collection tables */

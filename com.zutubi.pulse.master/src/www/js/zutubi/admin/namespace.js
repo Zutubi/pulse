@@ -425,6 +425,11 @@ if (window.Zutubi.admin === undefined)
                 return data.kind === "composite" &&
                     data.nested && data.nested.length === 1 && data.nested[0].kind === "collection" &&
                     (!data.type.simpleProperties || data.type.simpleProperties.length < 10);
+            },
+
+            labelCompare: function(a1, a2)
+            {
+                return a1.label.localeCompare(a2.label);
             }
         };
     }(jQuery));

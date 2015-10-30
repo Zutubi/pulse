@@ -86,7 +86,6 @@ public class WizardController
 
     private WizardModel buildTemplateModel(String scope, String parentName) throws TypeException
     {
-
         TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
         CompositeType itemType = collectionType.getTargetType();
         // FIXME kendo we pass true but don't yet know if this is a template.

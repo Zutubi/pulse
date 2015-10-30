@@ -2,10 +2,11 @@ package com.zutubi.pulse.master.rest.model;
 
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.tove.type.record.MutableRecord;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Model wrapping composite types.
@@ -13,6 +14,7 @@ import java.util.List;
 public class CompositeTypeModel extends TypeModel
 {
     private List<PropertyModel> simpleProperties;
+    private Map<String, Object> simplePropertyDefaults;
     private List<PropertyModel> nestedProperties;
     private List<CompositeTypeModel> subTypes;
     private FormModel form;
@@ -37,6 +39,27 @@ public class CompositeTypeModel extends TypeModel
             }
         }
 
+        try
+        {
+            MutableRecord defaults = type.unstantiate(type.getDefaultInstance(), null);
+            if (defaults != null)
+            {
+                Set<String> simpleKeySet = defaults.simpleKeySet();
+                if (simpleKeySet.size() > 0)
+                {
+                    simplePropertyDefaults = new HashMap<>();
+                    for (String key: simpleKeySet)
+                    {
+                        simplePropertyDefaults.put(key, defaults.get(key));
+                    }
+                }
+            }
+        }
+        catch (TypeException e)
+        {
+            // Defaults are not essential.
+        }
+
         List<String> nestedPropertyNames = type.getNestedPropertyNames();
         if (nestedPropertyNames.size() > 0)
         {
@@ -52,6 +75,11 @@ public class CompositeTypeModel extends TypeModel
     public List<PropertyModel> getSimpleProperties()
     {
         return simpleProperties;
+    }
+
+    public Map<String, Object> getSimplePropertyDefaults()
+    {
+        return simplePropertyDefaults;
     }
 
     public List<PropertyModel> getNestedProperties()
