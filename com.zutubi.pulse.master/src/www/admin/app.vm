@@ -7,6 +7,7 @@
     <link href="${base}/css/kendo/kendo.metro.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
     <link href="${base}/css/admina.css" rel="stylesheet"/>
+    <link href="${base}/css/config.css" rel="stylesheet"/>
 
     <script>
         window.baseUrl = "${base}";

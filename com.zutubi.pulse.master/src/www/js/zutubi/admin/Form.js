@@ -55,7 +55,7 @@
         options: {
             name: "ZaForm",
             formName: "form",
-            template: '<form name="#: id #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
+            template: '<form name="#: id #" id="#: id #"><table class="k-form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',

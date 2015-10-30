@@ -1,0 +1,30 @@
+#helpTag("Dashboard+Section")
+#authorisationTags($principle)
+<content tag="selectedTab">preferences</content>
+<content tag="header.javascript">
+    zutubi/admin/package.js
+</content>
+<html>
+<head>
+    <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.metro.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
+    <link href="${base}/css/config.css" rel="stylesheet"/>
+
+    <title>#wwtext("name=my.builds")</title>
+</head>
+<body>
+    #dashboardTabs("preferences")
+
+    <div id="config-view" style="position: fixed; top: 93px; bottom: 20px; left: 0; right: 0; overflow: auto;"></div>
+
+    <script>
+        window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
+        window.configPanel.setPaths("users/#jss($principle.login)/preferences", "");
+//        app.configPanel.bind("pathselect", function(e)
+//        {
+//            app.router.navigate("/config/" + e.path, true);
+//        });
+    </script>
+</body>
+</html>

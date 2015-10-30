@@ -270,6 +270,12 @@
             <result name="success" type="velocity">/my-builds.vm</result>
             <result name="guest" type="redirect">/browse.action</result>
         </action>
+
+        <action name="preferences" class="com.zutubi.pulse.master.xwork.actions.user.PreferencesAction">
+            <interceptor-ref name="ajaxReadOnlyStack"/>
+            <result name="success" type="velocity">/preferences.vm</result>
+            <result name="guest" type="redirect">/browse.action</result>
+        </action>
     </package>
 
     <package name="personal" namespace="/personal" extends="webwork-default-package">

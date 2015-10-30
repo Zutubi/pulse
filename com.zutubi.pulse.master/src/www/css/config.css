@@ -1,0 +1,331 @@
+#outer-split {
+    border-width: 0;
+}
+
+.pane-content, .fill-parent {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+/* Hierarchy Selector */
+
+.k-hierarchy-selector {
+    padding: 0.5em;
+}
+
+.k-hierarchy-selector input {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 80%;
+    height: 1.6em;
+    margin-bottom: 0.5em;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+.k-hierarchy-selector input::-ms-clear {
+    height: 0;
+    width: 0;
+}
+
+.k-hierarchy-selector .k-treeview {
+    overflow: visible;
+}
+
+.k-hierarchy-selector-clear {
+    position:relative;
+    z-index: 2;
+    float: right;
+    margin-top: -33px;
+    margin-right: 6px;
+    color: #444;
+}
+
+.k-hierarchy-selector-clear:hover {
+    color: #888;
+}
+
+.k-hierarchy-selector-clear:active {
+    color: #aaa;
+}
+
+/* Center pane */
+
+#center-pane-content h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #888;
+}
+
+/* Overview panels */
+
+.k-overview-panel {
+    padding: 0.4em;
+}
+
+.k-overview-panel .k-tabstrip {
+    border: none;
+}
+
+/* Composites */
+
+.k-composite-panel {
+    padding: 8px 16px;
+}
+
+.k-composite-panel h1 {
+    line-height: 36px;
+    margin-bottom: 8px;
+}
+
+.k-check-wrapper, .k-collapsed-collection-wrapper {
+    border-top: solid 1px #ddd;
+    margin-top: 16px;
+}
+
+.k-check-wrapper p {
+    margin: 0.5em 0;
+}
+
+.k-check-wrapper em {
+    font-style: italic;
+}
+
+.k-up-wrapper {
+    margin: 1em 0;
+}
+
+.k-up-wrapper a {
+    cursor: pointer;
+    padding: 0.2em;
+}
+
+/* Collections */
+
+/* FIXME kendo some duplication with above */
+
+.k-collection-panel {
+    padding: 8px 16px;
+}
+
+.k-collection-panel h1 {
+    line-height: 36px;
+    margin-bottom: 8px;
+}
+
+.k-collection-add {
+    float: right;
+}
+
+.k-collection-table td {
+    /* Allows a menu opened from a grid cell to overflow out of the cell. */
+    overflow: visible;
+    padding: 0.4em;
+}
+
+.k-collection-table .k-menu  {
+    display: inline-block;
+    border-right-width: 0;
+}
+
+/* This makes the actions menu open with its right side aligned with the right side of the ... hover target. */
+.k-collection-table .k-menu .k-animation-container {
+    left: auto !important;
+    right: -4px;
+}
+
+.k-collection-hidden {
+    margin-top: 16px;
+}
+
+/* Type select panel */
+
+.k-type-select-panel {
+    padding: 8px 16px;
+}
+
+#type-select-content {
+    margin: 1em 0 ;
+}
+
+.configured-descendants p {
+    margin: 1em 0;
+}
+
+.configured-descendants ul {
+    margin-left: 4ch;
+    list-style-type: circle;
+}
+
+.configured-descendants li {
+    margin: 0.4em 0;
+}
+
+.configured-descendants a {
+    cursor: pointer;
+    padding: 0.2em;
+}
+
+.configured-descendants a:hover {
+    color: #fff;
+    background-color: #8ebc00;
+}
+
+/* Forms */
+
+table.k-form {
+    width: 100%;
+    max-width: 800px;
+}
+
+.k-form th, .k-form td {
+    padding: 0.33em;
+}
+
+.k-form th {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+    vertical-align: top;
+    padding-top: 0.7em;
+    font-weight: normal;
+}
+
+.k-form td.submit {
+    text-align: center;
+}
+
+.k-form td.submit button {
+    margin: 4px;
+}
+
+input[type=checkbox].k-input {
+    height: 2em;
+    line-height: 2em;
+}
+
+input.k-input[readonly] {
+    background-color: #eee;
+}
+
+.k-stringlist input {
+    display: block;
+}
+
+.k-stringlist button {
+    position: absolute;
+    bottom: 0.15em;
+    right: 0.15em;
+    padding: 0.2em;
+    line-height: 1.2em;
+}
+
+.k-multiselect-wrap .k-handle {
+    position: relative;
+    background: none;
+    cursor: move;
+    margin-right: 1ch;
+}
+
+ul.validation-errors {
+    color: #bb2222;
+    list-style-type: disc;
+    margin-left: 4ch;
+}
+
+.validation-errors li {
+    margin: 0.4em 0;
+}
+
+/* Wizards */
+
+.k-wizard-step-index, .k-wizard-type-select {
+    margin-bottom: 0.6em;
+    border-bottom: solid 1px #dbdbdb;
+}
+
+.k-wizard-step-index li {
+    display: inline-block;
+    padding-bottom: 0.4em;
+    margin-right: 0.6em;
+}
+
+.k-wizard-step-index li.active {
+    border-bottom: solid 3px #8ebc00;
+}
+
+.k-wizard-type-select  {
+    padding-bottom: 0.6em;
+}
+
+/* Drag and drop in collection tables */
+
+.k-hint {
+    opacity: 0.6;
+}
+
+.k-placeholder {
+    opacity: 0.4;
+}
+
+.k-grid table[data-role=sortable] tbody tr {
+    cursor: move;
+}
+
+/* Buttons */
+
+.k-button .fa {
+    line-height: 14px;
+}
+
+/* Workflow Window */
+
+.k-workflow-content {
+    padding: 0.4em;
+}
+
+.k-workflow-actions {
+    text-align: center;
+}
+
+.k-workflow-actions .k-button {
+    margin: 0.4em;
+}
+
+/* Delete Window */
+
+table.cleanup-tasks {
+    margin: 12px;
+}
+
+table.cleanup-tasks th, .cleanup-tasks td {
+    padding: 0.4em;
+    border: solid 1px #dbdbdb;
+}
+
+table.cleanup-tasks th {
+    font-weight: bold;
+}
+
+/* Context panel */
+
+.context-content {
+    padding: 0.4em 1em;
+}
+
+.config-links li, .config-actions li {
+    padding: 0.4em 0;
+}
+
+.config-links a, .config-actions a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.config-links .fa, .config-actions .fa {
+    width: 20px;
+}
+
+.config-actions li:hover {
+    cursor: pointer;
+}

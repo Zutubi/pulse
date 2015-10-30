@@ -20,10 +20,7 @@ import com.zutubi.util.WebUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  */
@@ -119,9 +116,7 @@ public class PulseActionMapper implements ActionMapper
         }
         else if(ADMIN_NAMESPACE.equals(namespace))
         {
-            Map<String, String> params = Maps.newHashMap();
-            params.put("path", path);
-            mapping = new ActionMapping("app", ADMIN_NAMESPACE, null, params);
+            mapping = getAdminMapping(path);
         }
 
         if(mapping == null)
@@ -271,11 +266,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // /dashboard/preferences/<path> is a config view rooted at
             // users/<user>/preferences
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("prefixPath", "users/${principle}");
-            parameters.put("section", "dashboard");
-            parameters.put("tab", PATH_PREFERENCES);
-            return getConfigMapping(ADMIN_NAMESPACE, WebUtils.uriPathDecode(encodedPath), request.getQueryString(), parameters);
+            return new ActionMapping(encodedPath, DASHBOARD_NAMESPACE, null, Collections.emptyMap());
         }
         else if(encodedPath.startsWith(PATH_MY_CHANGES))
         {
@@ -338,6 +329,14 @@ public class PulseActionMapper implements ActionMapper
     private ActionMapping getAgentsMapping(String encodedPath)
     {
         return getResolverMapping(encodedPath, AGENTS_NAMESPACE, agentsActionResolver);
+    }
+
+    private ActionMapping getAdminMapping(String path)
+    {
+        ActionMapping mapping;Map<String, String> params = Maps.newHashMap();
+        params.put("path", path);
+        mapping = new ActionMapping("app", ADMIN_NAMESPACE, null, params);
+        return mapping;
     }
 
     private ActionMapping getResolverMapping(String encodedPath, String namespace, ActionResolver resolver)

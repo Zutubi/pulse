@@ -21,7 +21,7 @@
                 '<div id="login" style="display: none">' +
                     '<div id="login-error"></div>' +
                     '<form id="login-form">' +
-                        '<table class="form">' +
+                        '<table class="k-form">' +
                             '<tr>' +
                                 '<th><label for="username">login:</label></th>' +
                                 '<td><input class="k-textbox" type="text" name="username" required/></td>' +
