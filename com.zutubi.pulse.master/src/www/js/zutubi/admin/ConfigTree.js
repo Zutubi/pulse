@@ -5,6 +5,7 @@
     var ui = kendo.ui,
         TreeView = ui.TreeView,
         PATHSELECT = "pathselect",
+        READY = "ready",
 
     PathInfo = function(found, item, path, embedded)
     {
@@ -69,7 +70,8 @@
             // FIXME kendo: to subscribe to our own select event we need to have this here, is there a better way?
             "dataBound",
             "select",
-            PATHSELECT
+            PATHSELECT,
+            READY
         ],
 
         options: {
@@ -84,6 +86,7 @@
                 {
                     kendo.ui.progress(this.element, false);
                     this.bound = true;
+                    this.trigger(READY);
                     this._selectConfigNode();
                 }
             },
@@ -247,7 +250,7 @@
                     return new PathInfo(false, dataItem, path, false);
                 }
 
-                children = dataItem.children.data();
+                children = typeof dataItem.children.data === "function" ? dataItem.children.data() : [];
                 for (j = 0; j < children.length; j++)
                 {
                     if (children[j].key === key)
@@ -275,7 +278,7 @@
                 info = that._infoForConfigPath(that.configPath);
 
             that.expand(root);
-            if (info.found)
+            if (info.item)
             {
                 that.expandTo(info.item);
                 that.select(that.findByUid(info.item.uid));
@@ -284,6 +287,11 @@
             {
                 that.select(root);
             }
+        },
+
+        getConfigPath: function()
+        {
+            return this.configPath;
         },
 
         selectConfig: function(configPath)

@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: ./HierarchySelector.js
 
 (function($)
 {
@@ -6,9 +7,10 @@
         Widget = ui.Widget,
         SELECT = "select",
         ADD = "add",
-        SCOPE_SELECTED = "scope-selected";
+        SCOPE_SELECTED = "scope-selected",
+        ITEM_SELECTED = "item-selected";
 
-    Zutubi.admin.ScopeSelector = Widget.extend({
+    Zutubi.admin.Crumb = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -19,85 +21,34 @@
         },
 
         options: {
-            name: "ZaScopeSelector"
+            name: "ZaCrumb"
         },
-
-        events: [
-            SELECT
-        ],
 
         _create: function()
         {
-            var that = this,
-                i;
-
-            that.selected = "projects";
+            var that = this;
 
             that.outer = $('<div class="k-split-container"></div>');
-            that.mainButton = $('<a class="k-split-button">projects</a>');
+            that.mainButton = $('<a class="k-split-button"></a>');
             that.outer.append(that.mainButton);
             that.arrowButton = $('<a class="k-split-button-arrow"><span class="fa fa-caret-down"></span></a>');
             that.outer.append(that.arrowButton);
 
             that.element.append(that.outer);
 
-            that.scopes = ["projects", "agents"];
-            if (that.options.isAdmin)
-            {
-                that.scopes.push("settings", "users", "groups", "plugins");
-            }
+            that.popup = that.createPopup();
 
-            that.popupEl = $("<ul class='selector-popup'></ul>");
-            for (i = 0; i < that.scopes.length; i++)
-            {
-                that.popupEl.append("<li>" + that.scopes[i] + "</li>");
-            }
-
-            that.popup = that.popupEl.kendoPopup({
-                anchor: that.element.closest(".navitem"),
-                origin: "top left",
-                position: "bottom left",
-                animation: {
-                    open: {
-                        effects: "slideIn:up"
-                    }
-                }
-            }).data("kendoPopup");
-
-            that.popupEl.on("click", jQuery.proxy(that._popupClicked, that));
-            that.mainButton.on("click", jQuery.proxy(that._mainClicked, that));
-            that.arrowButton.on("click", jQuery.proxy(that._arrowClicked, that));
+            that.mainButton.on("click", jQuery.proxy(that._clicked, that));
+            that.arrowButton.on("click", jQuery.proxy(that._clicked, that));
         },
 
-        selectScope: function(scope)
+        select: function(text)
         {
-            this.selected = scope;
-            this.mainButton.text(scope);
+            this.selected = text;
+            this.mainButton.text(text);
         },
 
-        _popupClicked: function(e)
-        {
-            var that = this,
-                target = kendo.eventTarget(e),
-                item = $(target).closest("li");
-
-            e.preventDefault();
-
-            if (item)
-            {
-                that.popup.close();
-                that.selectScope(item.text());
-                that.trigger(SELECT, {scope: that.selected});
-            }
-        },
-
-        _mainClicked: function(e)
-        {
-            e.preventDefault();
-            this.trigger(SELECT, {scope: this.selected});
-        },
-
-        _arrowClicked: function(e)
+        _clicked: function(e)
         {
             var that = this;
 
@@ -111,6 +62,126 @@
             {
                 that.popup.open();
             }
+        }
+    });
+
+    Zutubi.admin.ScopeCrumb = Zutubi.admin.Crumb.extend({
+        init: function(element, options)
+        {
+            Zutubi.admin.Crumb.fn.init.call(this, element, options);
+
+            this.select("projects");
+        },
+
+        options: {
+            name: "ZaScopeCrumb"
+        },
+
+        events: [
+            SELECT
+        ],
+
+        createPopup: function()
+        {
+            var that = this,
+                i,
+                popup;
+
+            that.scopes = ["projects", "agents"];
+            if (that.options.isAdmin)
+            {
+                that.scopes.push("settings", "users", "groups", "plugins");
+            }
+
+            that.popupEl = $("<ul class='selector-popup'></ul>");
+            for (i = 0; i < that.scopes.length; i++)
+            {
+                that.popupEl.append("<li>" + that.scopes[i] + "</li>");
+            }
+
+            popup = that.popupEl.kendoPopup({
+                anchor: that.element.closest(".navitem"),
+                origin: "top left",
+                position: "bottom left",
+                animation: {
+                    open: {
+                        effects: "slideIn:up"
+                    }
+                }
+            }).data("kendoPopup");
+
+            that.popupEl.on("click", jQuery.proxy(that._popupClicked, that));
+            return popup;
+        },
+
+        _popupClicked: function(e)
+        {
+            var that = this,
+                target = kendo.eventTarget(e),
+                item = $(target).closest("li");
+
+            e.preventDefault();
+
+            if (item)
+            {
+                that.popup.close();
+                that.select(item.text());
+                that.trigger(SELECT, {scope: that.selected});
+            }
+        }
+    });
+
+    Zutubi.admin.HierarchyCrumb = Zutubi.admin.Crumb.extend({
+        init: function(element, options)
+        {
+            Zutubi.admin.Crumb.fn.init.call(this, element, options);
+        },
+
+        options: {
+            name: "ZaHierarchyCrumb"
+        },
+
+        events: [
+            SELECT
+        ],
+
+        createPopup: function()
+        {
+            var that = this,
+                popup;
+
+            that.popupEl = $("<div class='hierarchy-popup'></div>");
+            that.selector = that.popupEl.kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.selector.bind("nodeselect", function(e)
+            {
+                that.select(e.name);
+                that.popup.close();
+                that.trigger(SELECT, {name: e.name});
+            });
+
+            popup = that.popupEl.kendoPopup({
+                anchor: that.element.closest(".navitem"),
+                origin: "top left",
+                position: "bottom left",
+                animation: {
+                    open: {
+                        effects: "slideIn:up"
+                    }
+                }
+            }).data("kendoPopup");
+
+            return popup;
+        },
+
+        select: function(text)
+        {
+            Zutubi.admin.Crumb.fn.select.call(this, text);
+            this.selector.selectItem(text);
+        },
+
+        setScope: function(scope)
+        {
+            this.selector.setScope(scope);
         }
     });
 
@@ -135,52 +206,78 @@
         },
 
         options: {
-            name: "ZaNavbar"
+            name: "ZaNavbar",
+            itemTemplate: '<span class="navitem #: cls #">#= content #</span>'
         },
 
         events: [
             ADD,
-            SCOPE_SELECTED
+            SCOPE_SELECTED,
+            ITEM_SELECTED
         ],
 
         _create: function()
         {
             var that = this;
 
+            that.itemTemplate = kendo.template(that.options.itemTemplate);
+
             that.list = $('<div class="navlist"></div>');
             that.element.append(that.list);
-            that.pulseLink = $('<span class="navitem"><a href="' + window.baseUrl + '/admin/">:: pulse admin ::</a></span>');
-            that.list.append(that.pulseLink);
 
-            that.scopeSelectorItem = $('<span class="navitem"></span>');
-            that.scopeSelector = that.scopeSelectorItem.kendoZaScopeSelector({
+            that.list.append(that.itemTemplate({cls: '', content: '<a href="' + window.baseUrl + '/admin/">:: pulse admin ::</a>'}));
+
+            that.scopeCrumbItem = $(that.itemTemplate({cls: '', content: ''}));
+            that.scopeCrumb = that.scopeCrumbItem.kendoZaScopeCrumb({
                 isAdmin: that.options.isAdmin
-            }).data("kendoZaScopeSelector");
-            that.scopeSelector.bind(SELECT, function(e)
+            }).data("kendoZaScopeCrumb");
+            that.scopeCrumb.bind(SELECT, function(e)
             {
                 that._updateAddButton();
                 that.trigger(SCOPE_SELECTED, {scope: e.scope});
             });
 
-            that.list.append(that.scopeSelectorItem);
+            that.list.append(that.scopeCrumbItem);
 
-            that.addButtonItem = $('<span class="navitem"></span>');
+            that.hierarchyCrumbItem = $(that.itemTemplate({cls: '', content: ''}));
+            that.hierarchyCrumb = that.hierarchyCrumbItem.kendoZaHierarchyCrumb({}).data("kendoZaHierarchyCrumb");
+            that.hierarchyCrumb.bind(SELECT, function(e)
+            {
+                that.trigger(ITEM_SELECTED, {name: e.name});
+            });
+
+            that.list.append(that.hierarchyCrumbItem);
+
+            that.addButtonItem = $(that.itemTemplate({cls: '', content: ''}));
             that.list.append(that.addButtonItem);
 
-            that.exitLink = $('<span class="navitem navright"><a href="' + window.baseUrl + '/dashboard/"><span class="fa fa-dashboard"></span> dashboard</a></span>');
-            that.list.append(that.exitLink);
+            that.list.append(that.itemTemplate({
+                cls: 'navright',
+                content: '<a href="' + window.baseUrl + '/dashboard/"><span class="fa fa-dashboard"></span> dashboard</a>'
+            }));
         },
 
-        selectScope: function(scope)
+        selectScope: function(scope, hierarchyPath)
         {
-            this.scopeSelector.selectScope(scope);
+            this.scopeCrumb.select(scope);
+            if (typeof hierarchyPath === "undefined")
+            {
+                this.hierarchyCrumbItem.hide();
+            }
+            else
+            {
+                this.hierarchyCrumb.setScope(scope);
+                this.hierarchyCrumb.select(Zutubi.admin.subPath(hierarchyPath, 0, 1));
+                this.hierarchyCrumbItem.show();
+            }
+
             this._updateAddButton(scope);
         },
 
         _updateAddButton: function()
         {
             var that = this,
-                scope = that.scopeSelector.selected;
+                scope = that.scopeCrumb.selected;
 
             if (that.addButton)
             {
@@ -202,10 +299,12 @@
 
         _addClicked: function()
         {
-            this.trigger(ADD, {scope: this.scopeSelector.selected});
+            this.trigger(ADD, {scope: this.scopeCrumb.selected});
         }
     });
 
-    ui.plugin(Zutubi.admin.ScopeSelector);
+    ui.plugin(Zutubi.admin.Crumb);
+    ui.plugin(Zutubi.admin.ScopeCrumb);
+    ui.plugin(Zutubi.admin.HierarchyCrumb);
     ui.plugin(Zutubi.admin.Navbar);
 }(jQuery));

@@ -86,7 +86,7 @@ if (window.Zutubi.admin === undefined)
 
             router.route("/", function()
             {
-                router.navigate("/hierarchy/projects/");
+                router.navigate("/hierarchy/projects");
             });
 
             router.route("/hierarchy/projects(/)(:name)(/)", function(name)
@@ -95,10 +95,11 @@ if (window.Zutubi.admin === undefined)
                 _showScope("projects", name);
             });
 
-            router.route("/config/projects/*path", function(path)
+            router.route("/config/projects(/)*path", function(path)
             {
-                app.navbar.selectScope("projects");
-                _showConfig("projects/" + Zutubi.admin.normalisedPath(path), true);
+                var normalisedPath = Zutubi.admin.normalisedPath(path);
+                app.navbar.selectScope("projects", normalisedPath);
+                _showConfig("projects/" + normalisedPath, true);
             });
 
             router.route("/hierarchy/agents(/)(:name)(/)", function(name)
@@ -107,12 +108,13 @@ if (window.Zutubi.admin === undefined)
                 _showScope("agents", name);
             });
 
-            router.route("/config/agents/*path", function(path)
+            router.route("/config/agents(/)*path", function(path)
             {
-                app.navbar.selectScope("agents");
+                var normalisedPath = Zutubi.admin.normalisedPath(path);
+                app.navbar.selectScope("agents", normalisedPath);
                 if (path)
                 {
-                    _showConfig("agents/" + Zutubi.admin.normalisedPath(path), true);
+                    _showConfig("agents/" + normalisedPath(path), true);
                 }
             });
 
@@ -182,16 +184,27 @@ if (window.Zutubi.admin === undefined)
             {
                 if (e.scope === "projects" || e.scope === "agents")
                 {
-                    app.router.navigate("/hierarchy/" + e.scope + "/");
+                    app.router.navigate("/hierarchy/" + e.scope);
                 }
                 else if (e.scope === "plugins")
                 {
-                    app.router.navigate("/plugins/");
+                    app.router.navigate("/plugins");
                 }
                 else
                 {
-                    app.router.navigate("/config/" + e.scope + "/");
+                    app.router.navigate("/config/" + e.scope);
                 }
+            });
+
+            navbar.bind("item-selected", function(e)
+            {
+                var rootPath = app.configPanel.getRootPath(),
+                    configPath = app.configPanel.getConfigPath();
+
+                rootPath = Zutubi.admin.subPath(rootPath, 0, 1) + "/" + e.name;
+                app.router.navigate("/config/" + rootPath + "/" + configPath, true);
+                // Lazy setPaths will take care of choosing the longest valid config path.
+                app.configPanel.setPaths(rootPath, configPath, true);
             });
 
             navbar.bind("add", function(e)

@@ -75,17 +75,40 @@
             return this.configTree.getRootPath();
         },
 
-        setPaths: function(rootPath, configPath)
+        getConfigPath: function()
         {
-            var path = rootPath;
+            return this.configTree.getConfigPath();
+        },
+
+        setPaths: function(rootPath, configPath, lazy)
+        {
+            var that = this,
+                path = rootPath;
+
             if (configPath && configPath.length > 0)
             {
                 path += "/" + configPath;
             }
 
-            this.configTree.setRootPath(rootPath);
-            this.configTree.selectConfig(configPath);
-            this.loadContentPanes(path);
+            that.configTree.setRootPath(rootPath);
+
+            if (lazy)
+            {
+                that.beginNavigation();
+                that.contextPanel.beginNavigation();
+                that.configTree.one("ready", function()
+                {
+                    path = that.configTree.longestMatchingSubpath(path);
+                    that.configTree.selectAbsolutePath(path);
+                    Zutubi.admin.replaceConfigPath(path);
+                    that.loadContentPanes(path);
+                });
+            }
+            else
+            {
+                that.configTree.selectConfig(configPath);
+                that.loadContentPanes(path);
+            }
         },
 
         /**
@@ -146,7 +169,7 @@
 
             that.path = path;
 
-            Zutubi.admin.navigate("/api/config/" + path + "?depth=-1", [that, that.contextPanel], function(data)
+            Zutubi.admin.navigate("/api/config/" + Zutubi.admin.encodePath(path) + "?depth=-1", [that, that.contextPanel], function(data)
             {
                 if (data.length === 1)
                 {

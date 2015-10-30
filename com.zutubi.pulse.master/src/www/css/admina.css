@@ -57,7 +57,7 @@ body {
     vertical-align: middle;
 }
 
-.selector-popup {
+.selector-popup, .hierarchy-popup {
     margin-top: 4px;
     border-top: none;
 }
