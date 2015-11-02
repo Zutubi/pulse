@@ -8,6 +8,16 @@
     height: 100%;
 }
 
+/* Generic styles */
+
+.k-preformatted {
+    white-space: pre;
+}
+
+.k-understated {
+    color: #aaa;
+}
+
 /* Hierarchy Selector */
 
 .k-hierarchy-selector {
@@ -60,11 +70,60 @@
 /* Overview panels */
 
 .k-overview-panel {
-    padding: 0.4em;
+    padding: 0.5em;
 }
 
 .k-overview-panel .k-tabstrip {
     border: none;
+}
+
+.k-overview-panel > h1 {
+    margin-bottom: 0.5em;
+}
+
+.k-overview-panel table th, .k-overview-panel table td {
+    padding: 0.5em;
+}
+
+.k-overview-panel table td.k-summary-wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.k-overview-panel > table > tbody > tr > th {
+    border-right: solid 1px #eee;
+}
+
+.k-overview-panel > table > tbody > tr {
+    border-bottom: solid 1px #eee;
+}
+
+.k-overview-panel table tr:last-child {
+    border-bottom: none;
+}
+
+.k-overview-panel table th {
+    font-weight: bold;
+    text-align: right;
+    vertical-align: top;
+    /*border-right: solid 1px #eee;*/
+}
+
+.k-summary-edit {
+    cursor: pointer;
+}
+
+.k-summary-edit .fa {
+    margin-left: 0.5em;
+}
+
+.k-overview-panel table .k-summary-edit {
+    text-decoration: underline;
+}
+
+
+.k-overview-panel strong {
+    font-weight: bold;
 }
 
 /* Composites */

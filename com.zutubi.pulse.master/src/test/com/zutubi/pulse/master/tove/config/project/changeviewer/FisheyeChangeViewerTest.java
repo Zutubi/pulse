@@ -41,6 +41,12 @@ public class FisheyeChangeViewerTest extends PulseTestCase
             {
                 return scmType;
             }
+
+            @Override
+            public String getSummary()
+            {
+                return "summary";
+            }
         };
         projectConfiguration.setScm(scmConfiguration);
         viewer = new FisheyeConfiguration(BASE, PATH);

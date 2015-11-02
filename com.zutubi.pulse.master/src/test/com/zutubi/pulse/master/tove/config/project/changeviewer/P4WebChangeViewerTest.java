@@ -39,6 +39,12 @@ public class P4WebChangeViewerTest extends PulseTestCase
             {
                 return "mock";
             }
+
+            @Override
+            public String getSummary()
+            {
+                return "mock summary";
+            }
         };
 
         projectConfiguration = new ProjectConfiguration("test-project");

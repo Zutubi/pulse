@@ -45,6 +45,12 @@ public class ChangelistIsolatorTest extends PulseTestCase
             {
                 return "mock";
             }
+
+            @Override
+            public String getSummary()
+            {
+                return "mock summary";
+            }
         });
         BuildOptionsConfiguration options = new BuildOptionsConfiguration();
         options.setIsolateChangelists(true);

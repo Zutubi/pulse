@@ -14,6 +14,12 @@ public class TestScmConfiguration extends ScmConfiguration
         return "test";
     }
 
+    @Override
+    public String getSummary()
+    {
+        return "test summary";
+    }
+
     public String getPreviousRevision(String revision)
     {
         return null;

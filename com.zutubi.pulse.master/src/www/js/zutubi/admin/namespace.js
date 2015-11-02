@@ -393,12 +393,12 @@ if (window.Zutubi.admin === undefined)
 
             openConfigPath: function(newPath)
             {
-                app.router.navigate("/config/" + newPath, false);
+                app.router.navigate("/config/" + Zutubi.admin.encodePath(newPath), false);
             },
 
             replaceConfigPath: function(newPath)
             {
-                app.router.replace("/config/" + newPath, true);
+                app.router.replace("/config/" + Zutubi.admin.encodePath(newPath), true);
             },
 
             coerceProperties: function(properties, propertyTypes)

@@ -299,39 +299,20 @@ public class ConfigModelBuilder
             Map<String, Object> properties = new HashMap<>();
             Class<?> formatter = ConventionSupport.getFormatter(type);
 
-            if (formatter == null)
-            {
-                // If there is a table annotation, it could reference transient properties which we
-                // include with no extra formatting.
-                Table table = type.getAnnotation(Table.class, true);
-                if (table != null)
-                {
-                    for (String column: table.columns())
-                    {
-                        String methodName = getGetterMethodName(column);
-                        try
-                        {
-                            Method getter = instance.getClass().getMethod(methodName);
-                            properties.put(column, getter.invoke(instance));
-                        }
-                        catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
-                        {
-                            // noop
-                        }
-                    }
-                }
-            }
-            else
+            if (formatter != null)
             {
                 Object formatterInstance = objectFactory.buildBean(formatter);
-                for (Method method: formatter.getMethods())
+                for (Method method : formatter.getMethods())
                 {
                     if (isGetter(method, type))
                     {
                         try
                         {
-                            Object result  = method.invoke(formatterInstance, instance);
-                            properties.put(method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4), result);
+                            Object result = method.invoke(formatterInstance, instance);
+                            if (result != null)
+                            {
+                                properties.put(method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4), result);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -341,11 +322,37 @@ public class ConfigModelBuilder
                 }
             }
 
+            // If there is a table annotation, it could reference transient properties which we
+            // include with no extra formatting.
+            Table table = type.getAnnotation(Table.class, true);
+            if (table != null)
+            {
+                for (String column: table.columns())
+                {
+                    if (!properties.containsKey(column) && !type.hasProperty(column))
+                    {
+                        String methodName = getGetterMethodName(column);
+                        try
+                        {
+                            Method getter = instance.getClass().getMethod(methodName);
+                            Object result = getter.invoke(instance);
+                            if (result != null)
+                            {
+                                properties.put(column, result);
+                            }
+                        }
+                        catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
+                        {
+                            // noop
+                        }
+                    }
+                }
+            }
+
             if (properties.size() > 0)
             {
                 return properties;
             }
-
         }
 
         return null;

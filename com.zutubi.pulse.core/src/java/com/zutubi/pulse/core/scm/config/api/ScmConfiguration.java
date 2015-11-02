@@ -36,4 +36,13 @@ public abstract class ScmConfiguration extends AbstractConfiguration
      */
     @Transient
     public abstract String getType();
+
+    /**
+     * Returns a human-readable string used to summaries the SCM configuration. The string should
+     * briefly allow a user to understand what source code is being referenced by the SCM.
+     *
+     * @return a human-readable summary of this configuration
+     */
+    @Transient
+    public abstract String getSummary();
 }
