@@ -174,6 +174,12 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
         return SubversionClient.TYPE;
     }
 
+    @Override
+    public String getSummary()
+    {
+        return url;
+    }
+
     public ExternalsMonitoring getExternalsMonitoring()
     {
         return externalsMonitoring;

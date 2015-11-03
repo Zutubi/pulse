@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.hg.config;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.hg.MercurialClient;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -24,6 +25,18 @@ public class MercurialConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return MercurialClient.TYPE;
+    }
+
+    @Override
+    public String getSummary()
+    {
+        String summary = repository;
+        if (StringUtils.stringSet(branch))
+        {
+            summary += "[" + branch + "]";
+        }
+
+        return summary;
     }
 
     public String getRepository()

@@ -6,6 +6,7 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Text;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -75,5 +76,17 @@ public class CvsConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return "cvs";
+    }
+
+    @Override
+    public String getSummary()
+    {
+        String summary = root + " " + module;
+        if (StringUtils.stringSet(branch))
+        {
+            summary += " (branch: " + branch + ")";
+        }
+
+        return summary;
     }
 }

@@ -19,4 +19,10 @@ public class NoopScmConfiguration extends ScmConfiguration
     {
         return "noop";
     }
+
+    @Override
+    public String getSummary()
+    {
+        return "";
+    }
 }

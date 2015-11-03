@@ -58,6 +58,12 @@ public class GitConfiguration extends PollableScmConfiguration
         return GitClient.TYPE;
     }
 
+    @Override
+    public String getSummary()
+    {
+        return repository + "[" + branch + "]";
+    }
+
     public String getRepository()
     {
         return repository;

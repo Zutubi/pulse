@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.p4.PerforceWorkspaceManager;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Min;
 import com.zutubi.validation.annotations.Required;
 
@@ -135,6 +136,38 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public String getType()
     {
         return PerforceClient.TYPE;
+    }
+
+    @Override
+    public String getSummary()
+    {
+        String summary;
+
+        if (useTemplateClient)
+        {
+            summary = spec;
+        }
+        else if (StringUtils.stringSet(stream))
+        {
+            summary = stream;
+        }
+        else
+        {
+            summary = view + "\n";
+        }
+
+        summary += "@";
+
+        if (StringUtils.stringSet(port))
+        {
+            summary += port;
+        }
+        else
+        {
+            summary += "<default port>";
+        }
+
+        return summary;
     }
 
     public boolean getUseTicketAuth()
