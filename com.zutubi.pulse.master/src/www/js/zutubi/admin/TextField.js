@@ -52,6 +52,11 @@
 
         bindValue: function(value)
         {
+            if (value === null)
+            {
+                value = "";
+            }
+
             this.inputElement.prop("value", value);
         },
 
