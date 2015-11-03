@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
     <link href="${base}/css/config.css" rel="stylesheet"/>
 
-    <title>#wwtext("name=my.builds")</title>
+    <title>#wwtext("name=preferences")</title>
 </head>
 <body>
     #dashboardTabs("preferences")
