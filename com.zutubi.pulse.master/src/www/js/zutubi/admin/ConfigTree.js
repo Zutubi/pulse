@@ -403,22 +403,25 @@
             }
         },
 
-        _updateItem: function(path, item, data)
+        _parentDataSource: function(item)
         {
-            var parentItem = item.parentNode(),
-                dataSource,
-                index;
+            var parentItem = item.parentNode();
 
             if (parentItem)
             {
-                dataSource = parentItem.children;
+                return parentItem.children;
             }
             else
             {
-                dataSource = this.dataSource;
+                return this.dataSource;
             }
+        },
 
-            index = dataSource.indexOf(item);
+        _updateItem: function(path, item, data)
+        {
+            var dataSource = this._parentDataSource(item),
+                index = dataSource.indexOf(item);
+
             if (index >= 0)
             {
                 dataSource.remove(item);
@@ -499,24 +502,35 @@
                 {
                     model = delta.models[newPath];
                     oldPath = that._absoluteToConfigPath(oldPath);
-                    newPath = that._absoluteToConfigPath(newPath);
 
-                    info = that._infoForConfigPath(oldPath);
-                    if (info.found)
+                    if (oldPath === "")
                     {
-                        index = info.item.parentNode().children.indexOf(info.item);
-                        that.dataSource.remove(info.item);
+                        // The root path has been renamed, reload fully. This is overkill but rare
+                        // and it resets our paths properly.
+                        that.setRootPath(newPath);
+                        return;
                     }
-
-                    info = that._infoForConfigPath(Zutubi.admin.parentPath(newPath));
-                    if (info.found)
+                    else
                     {
-                        that._addModel(_cloneAndEmbed(model), info.item, index);
-                    }
+                        newPath = that._absoluteToConfigPath(newPath);
 
-                    if (oldPath === that.configPath)
-                    {
-                        that.selectConfig(newPath);
+                        info = that._infoForConfigPath(oldPath);
+                        if (info.found)
+                        {
+                            index = that._parentDataSource(info.item).indexOf(info.item);
+                            that.dataSource.remove(info.item);
+                        }
+
+                        info = that._infoForConfigPath(Zutubi.admin.parentPath(newPath));
+                        if (info.found)
+                        {
+                            that._addModel(_cloneAndEmbed(model), info.item, index);
+                        }
+
+                        if (oldPath === that.configPath)
+                        {
+                            that.selectConfig(newPath);
+                        }
                     }
                 });
             }
