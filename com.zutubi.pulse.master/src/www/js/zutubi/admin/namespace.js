@@ -38,7 +38,7 @@ if (window.Zutubi.admin === undefined)
                     var url = "/hierarchy/" + e.scope;
                     if (e.name.length > 0)
                     {
-                        url += "/" + e.name;
+                        url += "/" + encodeURIComponent(e.name);
                     }
 
                     app.router.navigate(url, true);
@@ -65,7 +65,8 @@ if (window.Zutubi.admin === undefined)
                 app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
                 app.configPanel.bind("pathselect", function(e)
                 {
-                    app.router.navigate("/config/" + e.path, true);
+                    console.log("PATH SELECT '" + e.path + '"');
+                    app.router.navigate("/config/" + Zutubi.admin.encodePath(e.path), true);
                 });
             }
 
@@ -170,7 +171,7 @@ if (window.Zutubi.admin === undefined)
                 label: label,
                 success: function(delta)
                 {
-                    app.router.navigate("/config/" + delta.addedPaths[0], false);
+                    app.router.navigate("/config/" + Zutubi.admin.encodePath(delta.addedPaths[0]), false);
                 }
             });
 
@@ -202,7 +203,7 @@ if (window.Zutubi.admin === undefined)
                     configPath = app.configPanel.getConfigPath();
 
                 rootPath = Zutubi.admin.subPath(rootPath, 0, 1) + "/" + e.name;
-                app.router.navigate("/config/" + rootPath + "/" + configPath, true);
+                app.router.navigate(Zutubi.admin.encodePath("/config/" + rootPath + "/" + configPath), true);
                 // Lazy setPaths will take care of choosing the longest valid config path.
                 app.configPanel.setPaths(rootPath, configPath, true);
             });
