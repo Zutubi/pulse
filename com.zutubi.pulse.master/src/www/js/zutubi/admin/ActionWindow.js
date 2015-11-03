@@ -27,7 +27,7 @@
                 actionPart = "single/" + options.action.action;
             }
 
-            that.url = "/api/action/" + actionPart + "/" + options.path;
+            that.url = "/api/action/" + actionPart + "/" + Zutubi.admin.encodePath(options.path);
 
             WorkflowWindow.fn.init.call(that, {
                 url: that.url,
