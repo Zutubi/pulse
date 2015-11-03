@@ -21,10 +21,6 @@
     <script>
         window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
         window.configPanel.setPaths("users/#jss($principle.login)/preferences", "");
-//        app.configPanel.bind("pathselect", function(e)
-//        {
-//            app.router.navigate("/config/" + e.path, true);
-//        });
     </script>
 </body>
 </html>
