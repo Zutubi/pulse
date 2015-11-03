@@ -116,7 +116,14 @@
                 row,
                 column;
 
-            row = {key: item.key, actions: item.actions};
+            row = {
+                key: item.key,
+                actions: jQuery.grep(item.actions, function(action)
+                {
+                    return action.label !== "configure";
+                })
+            };
+
             for (i = 0; i < columns.length; i++)
             {
                 column = columns[i];
