@@ -65,6 +65,7 @@
                         });
 
                         that.value(sortedValues);
+                        that.trigger("change");
                     }
                 });
             }

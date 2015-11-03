@@ -4,6 +4,7 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
+        CHANGE = "change",
         ns = ".kendoStringList",
         CLICK = "click" + ns,
         KEYPRESS = "keypress" + ns,
@@ -41,6 +42,10 @@
                          '</li>'
         },
 
+        events: [
+            CHANGE
+        ],
+
         _create: function()
         {
             var that = this,
@@ -68,7 +73,7 @@
                 },
                 change: function()
                 {
-                    // Update value for sorted...
+                    that.trigger(CHANGE);
                 }
             });
 
