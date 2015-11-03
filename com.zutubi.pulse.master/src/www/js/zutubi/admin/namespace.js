@@ -115,7 +115,7 @@ if (window.Zutubi.admin === undefined)
                 app.navbar.selectScope("agents", normalisedPath);
                 if (path)
                 {
-                    _showConfig("agents/" + normalisedPath(path), true);
+                    _showConfig("agents/" + normalisedPath, true);
                 }
             });
 

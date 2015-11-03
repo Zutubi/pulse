@@ -2,6 +2,7 @@
 // dependency: ./ajax.js
 // dependency: ./ContextPanel.js
 // dependency: ./HierarchySelector.js
+// dependency: ./AgentOverviewPanel.js
 // dependency: ./ProjectOverviewPanel.js
 
 (function($)
@@ -153,6 +154,13 @@
                 this.contentPanel = new Zutubi.admin.ProjectOverviewPanel({
                     containerSelector: "#center-pane-content",
                     project: data
+                });
+            }
+            else
+            {
+                this.contentPanel = new Zutubi.admin.AgentOverviewPanel({
+                    containerSelector: "#center-pane-content",
+                    agent: data
                 });
             }
 
