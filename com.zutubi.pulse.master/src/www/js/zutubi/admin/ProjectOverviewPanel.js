@@ -96,7 +96,8 @@
                 projects = this.getNested(dependencies, "dependencies"),
                 tableEl = this._addSubtable(cellEl),
                 i,
-                upstream;
+                upstream,
+                nested;
 
             this._addRow(tableEl, "dependencies", "status", dependencies.properties.status);
             this._addRow(tableEl, "dependencies", "version", kendo.htmlEncode(dependencies.properties.version));

@@ -34,7 +34,7 @@
             }
             this.inputElement.css("width", width);
 
-            if (options.structure.readOnly || options.structure.parameters && options.structure.parameters.noOverride)
+            if (options.structure.readOnly || (options.structure.parameters && options.structure.parameters.noOverride))
             {
                 this.inputElement.attr("readonly", "");
             }

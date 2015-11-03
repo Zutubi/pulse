@@ -65,7 +65,6 @@ if (window.Zutubi.admin === undefined)
                 app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
                 app.configPanel.bind("pathselect", function(e)
                 {
-                    console.log("PATH SELECT '" + e.path + '"');
                     app.router.navigate("/config/" + Zutubi.admin.encodePath(e.path), true);
                 });
             }

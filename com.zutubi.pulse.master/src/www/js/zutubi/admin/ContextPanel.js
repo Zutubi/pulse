@@ -90,7 +90,7 @@
 
                 if (data.descendantActions && data.descendantActions.length > 0)
                 {
-                    data.descendantActions.sort(_actionCompare);
+                    data.descendantActions.sort(Zutubi.admin.labelCompare);
 
                     element = $('<div class="context-content"></div>');
                     that._renderActions(element, data.descendantActions, "descendant");
