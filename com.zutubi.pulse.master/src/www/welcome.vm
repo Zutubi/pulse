@@ -14,157 +14,41 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.7!  This page provides information to help you get started and important
-        new features in the 2.7 release.
+        Welcome to Pulse 3.0 Alpha!  This is an early access release that is thoroughly incomplete, unstable and
+        unpolished.  We've released it early to solicit feedback from customers that are interested in the brand
+        new administration UI.  Highlights of the new UI include:
     </p>
+    <ul style="list-style: circle; width: 720px">
+        <li>An all-new HTML5-based implementation.</li>
+        <li>Integration with browser history for more convenient navigation.</li>
+        <li>New project and agent overview pages, showing important configuration at a glance. (Note these are
+            far from complete at this stage.)</li>
+        <li>A hierarchy navigator that allows you to easily jump from one project (or agent) to the next,
+            maintaining your relative location in the configuration.</li>
+        <li>The ability to filter hierarchy trees to easily find a project or agent in a large installation.</li>
+        <li>New multi-select and string list widgets that are more compact and usable.</li>
+        <li>Drag and drop reordering of collections.</li>
+        <li>All based on a new HTTP-based API that is more efficient (it will become publicly accessible in
+            a future major.minor release).</li>
+    </ul>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2.7" link in the top left
-        corner.
+        Major missing pieces include:
     </p>
-    <h1> :: getting started :: </h1>
+    <ul style="list-style: circle; width: 720px">
+        <li>Template hiearchy refactoring (e.g. smart clone, move).</li>
+        <li>Template decoration of forms (showing what is inherited/overridden and from where).</li>
+        <li>Configuration state display.</li>
+        <li>Field actions (e.g. browsing for files).</li>
+        <li>Plugin administration.</li>
+        <li>Built-in documentation.</li>
+        <li>Styling, polish, testing, ...</li>
+    </ul>
     <p>
-        New to Pulse?  Here are a few ways to get started:
+        The styling is also clunky and poorly linked relative to the existing UI, the links between them
+        will be overhauled before final release.  We may decide to keep somewhat distinct theming for the
+        administration section as it does give a sense of context (a serendipitous discovery as part of
+        these changes).
     </p>
-    <table class="template-actions" cellspacing="5px">
-        <tr>
-            <th class="category" colspan="2">configure</th>
-        </tr>
-#auth("path=projects" "action=create")
-        <tr>
-            #actionHeader("add.projects" "add new projects" "add" "$urls.adminProjects()")
-            <td>using the add project wizard (administration &gt; projects tab)</td>
-        </tr>
-#end
-#auth("path=users" "action=create")
-        <tr>
-            #actionHeader("add.users" "add new users" "add" "$urls.adminUsers()")
-            <td>at the users view (administration &gt; users tab)</td>
-        </tr>
-#end
-#auth("path=agents" "action=create")
-        <tr>
-            #actionHeader("add.agents" "add new agents" "add" "$urls.adminAgents()")
-            <td>using the add agent wizard (administration &gt; agents tab)</td>
-        </tr>
-#end
-#auth("path=settings" "action=write")
-        <tr>
-            #actionHeader("configure.settings" "configure server settings" "pencil" "$urls.adminSettings()")
-            <td>at the server settings view (administration &gt; settings tab)</td>
-        </tr>
-#end
-        <tr>
-            #actionHeader("configure.preferences" "configure your preferences" "pencil" "$urls.dashboardPreferences()")
-            <td>at the preferences view (dashboard &gt; preferences tab)</td>
-        </tr>
-        <tr>
-            <th class="category" colspan="2">explore</th>
-        </tr>
-        <tr>
-            #actionHeader("view.dashboard" "go to your home page" "zoom" "$urls.dashboard()")
-            <td>at the dashboard view (dashboard &gt; home)</td>
-        </tr>
-        <tr>
-            #actionHeader("browse.projects" "browse build reports" "zoom" "$urls.browse()")
-            <td>at the browse view (browse)</td>
-        </tr>
-        <tr>
-            #actionHeader("view.activity" "view server activity" "zoom" "$urls.server()")
-            <td>at the server view (server)</td>
-        </tr>
-        <tr>
-            #actionHeader("view.agents" "view all agents" "zoom" "$urls.agents()")
-            <td>at the agents view (agents)</td>
-        </tr>
-    </table>
-
-    <h1> :: what's new :: </h1>
-    <p>
-        Pulse 2.7 includes new features and improvements in a wide range of areas.  Key updates include:
-    </p>
-    <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
-        <tr>
-            <th class="category" colspan="2">new in 2.7</th>
-        </tr>
-        <tr>
-            #actionHeader("agentstorage" "agent storage management" "accept" false)
-            <td>
-                New agent storage management options allow you to avoid spurious build failures
-                due to low disk space, and easily clean up directories on a specific agent.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("configperformance" "configuration performance improvements" "accept" false)
-            <td>
-                Performance tuning of the configuration system should make it a lot snappier,
-                particularly for larger installations and especially for custom projects.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("outputperformance" "log performance improvements" "accept" false)
-            <td>
-                Performance and robustness improvements for real time output logging, reducing the
-                memory footprint and CPU usage of builds with a lot of output.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("xcode" "xcode command updates" "accept" false)
-            <td>
-                The Xcode command has been updated to include fields for modern projects that use
-                workspaces and schemes, and to post-process output from the clang/llvm toolchain.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("clang" "clang output post-processor" "accept" false)
-            <td>
-                A new post-processor plugin has been added to parse output from clang and related
-                tools (e.g. lld) to find common error and warning messages.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("xctest" "xctest post-processor" "accept" false)
-            <td>
-                A new post-processor plugin has been added to parse test logs from XCTest, the
-                preferred test framework in newer versions of Xcode.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("deprevisions" "improved dependency revision handling" "accept" false)
-            <td>
-                Revision handling across dependent projects is now more flexible, making it easier
-                to manage dependencies across multiple SCM repositories.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("manualtriggers" "manual triggering" "accept" false)
-            <td>
-                You can now manually fire cron and SCM triggers, to run a build using the trigger's
-                properties and configuration.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("servicerunning" "new service support" "accept" false)
-            <td>
-                Support for running as a service has improved on all platforms, now using
-                Apache Commons Daemon on Windows and with systemd and upstart integration on
-                Linux.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("scmupgrades" "scm upgrades" "accept" false)
-            <td>
-                Upgrades to SCM plugins support the latest Subversion (1.8) and Git (2.x)
-                versions. Git partial clone support has been revamped as part of the upgrade.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("more" "and more..." "accept" false)
-            <td>
-                This release also includes numerous smaller improvements and fixes based on
-                user feedback!
-            </td>
-        </tr>
-    </table>
 </body>
 </html>
 
