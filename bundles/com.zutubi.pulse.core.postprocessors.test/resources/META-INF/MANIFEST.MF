@@ -2,5 +2,5 @@ Bundle-Name: Test Post-Processor
 Bundle-SymbolicName: com.zutubi.pulse.core.postprocessors.test; singleton:=true
 Bundle-Description: A test post-processor plugin.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.7.0
-Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.7.0,2.8.0)"
+Bundle-Version: 3.0.0
+Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[3.0.0,3.1.0)"

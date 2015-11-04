@@ -2,5 +2,5 @@ Bundle-Name: Pulse Core
 Bundle-SymbolicName: com.zutubi.pulse.core; singleton:=true
 Bundle-Description: The pulse core subsystem.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.7.0
+Bundle-Version: 3.0.0
 Import-Package: org.osgi.framework
