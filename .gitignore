@@ -1,10 +1,12 @@
 *.iml
+*.DS_Store
 /local.properties
 /plugins
 /classes
 /build/
 */build/
 */*/build/
+/com.zutubi.pulse.master/etc/osgi/org.eclipse.*
 /data/
 /working/
 /velocity.log
