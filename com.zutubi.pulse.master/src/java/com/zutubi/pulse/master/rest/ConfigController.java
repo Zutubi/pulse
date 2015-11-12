@@ -21,6 +21,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,7 +86,7 @@ public class ConfigController
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
         ComplexType type = Utils.getType(configPath, configurationTemplateManager);
         String parentPath = PathUtils.getParentPath(configPath);
-        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        ComplexType parentType = StringUtils.stringSet(parentPath) ? configurationTemplateManager.getType(parentPath) : null;
 
         if (type instanceof CompositeType)
         {
