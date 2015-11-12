@@ -44,10 +44,10 @@
         <dependency org="com.opensymphony.xwork" name="com.opensymphony.xwork" rev="1.2.3" conf="build,release->default;src->src"/>
         <dependency org="javax.mail" name="javax.mail" rev="1.4.0" conf="build,release->default;src->src"/>
         <dependency org="sun" name="sjsxp" rev="1.0.1" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.core" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.beans" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.context" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.context.support" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.core" rev="4.2.2.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.beans" rev="4.2.2.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.context" rev="4.2.2.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.context.support" rev="4.2.2.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="net.sourceforge.cglib" name="net.sf.cglib" rev="2.1.3"  conf="external,build,release->default;src->src"/>
         <dependency org="nu.xom" name="nu.xom" rev="20111125" conf="external,build,release->default;src->src"/>
         <dependency org="com.thoughtworks.xstream" name="com.thoughtworks.xstream" rev="1.4.7" conf="external,build,release->default;src->src"/>

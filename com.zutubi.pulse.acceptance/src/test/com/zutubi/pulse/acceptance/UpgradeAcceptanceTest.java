@@ -259,8 +259,8 @@ public class UpgradeAcceptanceTest extends AcceptanceTestBase
         dataSource.setPassword((String) properties.get(JDBC_PASSWORD));
 
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        Long count = template.queryForLong("select count(*) from pg_database where datname = '"+databaseName+"'");
-        if (count > 0)
+        Long count = template.queryForObject("select count(*) from pg_database where datname = '" + databaseName + "'", Long.class);
+        if (count != null && count > 0)
         {
             template.update("drop database " + databaseName);
         }
