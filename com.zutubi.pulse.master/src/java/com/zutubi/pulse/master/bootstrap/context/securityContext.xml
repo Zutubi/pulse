@@ -8,7 +8,7 @@ based upon the Spring Security system.
   xmlns:security="http://www.springframework.org/schema/security"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
     <!-- do not trigger an init from here. We need the spring context to be completely loaded before
      doing so otherwise the DelegatingFilterProxy will be unable to locate the defined beans.
@@ -96,9 +96,7 @@ based upon the Spring Security system.
             </bean>
         </property>
         <property name="authenticationFailureHandler">
-            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-                <property name="defaultFailureUrl" value="/login!input.action?error=true"/>
-            </bean>
+            <bean class="com.zutubi.pulse.master.security.CustomAuthenticationFailureHandler"/>
         </property>
         <property name="rememberMeServices" ref="rememberMeServices"/>
     </bean>
@@ -157,6 +155,7 @@ based upon the Spring Security system.
     <bean id="rememberMeServices" class="com.zutubi.pulse.master.security.CustomRememberMeServices">
         <constructor-arg value="pulse"/>
         <constructor-arg ref="userManager"/>
+        <property name="parameter" value="rememberMe"/>
     </bean>
 
     <bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
@@ -247,7 +246,7 @@ based upon the Spring Security system.
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <property name="securityMetadataSource">
-            <security:filter-security-metadata-source request-matcher="ant" lowercase-comparisons="true">
+            <security:filter-security-metadata-source request-matcher="ant" lowercase-comparisons="true" use-expressions="false">
                 <security:intercept-url pattern="/api/auth/session" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/signup*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />

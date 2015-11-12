@@ -28,7 +28,6 @@ import java.net.URLConnection;
 import java.util.List;
 
 import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -80,20 +79,20 @@ public class SlaveAgentService implements AgentService
                 throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
             }
 
-            String query = WebUtils.buildQueryString(asPair(PARAM_TOKEN, serviceTokenManager.getToken()),
-                                            asPair(PARAM_AGENT_HANDLE, Long.toString(recipeDetails.getAgentHandle())),
-                                            asPair(PARAM_AGENT, recipeDetails.getAgent()),
-                                            asPair(PARAM_AGENT_DATA_PATTERN, recipeDetails.getAgentDataPattern()),
-                                            asPair(PARAM_PROJECT_HANDLE, Long.toString(recipeDetails.getProjectHandle())),
-                                            asPair(PARAM_PROJECT, recipeDetails.getProject()),
-                                            asPair(PARAM_STAGE_HANDLE, Long.toString(recipeDetails.getStageHandle())),
-                                            asPair(PARAM_STAGE, recipeDetails.getStage()),
-                                            asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
-                                            asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
-                                            asPair(PARAM_UPDATE, Boolean.toString(recipeDetails.isUpdate())),
-                                            asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern()),
-                                            asPair(PARAM_TEMP_PATTERN, recipeDetails.getProjectTempPattern()),
-                                            asPair(PARAM_OUTPUT, Boolean.toString(true)));
+            String query = WebUtils.buildQueryString(PARAM_TOKEN, serviceTokenManager.getToken(),
+                                            PARAM_AGENT_HANDLE, Long.toString(recipeDetails.getAgentHandle()),
+                                            PARAM_AGENT, recipeDetails.getAgent(),
+                                            PARAM_AGENT_DATA_PATTERN, recipeDetails.getAgentDataPattern(),
+                                            PARAM_PROJECT_HANDLE, Long.toString(recipeDetails.getProjectHandle()),
+                                            PARAM_PROJECT, recipeDetails.getProject(),
+                                            PARAM_STAGE_HANDLE, Long.toString(recipeDetails.getStageHandle()),
+                                            PARAM_STAGE, recipeDetails.getStage(),
+                                            PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId()),
+                                            PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental()),
+                                            PARAM_UPDATE, Boolean.toString(recipeDetails.isUpdate()),
+                                            PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern(),
+                                            PARAM_TEMP_PATTERN, recipeDetails.getProjectTempPattern(),
+                                            PARAM_OUTPUT, Boolean.toString(true));
 
             URL resultUrl = new URL(agentConfig.isSsl() ? "https" : "http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
             URLConnection urlConnection = resultUrl.openConnection();

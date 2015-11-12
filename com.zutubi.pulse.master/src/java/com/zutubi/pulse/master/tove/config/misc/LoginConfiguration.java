@@ -11,43 +11,43 @@ import com.zutubi.validation.annotations.Required;
  * Transient configuration used for the login form.  The odd field names are
  * to match Acegi expectations.
  */
-@Form(fieldOrder = { "j_username", "j_password", "_spring_security_remember_me" }, actions = { "login" })
+@Form(fieldOrder = { "username", "password", "_spring_security_remember_me" }, actions = { "login" })
 @SymbolicName("zutubi.transient.login")
 public class LoginConfiguration extends AbstractConfiguration
 {
     @Text(size = 200) @Required
-    private String j_username;
+    private String username;
     @Password(size = 200)
-    private String j_password;
-    private boolean _spring_security_remember_me;
+    private String password;
+    private boolean rememberMe;
 
-    public String getJ_username()
+    public String getUsername()
     {
-        return j_username;
+        return username;
     }
 
-    public void setJ_username(String j_username)
+    public void setUsername(String username)
     {
-        this.j_username = j_username;
+        this.username = username;
     }
 
-    public String getJ_password()
+    public String getPassword()
     {
-        return j_password;
+        return password;
     }
 
-    public void setJ_password(String j_password)
+    public void setPassword(String password)
     {
-        this.j_password = j_password;
+        this.password = password;
     }
 
-    public boolean is_spring_security_remember_me()
+    public boolean isRememberMe()
     {
-        return _spring_security_remember_me;
+        return rememberMe;
     }
 
-    public void set_spring_security_remember_me(boolean _spring_security_remember_me)
+    public void setRememberMe(boolean rememberMe)
     {
-        this._spring_security_remember_me = _spring_security_remember_me;
+        this.rememberMe = rememberMe;
     }
 }

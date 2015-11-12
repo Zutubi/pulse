@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.zutubi.util.adt.Pair;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -49,23 +48,28 @@ public class WebUtils
      * parameter names are included verbatim, the values encoded.  The returned
      * string may be appended to a URL following a ?.
      *
-     * @param params name-value pairs for parameters to build the query string
-     *               out of
+     * @param params alternating name-value pairs for parameters to build the
+     *               query string out of
      * @return an encoded query string, ready to append after a question mark
      */
-    public static String buildQueryString(Pair<String, String>... params)
+    public static String buildQueryString(String... params)
     {
         StringBuilder sb = new StringBuilder();
-        for (Pair<String, String> param: params)
+        for (int i = 0; i < params.length / 2; i++)
         {
             if (sb.length() > 0)
             {
                 sb.append('&');
             }
 
-            sb.append(param.first);
+            sb.append(params[i * 2]);
             sb.append('=');
-            sb.append(formUrlEncode(param.second));
+            String value = params[i * 2 + 1];
+            if (value == null)
+            {
+                value = "";
+            }
+            sb.append(formUrlEncode(value));
         }
 
         return sb.toString();

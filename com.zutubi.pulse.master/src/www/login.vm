@@ -9,12 +9,12 @@
     <div class="config-panel" style="width: 400px">
         <h3 class="config-header">login</h3>
         <div class="config-container">
-            #pform("path=$path" "action=j_spring_security_check")
+            #pform("path=$path" "action=login")
         </div>
     </div>
 
     <script type="text/javascript">
-        mainForm.on('render', function(form) { form.findById('zfid.j_username').focus(true); });
+        mainForm.on('render', function(form) { form.findById('zfid.username').focus(true); });
     </script>
     
     #if ($config.anonymousSignupEnabled)

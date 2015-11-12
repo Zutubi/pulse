@@ -1010,7 +1010,7 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
             if (this.userCanLogout)
             {
                 this.addItem({xtype: 'tbtext', html: '|', tag: 'span', cls: 'userToolbar'});
-                this.addItem({xtype: 'xztblink', id: 'logout', text: "logout", url: window.baseUrl + '/j_spring_security_logout', cls: 'userToolbar'});
+                this.addItem({xtype: 'xztblink', id: 'logout', text: "logout", url: window.baseUrl + '/logout', cls: 'userToolbar'});
             }
             this.addItem({xtype: 'tbtext', html: ']', tag: 'span', cls: 'userToolbar'});
         }

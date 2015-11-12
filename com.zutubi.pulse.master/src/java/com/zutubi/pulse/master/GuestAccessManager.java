@@ -15,9 +15,11 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.memory.UserAttribute;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+
+import java.util.List;
 
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
@@ -33,27 +35,26 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
 
     public synchronized void init()
     {
-        UserAttribute newAttribute = new UserAttribute();
-        newAttribute.setPassword((String) anonymousAuthenticationFilter.getPrincipal());
-        newAttribute.addAuthority(new SimpleGrantedAuthority(Role.ANONYMOUS));
-        if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
+        // FIXME kendo not sure if its kosher to modify this list in place.
+        List<GrantedAuthority> authorities = anonymousAuthenticationFilter.getAuthorities();
+        authorities.clear();
+        authorities.add(new SimpleGrantedAuthority(Role.ANONYMOUS));
+        if (configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
             BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
-            if(group != null)
+            if (group != null)
             {
-                for(String authority: group.getGrantedAuthorities())
+                for (String authority: group.getGrantedAuthorities())
                 {
-                    newAttribute.addAuthority(new SimpleGrantedAuthority(authority));
+                    authorities.add(new SimpleGrantedAuthority(authority));
                 }
             }
         }
-
-        anonymousAuthenticationFilter.setUserAttribute(newAttribute);
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)
     {
-        if(event instanceof PostSaveEvent)
+        if (event instanceof PostSaveEvent)
         {
             LOG.fine("Refreshing anonymous group authorities");
             init();
