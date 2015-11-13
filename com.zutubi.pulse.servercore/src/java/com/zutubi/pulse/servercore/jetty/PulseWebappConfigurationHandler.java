@@ -48,8 +48,7 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         {
             for (String host : StringUtils.split(bindAddress, ',', true))
             {
-                host = host.trim();
-                addConnector(server, config, host);
+                addConnector(server, config, host.trim());
             }
         }
         else

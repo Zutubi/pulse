@@ -206,6 +206,8 @@
         </init-param>
     </servlet>
 
+    <!-- NOTE: The Spring WebMVC servlet for /api is deployed dynamically by DeployApiServletStartupTask -->
+
     <!-- We make our default webwork, as it handles the most namespaces, simplifying config.
          This does mean we need to call out static namespaces and point them at Jetty (see
          the last mappings, this would be simpler if we consolidated under /static/) -->
