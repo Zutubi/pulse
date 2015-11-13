@@ -1,20 +1,16 @@
 package com.zutubi.pulse.servercore.servlet;
 
-import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -90,34 +86,7 @@ public class DownloadResultsServlet extends HttpServlet
                 zipFile = new File(paths.getBaseDir().getAbsolutePath() + ".zip");
             }
 
-            try
-            {
-                response.setContentType("application/x-octet-stream");
-                response.setContentLength((int) zipFile.length());
-
-                FileInputStream input = null;
-
-                try
-                {
-                    input = new FileInputStream(zipFile);
-                    ByteStreams.copy(input, response.getOutputStream());
-                }
-                finally
-                {
-                    IOUtils.close(input);
-                }
-
-                response.getOutputStream().flush();
-            }
-            catch (FileNotFoundException e)
-            {
-                LOG.warning(e);
-                response.sendError(404, "File not found: " + e.getMessage());
-            }
-            catch (IOException e)
-            {
-                LOG.warning(e);
-            }
+            ServletUtils.sendFile(zipFile, response);
         }
         catch (NumberFormatException e)
         {

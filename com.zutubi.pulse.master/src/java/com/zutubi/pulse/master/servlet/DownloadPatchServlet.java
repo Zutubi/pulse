@@ -1,19 +1,19 @@
 package com.zutubi.pulse.master.servlet;
 
-import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.servercore.servlet.ServletUtils;
 import com.zutubi.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -23,6 +23,17 @@ public class DownloadPatchServlet extends HttpServlet
     private static final Logger LOG = Logger.getLogger(DownloadPatchServlet.class);
     private MasterConfigurationManager configurationManager;
     private ServiceTokenManager serviceTokenManager;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException
+    {
+        super.init(config);
+
+        if (configurationManager == null || serviceTokenManager == null)
+        {
+            throw new UnavailableException("Servlet not ready", 30);
+        }
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
@@ -45,50 +56,22 @@ public class DownloadPatchServlet extends HttpServlet
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             File patchFile = paths.getUserPatchFile(userId, number);
 
-            try
-            {
-                response.setContentType("application/x-octet-stream");
-                response.setContentLength((int) patchFile.length());
-
-                FileInputStream input = null;
-
-                try
-                {
-                    input = new FileInputStream(patchFile);
-                    ByteStreams.copy(input, response.getOutputStream());
-                }
-                finally
-                {
-                    IOUtils.close(input);
-                }
-
-                response.getOutputStream().flush();
-            }
-            catch (FileNotFoundException e)
-            {
-                DownloadPatchServlet.LOG.warning(e);
-                response.sendError(404, "File not found: " + e.getMessage());
-            }
-            catch (IOException e)
-            {
-                DownloadPatchServlet.LOG.warning(e);
-                response.sendError(500, "I/O error: " + e.getMessage());
-            }
+            ServletUtils.sendFile(patchFile, response);
         }
         catch (NumberFormatException e)
         {
             try
             {
-                response.sendError(500, "Invalid parameter");
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Invalid parameter");
             }
             catch (IOException e1)
             {
-                DownloadPatchServlet.LOG.warning(e1);
+                LOG.warning(e1);
             }
         }
         catch (IOException e)
         {
-            DownloadPatchServlet.LOG.warning(e);
+            LOG.warning(e);
         }
     }
 

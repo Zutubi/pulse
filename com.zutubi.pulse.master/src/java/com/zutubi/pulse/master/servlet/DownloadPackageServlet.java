@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.servlet;
 
-import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.servercore.servlet.ServletUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -12,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -29,48 +26,20 @@ public class DownloadPackageServlet extends HttpServlet
         try
         {
             String packageName = request.getPathInfo();
-            if(packageName == null || packageName.length() == 0)
+            if (packageName == null || packageName.length() == 0)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
-            if(packageName.startsWith("/"))
+            if (packageName.startsWith("/"))
             {
                 packageName = packageName.substring(1);
             }
 
             File packageFile = getPackageFile(systemPaths, packageName);
 
-            try
-            {
-                response.setContentType("application/x-octet-stream");
-                response.setContentLength((int) packageFile.length());
-
-                FileInputStream input = null;
-
-                try
-                {
-                    input = new FileInputStream(packageFile);
-                    ByteStreams.copy(input, response.getOutputStream());
-                }
-                finally
-                {
-                    IOUtils.close(input);
-                }
-
-                response.getOutputStream().flush();
-            }
-            catch (FileNotFoundException e)
-            {
-                LOG.warning(e);
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found: " + e.getMessage());
-            }
-            catch (IOException e)
-            {
-                LOG.warning(e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "I/O error: " + e.getMessage());
-            }
+            ServletUtils.sendFile(packageFile, response);
         }
         catch (IOException e)
         {
