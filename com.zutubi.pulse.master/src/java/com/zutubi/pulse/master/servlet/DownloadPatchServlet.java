@@ -28,7 +28,7 @@ public class DownloadPatchServlet extends HttpServlet
     public void init(ServletConfig config) throws ServletException
     {
         super.init(config);
-
+        
         if (configurationManager == null || serviceTokenManager == null)
         {
             throw new UnavailableException("Servlet not ready", 30);
