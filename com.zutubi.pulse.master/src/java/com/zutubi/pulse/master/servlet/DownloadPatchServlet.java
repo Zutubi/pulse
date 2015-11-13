@@ -8,6 +8,9 @@ import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +26,16 @@ public class DownloadPatchServlet extends HttpServlet
     private static final Logger LOG = Logger.getLogger(DownloadPatchServlet.class);
     private MasterConfigurationManager configurationManager;
     private ServiceTokenManager serviceTokenManager;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException
+    {
+        super.init(config);
+        if (configurationManager == null || serviceTokenManager == null)
+        {
+            throw new UnavailableException("Servlet not ready", 30);
+        }
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
     {
