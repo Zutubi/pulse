@@ -54,12 +54,21 @@ based upon the Spring Security system.
             <security:filter-chain pattern="/css/**"        filters="none" />
             <security:filter-chain pattern="/images/**"     filters="none" />
             <security:filter-chain pattern="/favicon.*"     filters="none" />
-            <security:filter-chain pattern="/fonts/**"     filters="none" />
+            <security:filter-chain pattern="/fonts/**"      filters="none" />
             <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, apiPreAuthenticatedProcessingFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
+            <security:filter-chain pattern="/api/**"        filters="csrfFilter, csrfHeaderFilter, securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, apiPreAuthenticatedProcessingFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
             <security:filter-chain pattern="/**"            filters="securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, apiPreAuthenticatedProcessingFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
         </security:filter-chain-map>
         <property name="firewall"><bean class="com.zutubi.pulse.master.spring.web.context.OpenFirewall"/></property>
     </bean>
+
+    <bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <constructor-arg ref="csrfTokenRepository"/>
+    </bean>
+
+    <bean id="csrfHeaderFilter" class="com.zutubi.pulse.master.security.CsrfHeaderFilter"/>
+
+    <bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository"/>
 
     <!--
     This filter must be included in any filter chain. It is responsible for storing authentication information

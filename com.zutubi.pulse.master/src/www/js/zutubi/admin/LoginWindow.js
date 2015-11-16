@@ -104,14 +104,15 @@
                 dataType: 'json',
                 headers: {
                     Accept: "application/json; charset=utf-8",
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "X-CSRF-TOKEN": that.options.csrfToken
                 },
                 data: JSON.stringify(data),
                 success: function ()
                 {
                     that.completed = true;
                     that.loginWindow.close();
-                    that.options.success();
+                    that.options.success.apply(that, arguments);
                 },
                 error: function (jqXHR, textStatus)
                 {

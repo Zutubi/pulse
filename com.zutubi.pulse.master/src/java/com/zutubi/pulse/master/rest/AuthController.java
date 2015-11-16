@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.rest;
 
 import com.zutubi.pulse.master.security.CustomRememberMeServices;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +34,14 @@ public class AuthController
     @Autowired
     private CustomRememberMeServices rememberMeServices;
 
+    @RequestMapping(value = "/session", method = RequestMethod.GET)
+    public ResponseEntity<Session> getSession(HttpServletRequest request)
+    {
+        return getSessionResponse(request);
+    }
+
     @RequestMapping(value = "/session", method = RequestMethod.POST)
-    public ResponseEntity<Session> session(@RequestBody Credentials credentials, HttpServletRequest request, HttpServletResponse response)
+    public ResponseEntity<Session> postSession(@RequestBody Credentials credentials, HttpServletRequest request, HttpServletResponse response)
     {
         try
         {
@@ -52,7 +59,7 @@ public class AuthController
             rememberMeServices.loginSuccess(request, response, authResult);
             LOG.debug("RESTish login success for '" + credentials.username + "'");
 
-            return new ResponseEntity<>(new Session(request.getSession().getId(), request.getSession().getCreationTime()), HttpStatus.OK);
+            return getSessionResponse(request);
         }
         catch (AuthenticationException failed)
         {
@@ -63,6 +70,11 @@ public class AuthController
 
             throw failed;
         }
+    }
+
+    private ResponseEntity<Session> getSessionResponse(HttpServletRequest request)
+    {
+        return new ResponseEntity<>(new Session(request.getSession().getId(), request.getSession().getCreationTime(), SecurityUtils.getLoggedInUsername()), HttpStatus.OK);
     }
 
     public static class Credentials
@@ -110,11 +122,13 @@ public class AuthController
     {
         private String sessionId;
         private long creationTime;
+        private String username;
 
-        public Session(String sessionId, long creationTime)
+        public Session(String sessionId, long creationTime, String username)
         {
             this.sessionId = sessionId;
             this.creationTime = creationTime;
+            this.username = username;
         }
 
         public String getSessionId()
@@ -125,6 +139,11 @@ public class AuthController
         public long getCreationTime()
         {
             return creationTime;
+        }
+
+        public String getUsername()
+        {
+            return username;
         }
     }
 }
