@@ -225,7 +225,7 @@
                 {
                     if (this.submits.length > 0)
                     {
-                        this._buttonClicked(this.submits[0].structure.value);
+                        this._buttonClicked(this.options.defaultSubmit || this.submits[0].structure.value);
                     }
                     else
                     {

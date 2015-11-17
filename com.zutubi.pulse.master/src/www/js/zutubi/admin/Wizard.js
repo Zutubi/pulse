@@ -257,7 +257,8 @@
                 step = that.steps[stepIndex],
                 type = step.types[index],
                 lastIndex = that.steps.length - 1,
-                submits = [];
+                submits = [],
+                defaultSubmit;
 
             this._stashValuesAndCleanupForm();
 
@@ -271,10 +272,12 @@
             if (stepIndex !== lastIndex)
             {
                 submits.push(NEXT);
+                defaultSubmit = NEXT;
             }
             else
             {
                 submits.push(FINISH);
+                defaultSubmit = FINISH;
             }
 
             submits.push(CANCEL);
@@ -284,7 +287,8 @@
                 symbolicName: type.symbolicName,
                 structure: that._filterFields(type.form),
                 values: step.valuesByType[index],
-                submits: submits
+                submits: submits,
+                defaultSubmit: defaultSubmit
             }).data("kendoZaForm");
 
             that.form.bind("buttonClicked", jQuery.proxy(that._formSubmitted, that));
