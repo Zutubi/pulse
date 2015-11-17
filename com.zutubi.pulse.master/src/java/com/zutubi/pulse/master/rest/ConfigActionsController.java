@@ -143,18 +143,31 @@ public class ConfigActionsController
     {
         String configPath = Utils.getConfigPath(request);
 
-        // FIXME kendo support getting the type from the CheckModel, path type may not always exist (wizard).
-        ComplexType type = Utils.getType(configPath, configurationTemplateManager);
-        if (!(type instanceof CompositeType))
+        CompositeType compositeType;
+        String symbolicName = check.getMain().getType().getSymbolicName();
+        if (StringUtils.stringSet(symbolicName))
         {
-            throw new IllegalArgumentException("Path '" + configPath + "' refers to unexpected type '" + type + "'");
+            compositeType = typeRegistry.getType(symbolicName);
+            if (compositeType == null)
+            {
+                throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
+            }
+        }
+        else
+        {
+            ComplexType type = Utils.getType(configPath, configurationTemplateManager);
+            if (!(type instanceof CompositeType))
+            {
+                throw new IllegalArgumentException("Path '" + configPath + "' refers to unexpected type '" + type + "'");
+            }
+
+            compositeType = (CompositeType) type;
         }
 
-        CompositeType compositeType = (CompositeType) type;
         CompositeType checkType = configurationRegistry.getConfigurationCheckType(compositeType);
         if (checkType == null)
         {
-            throw new IllegalArgumentException("Path '" + configPath + "' has type '" + type + "' which does not support configuration checking");
+            throw new IllegalArgumentException("Path '" + configPath + "' has type '" + compositeType + "' which does not support configuration checking");
         }
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
@@ -182,7 +195,7 @@ public class ConfigActionsController
         }
 
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager.getTemplateOwnerPath(configPath), configurationReferenceManager, configurationTemplateManager);
-        Configuration instance = (Configuration) instantiator.instantiate(type, record);
+        Configuration instance = (Configuration) instantiator.instantiate(compositeType, record);
         instance.setConfigurationPath(configPath);
 
         @SuppressWarnings("unchecked")

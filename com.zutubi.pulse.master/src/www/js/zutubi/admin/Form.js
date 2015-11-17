@@ -204,7 +204,7 @@
             }
             else
             {
-                this.clearValidationErrors();
+                this.clearMessages();
                 this.trigger(BUTTON_CLICKED, {value: value});
             }
         },
@@ -280,7 +280,7 @@
 
         resetValues: function()
         {
-            this.clearValidationErrors();
+            this.clearMessages();
             if (this.originalValues)
             {
                 this.bindValues(this.originalValues);
@@ -396,9 +396,16 @@
             return null;
         },
 
-        clearValidationErrors: function()
+        clearMessages: function()
         {
-            this.element.find(".validation-errors").remove();
+            this.element.find(".k-form-validation-errors").remove();
+            this.element.find(".k-form-feedback").remove();
+        },
+
+        showStatus: function(success, message)
+        {
+            var status = $('<p class="k-form-feedback ' + (success ? 'k-form-success' : 'k-form-failure') + '"></p>').prependTo(this.element);
+            status.text(message);
         },
 
         showValidationErrors: function(errorDetails)
@@ -435,7 +442,7 @@
 
         _showInstanceErrors: function(messages)
         {
-            var errorList = $('<ul class="validation-errors"></ul>').prependTo(this.element);
+            var errorList = $('<ul class="k-form-validation-errors"></ul>').prependTo(this.element);
             this._showErrors(errorList, messages);
         },
 
@@ -449,7 +456,7 @@
                 if (field)
                 {
                     fieldCell = field.element.closest("td");
-                    errorList = $('<ul class="validation-errors"></ul>').appendTo(fieldCell);
+                    errorList = $('<ul class="k-form-validation-errors"></ul>').appendTo(fieldCell);
                     this._showErrors(errorList, messages);
                 }
             }

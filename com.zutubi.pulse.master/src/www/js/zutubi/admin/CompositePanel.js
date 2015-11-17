@@ -179,66 +179,7 @@
 
         _checkClicked: function()
         {
-            var that = this,
-                type = that.options.composite.type,
-                properties = that.form.getValues(),
-                checkProperties = that.checkForm.getValues();
-
-            Zutubi.admin.coerceProperties(properties, type.simpleProperties);
-            Zutubi.admin.coerceProperties(checkProperties, type.checkType.simpleProperties);
-
-            Zutubi.admin.ajax({
-                type: "POST",
-                maskAll: true,
-                url: "/api/action/check/" + Zutubi.admin.encodePath(that.options.path),
-                data: {
-                    main: {kind: "composite", properties: properties},
-                    check: {kind: "composite", properties: checkProperties}
-                },
-                success: function (data)
-                {
-                    // FIXME kendo better to display these near the check button
-                    if (data.success)
-                    {
-                        Zutubi.admin.reportSuccess("configuration ok");
-                    }
-                    else
-                    {
-                        Zutubi.admin.reportError(data.message || "check failed");
-                    }
-                },
-                error: function (jqXHR)
-                {
-                    var details;
-
-                    if (jqXHR.status === 422)
-                    {
-                        try
-                        {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                            {
-                                if (details.key === "main")
-                                {
-                                    that.form.showValidationErrors(details);
-                                }
-                                else
-                                {
-                                    that.checkForm.showValidationErrors(details);
-                                }
-                                return;
-                            }
-                        }
-                        catch(e)
-                        {
-                            // Do nothing.
-                        }
-                    }
-
-                    Zutubi.admin.reportError("Could not check configuration: " + Zutubi.admin.ajaxError(jqXHR));
-                }
-            });
-
+            Zutubi.admin.checkConfig(this.options.path, this.options.composite.type, this.form, this.checkForm);
         }
     });
 }(jQuery));

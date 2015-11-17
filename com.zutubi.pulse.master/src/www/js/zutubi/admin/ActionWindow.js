@@ -133,7 +133,7 @@
             var that = this,
                 properties = that._translateProperties();
 
-            that.form.clearValidationErrors();
+            that.form.clearMessages();
 
             that.mask(true);
 

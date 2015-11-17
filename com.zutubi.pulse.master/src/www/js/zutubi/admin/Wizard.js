@@ -25,18 +25,21 @@
             this.types = [{
                 label: "",
                 form: config.form,
-                propertyTypes: []
+                simpleProperties: []
             }];
 
             this.valuesByType = [config.formDefaults];
         }
         else if(config.kind === "typed")
         {
+            config.types.sort(Zutubi.admin.labelCompare);
+
             this.types = jQuery.map(config.types, function(type) { return {
                 label: type.label,
                 symbolicName: type.type.symbolicName,
                 form: type.type.form,
-                propertyTypes: type.type.simpleProperties
+                checkType: type.type.checkType,
+                simpleProperties: type.type.simpleProperties
             }; });
 
             this.valuesByType = jQuery.map(config.types, function(type)
@@ -74,7 +77,11 @@
             name: "ZaWizard",
             template: '<ul class="k-wizard-step-index"></ul>' +
                       '<div class="k-wizard-type-select">Select type: <input></div>' +
-                      '<div class="k-wizard-form"></div>',
+                      '<div class="k-wizard-form"></div>' +
+                      '<div class="k-wizard-check">' +
+                          '<p>click <em>check</em> below to test your configuration</p>' +
+                          '<div class="k-wizard-check-form"></div>' +
+                      '</div>',
             stepIndexTemplate: '<li>#: label #</li>'
         },
 
@@ -113,6 +120,8 @@
             }).data("kendoDropDownList");
 
             that.formWrapper = that.element.find(".k-wizard-form");
+            that.checkWrapper = that.element.find(".k-wizard-check");
+            that.checkFormWrapper = that.element.find(".k-wizard-check-form");
 
             that._showStepAtIndex(0);
         },
@@ -171,6 +180,7 @@
         _stashValuesAndCleanupForm: function()
         {
             var form = this.form,
+                checkForm = this.checkForm,
                 step;
 
             if (form)
@@ -181,6 +191,13 @@
                 form.element.empty();
                 form.destroy();
                 this.form = null;
+            }
+
+            if (checkForm)
+            {
+                checkForm.element.empty();
+                checkForm.destroy();
+                this.checkForm = null;
             }
         },
 
@@ -208,7 +225,6 @@
             if (types.length > 1)
             {
                 labels = jQuery.map(types, function(type) { return type.label; });
-                labels.sort();
                 dropDown.setDataSource(labels);
                 this.typeSelectWrapper.show();
             }
@@ -272,6 +288,27 @@
             }).data("kendoZaForm");
 
             that.form.bind("buttonClicked", jQuery.proxy(that._formSubmitted, that));
+
+            if (type.checkType)
+            {
+                that.checkForm = that.checkFormWrapper.kendoZaForm({
+                    formName: "check",
+                    symbolicName: type.checkType.symbolicName,
+                    structure: type.checkType.form,
+                    values: [],
+                    submits: ["check"]
+                }).data("kendoZaForm");
+
+                that.checkForm.bind("buttonClicked", jQuery.proxy(that._checkClicked, that));
+
+                that.checkWrapper.show();
+            }
+            else
+            {
+                that.checkWrapper.hide();
+            }
+
+            that.type = type;
         },
 
         _filterFields: function(formStructure)
@@ -337,7 +374,7 @@
             jQuery.each(wizardData, function(property, data)
             {
                 data.kind = "composite";
-                Zutubi.admin.coerceProperties(data.properties, data.type.propertyTypes);
+                Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
                 if (data.type.symbolicName)
                 {
                     data.type = {symbolicName: data.type.symbolicName};
@@ -385,6 +422,11 @@
                     Zutubi.admin.reportError("Could not finish wizard: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
+        },
+
+        _checkClicked: function(e)
+        {
+            Zutubi.admin.checkConfig(this.options.path, this.type, this.form, this.checkForm);
         }
     });
 
