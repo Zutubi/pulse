@@ -16,6 +16,7 @@
 
     WizardStep = function(config)
     {
+        this.kind = config.kind;
         this.key = config.key;
         this.label = config.label;
         this.selectedTypeIndex = 0;
@@ -54,7 +55,18 @@
     };
 
     WizardStep.prototype = {
+        getValue: function()
+        {
+            return {
+                properties: this.valuesByType[this.selectedTypeIndex],
+                type: this.types[this.selectedTypeIndex]
+            };
+        },
 
+        requiresValidation: function()
+        {
+            return this.kind === "typed";
+        }
     };
 
     Zutubi.admin.Wizard = Widget.extend({
@@ -143,28 +155,24 @@
 
             jQuery.each(that.steps, function(index, step)
             {
-                result[step.key] = {
-                    properties: step.valuesByType[step.selectedTypeIndex],
-                    type: step.types[step.selectedTypeIndex]
-                };
+                result[step.key] = step.getValue();
             });
 
             return result;
         },
 
-        showValidationErrors: function(details)
+        showValidationErrors: function(details, stepIndex)
         {
-            var that = this,
-                stepIndex = -1;
+            var that = this;
 
-            jQuery.each(that.steps, function(index, step)
-            {
-                if (step.key === details.key)
-                {
-                    stepIndex = index;
-                    return false;
-                }
-            });
+            if (stepIndex === -1) {
+                jQuery.each(that.steps, function (index, step) {
+                    if (step.key === details.key) {
+                        stepIndex = index;
+                        return false;
+                    }
+                });
+            }
 
             if (stepIndex === -1)
             {
@@ -357,16 +365,72 @@
             }
         },
 
+        _mask: function(mask)
+        {
+            kendo.ui.progress(this.element.closest(".k-widget"), mask);
+        },
+
+        _handleError: function(jqXHR, stepIndex)
+        {
+            var details;
+
+            if (jqXHR.status === 422)
+            {
+                try
+                {
+                    details = JSON.parse(jqXHR.responseText);
+                    if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                    {
+                        this.showValidationErrors(details, stepIndex);
+                        return;
+                    }
+                }
+                catch(e)
+                {
+                    // Do nothing.
+                }
+            }
+
+            Zutubi.admin.reportError("Error stepping forward: " + Zutubi.admin.ajaxError(jqXHR));
+        },
+
         _forward: function()
         {
-            // FIXME kendo validate before stepping forward.
-            if (this.currentStepIndex === this.steps.length - 1)
+            var that = this,
+                step = that.steps[that.currentStepIndex];
+
+            if (that.currentStepIndex === that.steps.length - 1)
             {
-                this._finish();
+                that._finish();
+            }
+            else if (step.requiresValidation())
+            {
+                that._mask(true);
+
+                // FIXME kendo need to update data with proper ignoredFields and concrete.
+                Zutubi.admin.ajax({
+                    type: "POST",
+                    url: "/api/action/validate/" + Zutubi.admin.encodePath(that.options.path),
+                    data: {
+                        ignoredFields: [],
+                        composite: step.getValue()
+                    },
+                    success: function ()
+                    {
+                        that._mask(false);
+                        that._showStepAtIndex(that.currentStepIndex + 1);
+                    },
+                    error: function (jqXHR)
+                    {
+                        that._mask(false);
+                        that._handleError(jqXHR, that.currentStepIndex);
+                    }
+
+                })
             }
             else
             {
-                this._showStepAtIndex(this.currentStepIndex + 1);
+                that._showStepAtIndex(that.currentStepIndex + 1);
             }
         },
 
@@ -402,33 +466,13 @@
                 },
                 error: function (jqXHR)
                 {
-                    var details;
-
                     that.trigger(POSTED);
-
-                    if (jqXHR.status === 422)
-                    {
-                        try
-                        {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                            {
-                                that.showValidationErrors(details);
-                                return;
-                            }
-                        }
-                        catch(e)
-                        {
-                            // Do nothing.
-                        }
-                    }
-
-                    Zutubi.admin.reportError("Could not finish wizard: " + Zutubi.admin.ajaxError(jqXHR));
+                    that._handleError(jqXHR, -1);
                 }
             });
         },
 
-        _checkClicked: function(e)
+        _checkClicked: function()
         {
             Zutubi.admin.checkConfig(this.options.path, this.type, this.form, this.checkForm);
         }

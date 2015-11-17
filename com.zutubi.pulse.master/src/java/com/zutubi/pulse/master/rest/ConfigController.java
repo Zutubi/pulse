@@ -57,7 +57,6 @@ public class ConfigController
         ComplexType type = Utils.getType(configPath, configurationTemplateManager);
 
         String parentPath = PathUtils.getParentPath(configPath);
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
         Record record = configurationTemplateManager.getRecord(configPath);
 

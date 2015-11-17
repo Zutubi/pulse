@@ -137,6 +137,24 @@ public class ConfigActionsController
         return annotation;
     }
 
+    @RequestMapping(value = "validate/**", method = RequestMethod.POST)
+    public ResponseEntity<String> validate(HttpServletRequest request, @RequestBody ValidateModel model) throws TypeException
+    {
+        String parentPath = Utils.getConfigPath(request);
+
+        String symbolicName = model.getComposite().getType().getSymbolicName();
+        CompositeType type = typeRegistry.getType(symbolicName);
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
+        }
+
+        MutableRecord record = Utils.convertProperties(type, null, model.getComposite().getProperties());
+        configurationTemplateManager.validate(parentPath, model.getBaseName(), record, model.isConcrete(), false, model.getIgnoredFields());
+
+        return new ResponseEntity<>(parentPath, HttpStatus.OK);
+    }
+
     @RequestMapping(value = "check/**", method = RequestMethod.POST)
     public ResponseEntity<CheckResultModel> check(HttpServletRequest request,
                                       @RequestBody CheckModel check) throws TypeException
