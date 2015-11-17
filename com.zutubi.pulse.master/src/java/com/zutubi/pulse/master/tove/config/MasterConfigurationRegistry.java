@@ -124,6 +124,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(FisheyeConfiguration.class);
             registerConfigurationType(CustomChangeViewerConfiguration.class);
             registerConfigurationType(P4WebChangeViewer.class);
+            registerConfigurationType(PerforceSwarmChangeViewer.class);
             registerConfigurationType(AbstractTracChangeViewer.class);
             registerConfigurationType(Trac10ChangeViewer.class);
             registerConfigurationType(Trac11ChangeViewer.class);
