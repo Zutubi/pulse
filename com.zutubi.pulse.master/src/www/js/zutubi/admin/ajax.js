@@ -83,6 +83,48 @@
         return jqXHR.status === 401 || (jqXHR.status === 403 && jqXHR.statusText && jqXHR.statusText.indexOf("CSRF") >= 0);
     }
 
+    function loginThenRetryAjax(ajaxOptions)
+    {
+        // The initial GET may automatically log us in via remember-me.  If not, it also serves to
+        // ensure we have a live session and matching CSRF token.
+        jQuery.ajax({
+            method: "GET",
+            url: window.baseUrl + "/api/auth/session",
+            dataType: "json",
+            headers: DEFAULT_HEADERS,
+            success: function(data, status, jqXHR)
+            {
+                var token = stashCsrfToken(jqXHR);
+
+                if (data.username)
+                {
+                    jQuery.ajax(ajaxOptions);
+                }
+                else
+                {
+                    Zutubi.admin.app.loginWindow = new Zutubi.admin.LoginWindow({
+                        csrfToken: token,
+                        success: function(data, status, jqXHR)
+                        {
+                            stashCsrfToken(jqXHR);
+                            jQuery.ajax(ajaxOptions);
+                        },
+                        cancel: function()
+                        {
+                            Zutubi.admin.reportError("Action cancelled: authentication required.");
+                        }
+                    });
+
+                    Zutubi.admin.app.loginWindow.show();
+                }
+            },
+            error: function(jqXHR)
+            {
+                ajaxOptions.error.apply(this, arguments);
+            }
+        });
+    }
+
     jQuery.extend(Zutubi.admin, {
         ajax: function(options)
         {
@@ -114,44 +156,7 @@
 
                     if (loginRequired(jqXHR))
                     {
-                        // The initial GET may automatically log us in via remember-me.  If not, it also serves to
-                        // ensure we have a live session and matching CSRF token.
-                        jQuery.ajax({
-                            method: "GET",
-                            url: window.baseUrl + "/api/auth/session",
-                            dataType: "json",
-                            headers: DEFAULT_HEADERS,
-                            success: function(data, status, jqXHR)
-                            {
-                                var token = stashCsrfToken(jqXHR);
-
-                                if (data.username)
-                                {
-                                    jQuery.ajax(resolvedOptions);
-                                }
-                                else
-                                {
-                                    Zutubi.admin.app.loginWindow = new Zutubi.admin.LoginWindow({
-                                        csrfToken: token,
-                                        success: function(data, status, jqXHR)
-                                        {
-                                            stashCsrfToken(jqXHR);
-                                            jQuery.ajax(resolvedOptions);
-                                        },
-                                        cancel: function()
-                                        {
-                                            Zutubi.admin.reportError("Action cancelled: authentication required.");
-                                        }
-                                    });
-
-                                    Zutubi.admin.app.loginWindow.show();
-                                }
-                            },
-                            error: function(jqXHR)
-                            {
-                                options.error.apply(this, arguments);
-                            }
-                        });
+                        loginThenRetryAjax(resolvedOptions);
                     }
                     else
                     {
