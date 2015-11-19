@@ -24,7 +24,7 @@ public class UserConfigurationWizard implements ConfigurationWizard
     public WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete) throws TypeException
     {
         WizardModel model = new WizardModel();
-        model.appendStep(wizardModelBuilder.buildStepForType(getCreatorType(), parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("", getCreatorType(), parentPath, baseName, concrete));
         return model;
     }
 

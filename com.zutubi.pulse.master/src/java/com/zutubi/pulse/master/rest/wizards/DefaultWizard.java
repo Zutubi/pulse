@@ -23,15 +23,13 @@ public class DefaultWizard implements ConfigurationWizard
     public WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete)
     {
         WizardModel model = new WizardModel();
-        model.appendStep(wizardModelBuilder.buildStepForType(type, parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("", type, parentPath, baseName, concrete));
         return model;
     }
-
 
     @Override
     public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
-
         MutableRecord record = wizardModelBuilder.buildRecord(templateOwnerPath, type, "", models.get(""));
         Configuration instance = configurationTemplateManager.validate(parentPath, null, record, concrete, false);
         if (!instance.isValid())

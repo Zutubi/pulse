@@ -57,10 +57,20 @@
     WizardStep.prototype = {
         getValue: function()
         {
-            return {
-                properties: this.valuesByType[this.selectedTypeIndex],
-                type: this.types[this.selectedTypeIndex]
-            };
+            var type = this.types[this.selectedTypeIndex],
+                value = {
+                    kind: "composite",
+                    properties: this.valuesByType[this.selectedTypeIndex]
+                };
+
+            Zutubi.admin.coerceProperties(value.properties, type.simpleProperties);
+
+            if (type.symbolicName)
+            {
+                value.type = {symbolicName: type.symbolicName};
+            }
+
+            return value;
         },
 
         requiresValidation: function()
@@ -438,20 +448,6 @@
         {
             var that = this,
                 wizardData = that.getValue();
-
-            jQuery.each(wizardData, function(property, data)
-            {
-                data.kind = "composite";
-                Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
-                if (data.type.symbolicName)
-                {
-                    data.type = {symbolicName: data.type.symbolicName};
-                }
-                else
-                {
-                    delete data.type;
-                }
-            });
 
             that.trigger(POSTING);
 

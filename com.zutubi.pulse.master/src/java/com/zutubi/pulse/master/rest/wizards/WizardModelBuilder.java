@@ -33,7 +33,7 @@ public class WizardModelBuilder
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager;
 
-    public TypedWizardStepModel buildStepForType(CompositeType type, String parentPath, String baseName, boolean concrete)
+    public TypedWizardStepModel buildStepForType(String key, CompositeType type, String parentPath, String baseName, boolean concrete)
     {
         List<CompositeType> types;
         if (type.isExtendable())
@@ -46,7 +46,7 @@ public class WizardModelBuilder
         }
 
         Messages messages = Messages.getInstance(type.getClazz());
-        TypedWizardStepModel step = new TypedWizardStepModel("", messages.format("label"));
+        TypedWizardStepModel step = new TypedWizardStepModel(key, messages.format("label"));
         for (CompositeType stepType : types)
         {
             messages = Messages.getInstance(stepType.getClazz());
