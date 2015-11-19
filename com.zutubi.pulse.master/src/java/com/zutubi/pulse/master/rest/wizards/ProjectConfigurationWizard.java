@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
@@ -25,13 +26,13 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     private ConfigurationTemplateManager configurationTemplateManager;
 
     @Override
-    public WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete) throws TypeException
+    public WizardModel buildModel(CompositeType type, FormContext context) throws TypeException
     {
         WizardModel model = new WizardModel();
-        model.appendStep(wizardModelBuilder.buildStepForType("", type, parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
         // FIXME kendo these paths are dodgy, maybe paths need to be removed.
-        model.appendStep(wizardModelBuilder.buildStepForType("scm", typeRegistry.getType(ScmConfiguration.class), parentPath, baseName, concrete));
-        model.appendStep(wizardModelBuilder.buildStepForType("type", typeRegistry.getType(TypeConfiguration.class), parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("scm", typeRegistry.getType(ScmConfiguration.class), context));
+        model.appendStep(wizardModelBuilder.buildStepForType("type", typeRegistry.getType(TypeConfiguration.class), context));
         return model;
     }
 

@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest.wizards;
 
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -19,6 +20,6 @@ import java.util.Map;
  */
 public interface ConfigurationWizard
 {
-    WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete) throws TypeException;
+    WizardModel buildModel(CompositeType type, FormContext context) throws TypeException;
     MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException;
 }

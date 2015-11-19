@@ -1,7 +1,6 @@
 package com.zutubi.validation.providers;
 
 import com.zutubi.validation.Validateable;
-import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.validators.ValidateableValidator;
@@ -21,7 +20,7 @@ public class ReflectionValidatorProvider implements ValidatorProvider
     private Map<Class, Boolean> cache = Collections.synchronizedMap(new HashMap<Class, Boolean>());
 
     @Override
-    public List<Validator> getValidators(Class clazz, ValidationContext context)
+    public List<Validator> getValidators(Class clazz)
     {
         Boolean isValidateable = cache.get(clazz);
         if(isValidateable == null)

@@ -4,7 +4,6 @@ import com.zutubi.pulse.master.rest.model.forms.OptionFieldModel;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
@@ -53,19 +52,25 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
     }
 
     @Override
-    protected void process(TypeProperty property, OptionFieldModel field, OptionProvider optionProvider, Object instance)
+    protected void process(TypeProperty property, OptionFieldModel field, OptionProvider optionProvider, FormContext context)
     {
         // In the case of the @Reference annotation, the presence of the 'dependentOn' field is used to
         // replace the default 'instance' for use by the OptionProvider.  Note that the configured OptionProvider
         // will need to expect that it will not be receiving the default instance.
+        Configuration scopeInstance = context.getExistingInstance();
+        if (scopeInstance == null)
+        {
+            scopeInstance = configurationProvider.get(context.getClosestExistingPath(), Configuration.class);
+        }
+
         if (field.hasParameter("dependentOn"))
         {
             String dependentField = (String) field.getParameter("dependentOn");
-            if (instance != null)
+            if (scopeInstance != null)
             {
                 try
                 {
-                    instance = BeanUtils.getProperty(dependentField, instance);
+                    scopeInstance = (Configuration) BeanUtils.getProperty(dependentField, scopeInstance);
                 }
                 catch (BeanException e)
                 {
@@ -75,15 +80,7 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
                 }
             }
         }
-        else if (instance == null)
-        {
-            // The option provider needs an instance to define the scope where reference-able instances can be found.
-            // If we don't have one it's because we're adding a new instance, in that case use the parent of the new
-            // instance as the scope.
-            String path = field.getPath();
-            instance = configurationProvider.get(path == null ? null : PathUtils.getParentPath(path), Configuration.class);
-        }
 
-        super.process(property, field, optionProvider, instance);
+        super.process(property, field, optionProvider, new FormContext(scopeInstance));
     }
 }

@@ -1185,7 +1185,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     CompositeType type = typeRegistry.getType(o.getClass());
                     if (type != null)
                     {
-                        composites.add(new Pair<Configuration, CompositeType>((Configuration) o, type));
+                        composites.add(new Pair<>((Configuration) o, type));
                     }
                 }
 

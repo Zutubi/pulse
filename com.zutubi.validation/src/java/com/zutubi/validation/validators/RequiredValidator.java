@@ -9,8 +9,6 @@ import java.util.Collection;
  */
 public class RequiredValidator extends FieldValidatorSupport
 {
-    private boolean ignorable = true;
-
     public RequiredValidator()
     {
         super("required");
@@ -49,15 +47,5 @@ public class RequiredValidator extends FieldValidatorSupport
         }
 
         return true;
-    }
-
-    public boolean isIgnorable()
-    {
-        return ignorable;
-    }
-
-    public void setIgnorable(boolean ignorable)
-    {
-        this.ignorable = ignorable;
     }
 }

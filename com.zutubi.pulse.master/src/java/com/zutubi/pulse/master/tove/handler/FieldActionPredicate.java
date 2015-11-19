@@ -12,5 +12,5 @@ public interface FieldActionPredicate
     // FIXME kendo old version
     boolean satisfied(FieldDescriptor field, FieldAction annotation);
 
-    boolean satisfied(FieldModel field, FieldAction annotation);
+    boolean satisfied(FieldModel field, FieldAction annotation, FormContext context);
 }

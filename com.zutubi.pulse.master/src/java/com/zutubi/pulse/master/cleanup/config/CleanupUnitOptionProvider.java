@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.TypeProperty;
 
 /**
@@ -9,7 +10,7 @@ import com.zutubi.tove.type.TypeProperty;
  */
 public class CleanupUnitOptionProvider extends EnumOptionProvider
 {
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }

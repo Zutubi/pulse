@@ -132,7 +132,7 @@ public class TwoStepStateBuilder
             ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(extensions);
             select.setListKey(optionProvider.getOptionValue());
             select.setListValue(optionProvider.getOptionText());
-            select.setList(optionProvider.getOptions(null, null, null));
+            select.setList(optionProvider.getOptions(null, null));
 
             descriptor.add(select);
             return descriptor;

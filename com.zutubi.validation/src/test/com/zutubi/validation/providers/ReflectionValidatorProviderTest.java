@@ -7,9 +7,6 @@ import com.zutubi.validation.validators.ValidateableValidator;
 
 import java.util.List;
 
-/**
- * <class-comment/>
- */
 public class ReflectionValidatorProviderTest extends ZutubiTestCase
 {
     private ReflectionValidatorProvider provider;
@@ -30,7 +27,7 @@ public class ReflectionValidatorProviderTest extends ZutubiTestCase
 
     public void testValidateableObject()
     {
-        List<Validator> validators = provider.getValidators(TestWallet.class, null);
+        List<Validator> validators = provider.getValidators(TestWallet.class);
         assertEquals(1, validators.size());
 
         assertTrue(validators.get(0) instanceof ValidateableValidator);
@@ -38,7 +35,7 @@ public class ReflectionValidatorProviderTest extends ZutubiTestCase
 
     public void testPlainOldJavaObject()
     {
-        List<Validator> validators = provider.getValidators(Object.class, null);
+        List<Validator> validators = provider.getValidators(Object.class);
         assertEquals(0, validators.size());
     }
 }

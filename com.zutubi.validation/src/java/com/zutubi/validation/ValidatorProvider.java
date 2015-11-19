@@ -11,9 +11,8 @@ public interface ValidatorProvider
      * Get the list of validators applicable to the specified class within the given context.
      *
      * @param clazz type of objects to validate
-     * @param context for this validation
      *
      * @return list of validators to be used to validate the object.
      */
-    List<Validator> getValidators(Class clazz, ValidationContext context);
+    List<Validator> getValidators(Class clazz);
 }

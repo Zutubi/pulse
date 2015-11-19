@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config;
 
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -29,49 +30,40 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(TypeProperty property, FormContext context)
     {
         // An empty option is always available from getMap.
         return null;
     }
 
     /**
-     * Gets the map of options, which for references maps from paths to names.  The parameters are tweaked vs our
+     * Gets the map of options, which for references maps from paths to names.  The context is tweaked vs our
      * super implementation, hence the documentation here.  See also the {@link com.zutubi.pulse.master.tove.handler.ReferenceAnnotationHandler}
      * which does the tweaking.
      *
-     * @param referencedScopeInstance this instance defines where reference-able instances can be found.  In the normal
-     *                                case this is the same instance the reference is coming from.  However, when the
-     *                                reference is dependentOn another field, that field determines the reference-able
-     *                                scope.  (At the time of writing the example is configuration of selected stages in
-     *                                dependencies, the stage options are from the upstream project, not the project
-     *                                defining the dependency.)
-     * @param referencingFieldParentPath this always refers to the parent path for the field we are providing options
-     *                                   for.  This will correspond with the referencedScopeInstance in the normal case,
-     *                                   but will differ in the dependentOn case.
      * @param property the property defining the field we are providing options for
+     * @param context normal field context with the existing instance changed to the scope for looking up references
      * @return available options for the given property under the given referencingFieldParentPath.  These are instances
      *         of the right type in the closest owning scope (of that type) of the referencedScopeInstance.
      */
-    public Map<String, String> getMap(Object referencedScopeInstance, String referencingFieldParentPath, TypeProperty property)
+    public Map<String, String> getMap(TypeProperty property, FormContext context)
     {
-        if (referencedScopeInstance == null)
+        if (context.getExistingInstance() == null)
         {
             // We don't yet know where we are looking for the reference-able instances.
             return Collections.emptyMap();
         }
 
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
-        Configuration referencedScopeConfiguration = (Configuration) referencedScopeInstance;
-        Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), referencedScopeConfiguration.getConfigurationPath());
-        Map<String, String> options = new LinkedHashMap<String, String>();
+        Configuration referencedScope = context.getExistingInstance();
+        Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), referencedScope.getConfigurationPath());
+        Map<String, String> options = new LinkedHashMap<>();
 
         // Empty option (empty path == null reference).  This is the initial
         // selection when a new instance is being created - required validation
         // can be used to ensure a selection is made.
         options.put("", "");
 
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(referencingFieldParentPath);
         for (Configuration r : referencable)
         {
             if (configurationSecurityManager.hasPermission(r.getConfigurationPath(), AccessManager.ACTION_VIEW))

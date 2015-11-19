@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
@@ -174,7 +175,6 @@ public class ConfigModelBuilder
                 }
             }
         }
-
     }
 
     private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)
@@ -183,7 +183,14 @@ public class ConfigModelBuilder
         TypeSelectionModel model = new TypeSelectionModel(baseName, label);
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(buildCompositeTypeModel(PathUtils.getParentPath(path), baseName, compositeType, configurationTemplateManager.isConcrete(path)));
+            String closestExistingPath = path;
+            while (!configurationTemplateManager.pathExists(closestExistingPath))
+            {
+                closestExistingPath = PathUtils.getParentPath(closestExistingPath);
+            }
+
+            FormContext context = new FormContext(closestExistingPath);
+            model.setType(buildCompositeTypeModel(compositeType, context));
         }
 
         if (isFieldSelected(filters, "configuredDescendants"))
@@ -229,8 +236,8 @@ public class ConfigModelBuilder
     private CompositeModel createCompositeModel(String path, CompositeType type, String label, boolean keyed, Record record, String[] filters) throws TypeException
     {
         String baseName = PathUtils.getBaseName(path);
-        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed);
         Configuration instance = configurationTemplateManager.getInstance(path);
+        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, instance.isConcrete());
         if (isFieldSelected(filters, "properties"))
         {
             model.setProperties(getProperties(configurationTemplateManager.getTemplateOwnerPath(path), type, record));
@@ -243,7 +250,7 @@ public class ConfigModelBuilder
 
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(buildCompositeTypeModel(PathUtils.getParentPath(path), baseName, type, instance.isConcrete()));
+            model.setType(buildCompositeTypeModel(type, new FormContext(instance)));
             if (record instanceof TemplateRecord)
             {
                 decorateForm(model.getType().getForm(), type, (TemplateRecord) record);
@@ -371,18 +378,19 @@ public class ConfigModelBuilder
         return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
     }
 
-    public CompositeTypeModel buildCompositeTypeModel(String parentPath, String baseName, CompositeType type, boolean concrete)
+    public CompositeTypeModel buildCompositeTypeModel(CompositeType type, FormContext context)
     {
         CompositeTypeModel typeModel = new CompositeTypeModel(type);
         if (!type.isExtendable())
         {
-            typeModel.setForm(formModelBuilder.createForm(parentPath, baseName, type, concrete));
+            typeModel.setForm(formModelBuilder.createForm(type));
+            formModelBuilder.applyContextToForm(context, type, typeModel.getForm());
 
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
             if (checkType != null)
             {
                 CompositeTypeModel checkTypeModel = new CompositeTypeModel(checkType);
-                checkTypeModel.setForm(formModelBuilder.createForm(parentPath, null, checkType, true));
+                checkTypeModel.setForm(formModelBuilder.createForm(checkType));
                 typeModel.setCheckType(checkTypeModel);
             }
         }
@@ -390,7 +398,7 @@ public class ConfigModelBuilder
         List<CompositeType> extensions = type.getExtensions();
         for (CompositeType extension: extensions)
         {
-            typeModel.addSubType(buildCompositeTypeModel(parentPath, baseName, extension, concrete));
+            typeModel.addSubType(buildCompositeTypeModel(extension, context));
         }
 
         return typeModel;

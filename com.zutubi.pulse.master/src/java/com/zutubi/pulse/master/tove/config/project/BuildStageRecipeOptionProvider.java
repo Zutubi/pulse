@@ -11,9 +11,9 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.concurrent.ConcurrentUtils;
@@ -40,12 +40,12 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
     private ProjectManager projectManager;
     private ScmManager scmManager;
 
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, final String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, final FormContext context)
     {
         List<String> recipes = new LinkedList<String>();
         recipes.add("");
@@ -57,8 +57,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
             {
                 public List<String> call() throws Exception
                 {
-                    Configuration stages = configurationProvider.get(parentPath, Configuration.class);
-                    ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(stages, ProjectConfiguration.class);
+                    ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(context.getClosestExistingPath(), ProjectConfiguration.class);
                     if (projectConfig != null)
                     {
                         PulseFileProvider pulseFileProvider = projectConfig.getType().getPulseFile();

@@ -18,11 +18,11 @@ import java.util.Map;
  */
 public abstract class MapOptionProvider implements OptionProvider
 {
-    public abstract Option getEmptyOption(Object instance, String parentPath, TypeProperty property);
+    public abstract Option getEmptyOption(TypeProperty property, FormContext context);
 
-    public List<Option> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<Option> getOptions(TypeProperty property, FormContext context)
     {
-        Map<String, String> optionMap = getMap(instance, parentPath, property);
+        Map<String, String> optionMap = getMap(property, context);
         List<Option> options = Lists.newArrayList(Iterables.transform(optionMap.entrySet(), new Function<Map.Entry<String, String>, Option>()
         {
             @Override
@@ -49,7 +49,7 @@ public abstract class MapOptionProvider implements OptionProvider
         });
     }
 
-    protected abstract Map<String, String> getMap(Object instance, String parentPath, TypeProperty property);
+    protected abstract Map<String, String> getMap(TypeProperty property, FormContext context);
 
     public String getOptionValue()
     {

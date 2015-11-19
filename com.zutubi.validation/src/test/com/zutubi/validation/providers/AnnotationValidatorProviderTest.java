@@ -21,7 +21,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testPropertyConstraint()
     {
         TestAnimal animal = new TestAnimal();
-        List<Validator> validators = provider.getValidators(animal.getClass(), null);
+        List<Validator> validators = provider.getValidators(animal.getClass());
         assertNotNull(validators);
         assertEquals(1, validators.size());
 
@@ -32,7 +32,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testPropertyConstriantWithParameters()
     {
         TestWall wall = new TestWall();
-        List<Validator> validators = provider.getValidators(wall.getClass(), null);
+        List<Validator> validators = provider.getValidators(wall.getClass());
         assertNotNull(validators);
         assertEquals(1, validators.size());
 
@@ -44,7 +44,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testCustomKeySuffixDefinedOnConstraint()
     {
         TestAnimal animal = new TestAnimal();
-        List<Validator> validators = provider.getValidators(animal.getClass(), null);
+        List<Validator> validators = provider.getValidators(animal.getClass());
         RequiredValidator r = (RequiredValidator) validators.get(0);
         assertEquals("myrequired", r.getDefaultKeySuffix());
     }
@@ -52,7 +52,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testNestedValidation()
     {
         TestHouse house = new TestHouse();
-        List<Validator> validators = provider.getValidators(house.getClass(), null);
+        List<Validator> validators = provider.getValidators(house.getClass());
 
         assertEquals(1, validators.size());
 
@@ -63,7 +63,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     public void testValidationDefinedInSuperClass()
     {
         TestMouse mouse = new TestMouse();
-        List<Validator> validators = provider.getValidators(mouse.getClass(), null);
+        List<Validator> validators = provider.getValidators(mouse.getClass());
 
         assertEquals(1, validators.size());
         RequiredValidator r = (RequiredValidator) validators.get(0);
@@ -74,14 +74,14 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
     {
         // the book implementes the readable interface with its validation.
         TestBook book = new TestBook();
-        List<Validator> validators = provider.getValidators(book.getClass(), null);
+        List<Validator> validators = provider.getValidators(book.getClass());
 
         assertEquals(2, validators.size());
 
         // ensure that the readable validator is picked up only once, even through the interface is
         // implemented multiple times.
         TestNiceBook niceBook = new TestNiceBook();
-        validators = provider.getValidators(niceBook.getClass(), null);
+        validators = provider.getValidators(niceBook.getClass());
 
         assertEquals(2, validators.size());
     }
@@ -191,7 +191,7 @@ public class AnnotationValidatorProviderTest extends ZutubiTestCase
      */
     private List<Validator> typedValidatorHelper(Object instance, Class<? extends Validator>... expectedTypes)
     {
-        List<Validator> validators = provider.getValidators(instance.getClass(), null);
+        List<Validator> validators = provider.getValidators(instance.getClass());
         assertEquals(expectedTypes.length, validators.size());
         int i = 0;
         for (Validator validator: validators)

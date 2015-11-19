@@ -11,7 +11,6 @@ import java.util.Map;
 public class FieldModel
 {
     private String type;
-    private String path;
     private String name;
     private String label;
     private boolean required;
@@ -41,16 +40,6 @@ public class FieldModel
     public void setType(String type)
     {
         this.type = type;
-    }
-
-    public String getPath()
-    {
-        return path;
-    }
-
-    public void setPath(String path)
-    {
-        this.path = path;
     }
 
     public String getName()

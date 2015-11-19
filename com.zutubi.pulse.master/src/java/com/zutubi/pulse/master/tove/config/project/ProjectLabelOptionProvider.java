@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
@@ -23,19 +24,19 @@ public class ProjectLabelOptionProvider extends ListOptionProvider
 
     private ProjectManager projectManager;
 
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
-        Set<String> sortedLabels = new TreeSet<String>(new Sort.StringComparator());
-        if(instance != null)
+        Set<String> sortedLabels = new TreeSet<>(new Sort.StringComparator());
+        if (context.getExistingInstance() != null)
         {
             try
             {
-                Object propertyValue = property.getValue(instance);
+                Object propertyValue = property.getValue(context.getExistingInstance());
                 if(propertyValue instanceof List)
                 {
                     sortedLabels.addAll((List<String>)propertyValue);
@@ -55,7 +56,7 @@ public class ProjectLabelOptionProvider extends ListOptionProvider
             }
         }));
 
-        return new ArrayList<String>(sortedLabels);
+        return new ArrayList<>(sortedLabels);
     }
 
     public void setProjectManager(ProjectManager projectManager)

@@ -6,7 +6,6 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.validation.FieldValidator;
-import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.annotations.Constraint;
@@ -47,7 +46,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     }
 
     @Override
-    public List<Validator> getValidators(Class clazz, ValidationContext context)
+    public List<Validator> getValidators(Class clazz)
     {
         List<Validator> validators = secondLevelCache.get(clazz);
         if (validators == null)

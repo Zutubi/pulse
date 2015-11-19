@@ -24,6 +24,12 @@ public class OptionAnnotationHandler extends FieldAnnotationHandler
     private ObjectFactory objectFactory;
     protected ConfigurationProvider configurationProvider;
 
+    @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        return true;
+    }
+
     // FIXME kendo old version
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
@@ -48,11 +54,12 @@ public class OptionAnnotationHandler extends FieldAnnotationHandler
     {
         String parentPath = field.getParentPath();
         TypeProperty fieldTypeProperty = field.getProperty();
-        
-        List optionList = optionProvider.getOptions(instance, parentPath, fieldTypeProperty);
+
+        FormContext context = new FormContext((Configuration) instance);
+        List optionList = optionProvider.getOptions(fieldTypeProperty, context);
         field.setList(optionList);
 
-        Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, fieldTypeProperty);
+        Object emptyOption = optionProvider.getEmptyOption(fieldTypeProperty, context);
         if (emptyOption != null)
         {
             field.setEmptyOption(emptyOption);
@@ -73,35 +80,24 @@ public class OptionAnnotationHandler extends FieldAnnotationHandler
 
 
 
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
-        super.process(annotatedType, property, annotation, field);
+        super.process(annotatedType, property, annotation, field, context);
 
         OptionFieldModel optionField = (OptionFieldModel) field;
         if (!optionField.isLazy())
         {
             OptionProvider optionProvider = OptionProviderFactory.build(annotatedType, property.getType(), annotation, objectFactory);
-            Configuration instance = null;
-            String path = field.getPath();
-            String baseName = path == null ? null : PathUtils.getBaseName(path);
-            if (baseName != null && configurationProvider != null)
-            {
-                instance = configurationProvider.get(path, Configuration.class);
-            }
-
-            process(property, optionField, optionProvider, instance);
+            process(property, optionField, optionProvider, context);
         }
     }
 
-    protected void process(TypeProperty property, OptionFieldModel field, OptionProvider optionProvider, Object instance)
+    protected void process(TypeProperty property, OptionFieldModel field, OptionProvider optionProvider, FormContext context)
     {
-        String path = field.getPath();
-        String parentPath = path == null ? null : PathUtils.getParentPath(path);
-
-        List optionList = optionProvider.getOptions(instance, parentPath, property);
+        List optionList = optionProvider.getOptions(property, context);
         field.setList(optionList);
 
-        Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, property);
+        Object emptyOption = optionProvider.getEmptyOption(property, context);
         if (emptyOption != null)
         {
             field.setEmptyOption(emptyOption);

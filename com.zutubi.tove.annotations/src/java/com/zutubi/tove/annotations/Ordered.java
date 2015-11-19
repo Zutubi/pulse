@@ -11,8 +11,6 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-// we need the annotations parameters to be picked up and applied to the context via a handler
-@Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface Ordered
 {
     /**

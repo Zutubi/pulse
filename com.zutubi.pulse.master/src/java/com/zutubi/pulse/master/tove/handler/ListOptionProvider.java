@@ -9,8 +9,8 @@ import java.util.List;
  */
 public abstract class ListOptionProvider implements OptionProvider
 {
-    public abstract String getEmptyOption(Object instance, String parentPath, TypeProperty property);
-    public abstract List<String> getOptions(Object instance, String parentPath, TypeProperty property);
+    public abstract String getEmptyOption(TypeProperty property, FormContext context);
+    public abstract List<String> getOptions(TypeProperty property, FormContext context);
 
     public String getOptionValue()
     {

@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
@@ -47,10 +48,12 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     }
 
     @Override
-    public boolean satisfied(FieldModel field, FieldAction annotation)
+    public boolean satisfied(FieldModel field, FieldAction annotation, FormContext context)
     {
-        String path = field.getPath();
-        return satisfied(path, path == null ? null : PathUtils.getBaseName(path));
+        // FIXME kendo
+        return false;
+//        String path = field.getPath();
+//        return satisfied(path, path == null ? null : PathUtils.getBaseName(path));
     }
 
     private boolean satisfied(String path, String baseName)

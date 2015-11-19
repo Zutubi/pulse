@@ -22,5 +22,5 @@ public @interface Field
      *
      * @return a valid type identifier
      */
-    public String type();
+    String type();
 }

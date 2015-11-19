@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -21,10 +22,10 @@ public class UserConfigurationWizard implements ConfigurationWizard
     private TypeRegistry typeRegistry;
 
     @Override
-    public WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete) throws TypeException
+    public WizardModel buildModel(CompositeType type, FormContext context) throws TypeException
     {
         WizardModel model = new WizardModel();
-        model.appendStep(wizardModelBuilder.buildStepForType("", getCreatorType(), parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("", getCreatorType(), context));
         return model;
     }
 

@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,17 +15,17 @@ import java.util.List;
  */
 public class MultiRecipeTypeDefaultRecipeOptionProvider extends ListOptionProvider
 {
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
-        List<String> recipes = new LinkedList<String>();
-        if (instance != null)
+        List<String> recipes = new ArrayList<>();
+        if (context.getExistingInstance() != null)
         {
-            MultiRecipeTypeConfiguration config = (MultiRecipeTypeConfiguration) instance;
+            MultiRecipeTypeConfiguration config = (MultiRecipeTypeConfiguration) context.getExistingInstance();
             recipes.addAll(config.getRecipes().keySet());
             Collections.sort(recipes, new Sort.StringComparator());
         }

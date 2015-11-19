@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.rest.wizards.ConfigurationWizard;
 import com.zutubi.pulse.master.rest.wizards.DefaultWizard;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
@@ -78,7 +79,7 @@ public class WizardController
             configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_CREATE);
 
             PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);
-            model = buildModel(context.getPostableType(), context.getParentPath(), context.getBaseName(), configurationTemplateManager.isConcrete(configPath));
+            model = buildModel(context.getPostableType(), context.getParentPath());
         }
 
         return new ResponseEntity<>(model, HttpStatus.OK);
@@ -89,7 +90,7 @@ public class WizardController
         TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
         CompositeType itemType = collectionType.getTargetType();
         // FIXME kendo we pass true but don't yet know if this is a template.
-        WizardModel model = buildModel(itemType, scope, null, true);
+        WizardModel model = buildModel(itemType, scope);
 
         TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
         TemplateNode parentNode = hierarchy.getRoot();
@@ -142,10 +143,11 @@ public class WizardController
         return templates;
     }
 
-    private WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete) throws TypeException
+    private WizardModel buildModel(CompositeType type, String parentPath) throws TypeException
     {
         ConfigurationWizard wizard = buildWizard(type);
-        return wizard.buildModel(type, parentPath, baseName, concrete);
+        FormContext context = new FormContext(parentPath);
+        return wizard.buildModel(type, context);
     }
 
     private ConfigurationWizard buildWizard(CompositeType type)
@@ -256,7 +258,7 @@ public class WizardController
 
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ConfigurationWizard wizard = buildWizard(context.getPostableType());
-        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), templateOwnerPath, configurationTemplateManager.isConcrete(configPath), body);
+        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), templateOwnerPath, configurationTemplateManager.isConcrete(templateOwnerPath), body);
 
         return configurationTemplateManager.insertRecord(configPath, record);
     }

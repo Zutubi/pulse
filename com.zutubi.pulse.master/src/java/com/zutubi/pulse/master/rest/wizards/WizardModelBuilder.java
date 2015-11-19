@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.CompositeTypeModel;
 import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
 import com.zutubi.pulse.master.rest.model.WizardTypeModel;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.ConfigurationValidationContext;
@@ -33,7 +34,7 @@ public class WizardModelBuilder
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager;
 
-    public TypedWizardStepModel buildStepForType(String key, CompositeType type, String parentPath, String baseName, boolean concrete)
+    public TypedWizardStepModel buildStepForType(String key, CompositeType type, FormContext context)
     {
         List<CompositeType> types;
         if (type.isExtendable())
@@ -51,7 +52,7 @@ public class WizardModelBuilder
         {
             messages = Messages.getInstance(stepType.getClazz());
             String labelKey = messages.isKeyDefined("wizard.label") ? "wizard.label" : "label";
-            step.addType(new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(parentPath, baseName, stepType, concrete), messages.format(labelKey)));
+            step.addType(new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context), messages.format(labelKey)));
         }
         return step;
     }

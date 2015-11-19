@@ -24,13 +24,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Numeric
 {
-    static final String DEFAULT_defaultKeySuffix = "";
+    String DEFAULT_defaultKeySuffix = "";
 
-    static final boolean DEFAULT_shortCircuit = true;
+    boolean DEFAULT_shortCircuit = true;
 
-    static final int DEFAULT_max = Integer.MAX_VALUE;
+    int DEFAULT_max = Integer.MAX_VALUE;
 
-    static final int DEFAULT_min = Integer.MIN_VALUE;
+    int DEFAULT_min = Integer.MIN_VALUE;
 
     String defaultKeySuffix() default DEFAULT_defaultKeySuffix;
 

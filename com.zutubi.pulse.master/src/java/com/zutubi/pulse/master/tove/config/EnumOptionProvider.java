@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config;
 
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
@@ -15,12 +16,12 @@ import java.util.Map;
  */
 public class EnumOptionProvider extends MapOptionProvider
 {
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(TypeProperty property, FormContext context)
     {
         return new Option("", "");
     }
 
-    public Map<String,String> getMap(Object instance, String path, TypeProperty property)
+    public Map<String,String> getMap(TypeProperty property, FormContext context)
     {
         EnumType enumType = (EnumType) property.getType().getTargetType();
         Class<? extends Enum> enumClass = enumType.getClazz();

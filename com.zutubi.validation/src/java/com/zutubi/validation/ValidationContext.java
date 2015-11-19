@@ -10,4 +10,5 @@ import com.zutubi.validation.i18n.TextProvider;
  */
 public interface ValidationContext extends ValidationAware, TextProvider, Config
 {
+    boolean shouldIgnoreValidator(Validator validator);
 }

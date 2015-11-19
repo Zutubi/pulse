@@ -23,6 +23,13 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
     private ObjectFactory objectFactory;
 
     @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        FieldAction fieldAction = (FieldAction) annotation;
+        return StringUtils.stringSet(fieldAction.filterClass());
+    }
+
+    @Override
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
@@ -56,13 +63,13 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
     }
 
     @Override
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
         FieldAction fieldAction = (FieldAction) annotation;
         if (StringUtils.stringSet(fieldAction.filterClass()))
         {
             Class<Object> filterClass = ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), fieldAction.filterClass());
-            if (!satisfied(filterClass, field, fieldAction))
+            if (!satisfied(filterClass, field, fieldAction, context))
             {
                 return;
             }
@@ -77,7 +84,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
 
     }
 
-    private boolean satisfied(Class<Object> filterClass, FieldModel field, FieldAction fieldAction)
+    private boolean satisfied(Class<Object> filterClass, FieldModel field, FieldAction fieldAction, FormContext context)
     {
         if (!FieldActionPredicate.class.isAssignableFrom(filterClass))
         {
@@ -86,7 +93,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
         }
 
         FieldActionPredicate predicate = (FieldActionPredicate) objectFactory.buildBean(filterClass);
-        return predicate.satisfied(field, fieldAction);
+        return predicate.satisfied(field, fieldAction, context);
     }
 
 

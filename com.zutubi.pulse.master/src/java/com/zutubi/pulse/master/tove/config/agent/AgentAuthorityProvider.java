@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeProperty;
@@ -17,12 +18,12 @@ import java.util.List;
  */
 public class AgentAuthorityProvider extends ListOptionProvider
 {
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
         List<String> options = new LinkedList<String>();
         options.addAll(Arrays.asList(AccessManager.ACTION_ADMINISTER, AccessManager.ACTION_VIEW, AccessManager.ACTION_WRITE, AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING));

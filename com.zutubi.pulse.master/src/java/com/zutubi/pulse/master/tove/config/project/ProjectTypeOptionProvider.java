@@ -1,23 +1,25 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import static com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration.*;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration.*;
+
 /**
  * An option provider that gives the high-level project types available.
  */
 public class ProjectTypeOptionProvider extends ListOptionProvider
 {
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
         return Arrays.asList(TYPE_CUSTOM, TYPE_MULTI_STEP, TYPE_SINGLE_STEP, TYPE_VERSIONED);
     }

@@ -15,6 +15,7 @@ public class CompositeModel extends ConfigModel
 {
     private CompositeTypeModel type;
     private boolean keyed;
+    private boolean concrete;
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
     private List<ActionModel> actions;
@@ -25,10 +26,11 @@ public class CompositeModel extends ConfigModel
     {
     }
 
-    public CompositeModel(String handle, String key, String label, boolean keyed)
+    public CompositeModel(String handle, String key, String label, boolean keyed, boolean concrete)
     {
         super(handle, key, label);
         this.keyed = keyed;
+        this.concrete = concrete;
     }
 
     public CompositeTypeModel getType()
@@ -44,6 +46,11 @@ public class CompositeModel extends ConfigModel
     public boolean isKeyed()
     {
         return keyed;
+    }
+
+    public boolean isConcrete()
+    {
+        return concrete;
     }
 
     public Map<String, Object> getProperties()

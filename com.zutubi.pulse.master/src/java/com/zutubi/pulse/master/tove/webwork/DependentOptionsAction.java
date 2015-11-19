@@ -1,11 +1,13 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.google.common.base.Function;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
@@ -86,9 +88,9 @@ public class DependentOptionsAction extends ActionSupport
 
         OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.optionProvider()));
 
-        Object instance = configurationProvider.get(this.dependency, dependencyProperty.getClazz());
+        Configuration instance = configurationProvider.get(this.dependency, dependencyProperty.getClazz());
 
-        List mapOptions = optionProvider.getOptions(instance, path, property);
+        List mapOptions = optionProvider.getOptions(property, new FormContext(instance));
 
         // convert the map options to a list of lists for easy consumption by the javascript.
         options = newArrayList(transform(mapOptions, new Function<Object, Object>()

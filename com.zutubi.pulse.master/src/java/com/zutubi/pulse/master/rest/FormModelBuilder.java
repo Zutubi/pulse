@@ -5,14 +5,14 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.model.forms.*;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
-import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.validation.NameValidator;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -91,7 +91,15 @@ public class FormModelBuilder
         fieldDescriptorTypes.put(type, clazz);
     }
 
-    public FormModel createForm(String parentPath, String baseName, CompositeType type, boolean concrete)
+    /**
+     * Creates a form for configuring the given type.  This method deliberately only deals with the
+     * type without further context (e.g. an existing instance).  Therefore it does not include
+     * things like option lists, validation notes or other decoration that depends on the context.
+     *
+     * @param type type to create the form for
+     * @return the new form
+     */
+    public FormModel createForm(CompositeType type)
     {
         Messages messages = Messages.getInstance(type.getClazz());
         FormModel form = new FormModel();
@@ -103,7 +111,7 @@ public class FormModelBuilder
             AnnotationUtils.setPropertiesFromAnnotation(formAnnotation, form);
             fieldOrder.addAll(Arrays.asList(formAnnotation.fieldOrder()));
         }
-        addFields(parentPath, baseName, type, messages, concrete, form);
+        addFields(type, messages, form);
 
         fieldOrder = ToveUtils.evaluateFieldOrder(fieldOrder, newArrayList(transform(form.getFields(), new Function<FieldModel, String>()
         {
@@ -118,15 +126,35 @@ public class FormModelBuilder
         return form;
     }
 
-    private void addFields(String parentPath, String baseName, CompositeType type, Messages messages, boolean concrete, FormModel form)
+    public void applyContextToForm(FormContext context, CompositeType type, FormModel form)
     {
-        List<Validator> validators = getValidators(parentPath, baseName, concrete, type);
-        String path = PathUtils.getPath(parentPath, baseName);
+        for (FieldModel field: form.getFields())
+        {
+            handleAnnotations(type, type.getProperty(field.getName()), field, context);
+        }
+    }
+
+    private boolean hasRequiredValidator(String fieldName, List<Validator> validators)
+    {
+        for (Validator v : validators)
+        {
+            if (v instanceof FieldValidator && ((FieldValidator) v).getFieldName().equals(fieldName))
+            {
+                return v instanceof RequiredValidator || v instanceof NameValidator;
+            }
+        }
+
+        return false;
+    }
+
+    private void addFields(CompositeType type, Messages messages, FormModel form)
+    {
+        List<Validator> validators =  getValidators(type);
 
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
-            FieldModel fd = createField(path, property, messages);
-            addFieldParameters(type, parentPath, property, fd, validators);
+            FieldModel fd = createField(property, messages);
+            addFieldParameters(type, property, fd, validators);
             form.addField(fd);
         }
 
@@ -143,20 +171,19 @@ public class FormModelBuilder
                     fieldType = field.type();
                 }
 
-                FieldModel fd = createFieldOfType(fieldType, path, property, messages);
-                addFieldParameters(type, parentPath, property, fd, validators);
+                FieldModel fd = createFieldOfType(fieldType, property, messages);
+                addFieldParameters(type, property, fd, validators);
                 form.addField(fd);
             }
         }
     }
 
-    private List<Validator> getValidators(String parentPath, String baseName, boolean concrete, CompositeType type)
+    private List<Validator> getValidators(CompositeType type)
     {
         List<Validator> validators;
         try
         {
-            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(null, null, parentPath, baseName, !concrete, false, null);
-            validators = configurationValidatorProvider.getValidators(type.getClazz(), validationContext);
+            validators = configurationValidatorProvider.getValidators(type.getClazz());
         }
         catch (Throwable e)
         {
@@ -167,7 +194,7 @@ public class FormModelBuilder
         return validators;
     }
 
-    private FieldModel createField(String path, TypeProperty property, Messages messages)
+    private FieldModel createField(TypeProperty property, Messages messages)
     {
         String fieldType = FieldType.TEXT;
         com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
@@ -188,10 +215,10 @@ public class FormModelBuilder
             }
         }
 
-        return createFieldOfType(fieldType, path, property, messages);
+        return createFieldOfType(fieldType, property, messages);
     }
 
-    private FieldModel createFieldOfType(String type, String path, TypeProperty property, Messages messages)
+    private FieldModel createFieldOfType(String type, TypeProperty property, Messages messages)
     {
         Class<? extends FieldModel> clazz = fieldDescriptorTypes.get(type);
         FieldModel field;
@@ -212,16 +239,16 @@ public class FormModelBuilder
             }
         }
 
-        field.setPath(path);
         field.setName(property.getName());
         field.setType(type);
         field.setLabel(messages.format(property.getName() + ".label"));
         return field;
     }
 
-    private void addFieldParameters(CompositeType type, String parentPath, TypeProperty property, FieldModel field, List<Validator> validators)
+    private void addFieldParameters(CompositeType type, TypeProperty property, FieldModel field, List<Validator> validators)
     {
-        handleAnnotations(type, property, field, property.getAnnotations());
+        field.setRequired(hasRequiredValidator(field.getName(), validators));
+        handleAnnotations(type, property, field, null);
 
         if (!property.isWritable())
         {
@@ -242,31 +269,23 @@ public class FormModelBuilder
             OptionFieldModel optionModel = (OptionFieldModel) field;
             if (optionModel.getList() == null)
             {
-                addDefaultOptions(parentPath, property, optionModel);
-            }
-        }
-
-        for (Validator validator: validators)
-        {
-            if (validator instanceof RequiredValidator && ((FieldValidator)validator).getFieldName().equals(field.getName()))
-            {
-                field.setRequired(true);
+                addDefaultOptions(property, optionModel);
             }
         }
     }
 
-    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, OptionFieldModel fd)
+    private void addDefaultOptions(TypeProperty typeProperty, OptionFieldModel fd)
     {
         if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
             // We can pass null through to the option provider here because we know that the EnumOptionProvider
-            // does not make use of the instance.
+            // does not make use of the context.
             EnumOptionProvider optionProvider = new EnumOptionProvider();
-            fd.setList(optionProvider.getOptions(null, parentPath, typeProperty));
+            fd.setList(optionProvider.getOptions(typeProperty, null));
             fd.setListValue(optionProvider.getOptionValue());
             fd.setListText(optionProvider.getOptionText());
 
-            Object emptyOption = optionProvider.getEmptyOption(null, parentPath, typeProperty);
+            Object emptyOption = optionProvider.getEmptyOption(typeProperty, null);
             if (emptyOption != null)
             {
                 fd.setEmptyOption(emptyOption);
@@ -278,9 +297,9 @@ public class FormModelBuilder
         }
     }
 
-    private void handleAnnotations(CompositeType type, TypeProperty property, FieldModel field, Iterable<Annotation> annotations)
+    private void handleAnnotations(CompositeType type, TypeProperty property, FieldModel field, FormContext context)
     {
-        for (Annotation annotation : annotations)
+        for (Annotation annotation : property.getAnnotations())
         {
             Class<? extends Annotation> annotationType = annotation.annotationType();
             if (annotationType.getName().startsWith("java.lang"))
@@ -295,7 +314,12 @@ public class FormModelBuilder
                 try
                 {
                     AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.className(), AnnotationHandler.class);
-                    handler.process(type, property, annotation, field);
+                    boolean contextAvailable = context != null;
+                    boolean contextRequired = handler.requiresContext(annotation);
+                    if (contextAvailable == contextRequired)
+                    {
+                        handler.process(type, property, annotation, field, context);
+                    }
                 }
                 catch (Exception e)
                 {

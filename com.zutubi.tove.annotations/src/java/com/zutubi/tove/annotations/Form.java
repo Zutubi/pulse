@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
  * The form annotation allows for some level of customisation of the rendering of the form
  * that is generated for the annotated object.
  */
-@Handler(className = DefaultAnnotationHandlers.FORM)
 public @interface Form
 {
     /**

@@ -27,12 +27,12 @@ public class ExtensionOptionProvider extends MapOptionProvider
         this.extensions = extensions;
     }
 
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
+    public Map<String, String> getMap(TypeProperty property, FormContext context)
     {
         List<CompositeType> extensions;
         if (this.extensions != null)

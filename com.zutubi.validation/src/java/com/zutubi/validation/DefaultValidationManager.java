@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class DefaultValidationManager implements ValidationManager
 {
-    private List<ValidatorProvider> providers = new LinkedList<ValidatorProvider>();
+    private List<ValidatorProvider> providers = new LinkedList<>();
 
     public DefaultValidationManager()
     {
@@ -21,21 +21,25 @@ public class DefaultValidationManager implements ValidationManager
     {
         verify(providers);
 
-        List<Validator> validators = new LinkedList<Validator>();
+        List<Validator> validators = new LinkedList<>();
         for (ValidatorProvider provider : providers)
         {
-            validators.addAll(provider.getValidators(o.getClass(), context));
+            validators.addAll(provider.getValidators(o.getClass()));
         }
 
         for (Validator v : validators)
         {
+            if (context.shouldIgnoreValidator(v))
+            {
+                continue;
+            }
+
             // short circuit is on a per field basis.
             if (v instanceof FieldValidator)
             {
                 FieldValidator vf = (FieldValidator) v;
                 if (context.hasFieldError(vf.getFieldName()) && (v instanceof ShortCircuitableValidator) && ((ShortCircuitableValidator)v).isShortCircuit())
                 {
-                    // short circuit.
                     continue;
                 }
             }

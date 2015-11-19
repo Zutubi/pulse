@@ -7,9 +7,7 @@ import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Handler;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -113,8 +111,8 @@ public class FormDescriptorFactory
 
     private List<FieldDescriptor> buildFieldDescriptors(String parentPath, String baseName, CompositeType type, boolean concrete, FormDescriptor form)
     {
-        List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
-        List<Validator> validators = getValidators(parentPath, baseName, concrete, type);
+        List<FieldDescriptor> fieldDescriptors = new LinkedList<>();
+        List<Validator> validators = getValidators(type);
 
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
@@ -161,20 +159,18 @@ public class FormDescriptorFactory
         fd.setType(fieldType);
     }
 
-    private List<Validator> getValidators(String parentPath, String baseName, boolean concrete, CompositeType type)
+    private List<Validator> getValidators(CompositeType type)
     {
         List<Validator> validators;
         try
         {
-            Configuration dummyInstance = type.getClazz().newInstance();
-            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, false, configurationTemplateManager);
-            validators = configurationValidatorProvider.getValidators(type.getClazz(), validationContext);
+            validators = configurationValidatorProvider.getValidators(type.getClazz());
         }
         catch (Throwable e)
         {
             // Not ideal, but we can soldier on regardless.
             LOG.warning("Unable to get validators for type '" + type.getSymbolicName() + "': " + e.getMessage(), e);
-            validators = new ArrayList<Validator>(0);
+            validators = new ArrayList<>(0);
         }
         return validators;
     }
@@ -273,11 +269,11 @@ public class FormDescriptorFactory
             // We can pass null through to the option provider here because we know that the EnumOptionProvider
             // does not make use of the instance.
             EnumOptionProvider optionProvider = new EnumOptionProvider();
-            fd.setList(optionProvider.getOptions(null, parentPath, fd.getProperty()));
+            fd.setList(optionProvider.getOptions(fd.getProperty(), null));
             fd.setListKey(optionProvider.getOptionValue());
             fd.setListValue(optionProvider.getOptionText());
 
-            Object emptyOption = optionProvider.getEmptyOption(null, parentPath, fd.getProperty());
+            Object emptyOption = optionProvider.getEmptyOption(fd.getProperty(), null);
             if (emptyOption != null)
             {
                 fd.setEmptyOption(emptyOption);

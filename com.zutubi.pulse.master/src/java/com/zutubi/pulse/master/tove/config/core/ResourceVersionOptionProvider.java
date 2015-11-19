@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.core;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
@@ -13,22 +14,22 @@ import java.util.*;
  */
 public class ResourceVersionOptionProvider extends MapOptionProvider
 {
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(TypeProperty property, FormContext context)
     {
         // There is always an 'empty' option.
         return null;
     }
 
-    public Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
+    public Map<String, String> getMap(TypeProperty property, FormContext context)
     {
-        List<String> resourceVersions = new LinkedList<String>();
-        if(instance != null)
+        List<String> resourceVersions = new ArrayList<>();
+        if (context.getExistingInstance() != null)
         {
-            resourceVersions.addAll(((ResourceConfiguration) instance).getVersions().keySet());
+            resourceVersions.addAll(((ResourceConfiguration) context.getExistingInstance()).getVersions().keySet());
         }
         Collections.sort(resourceVersions, new Sort.StringComparator());
 
-        Map<String, String> versions = new HashMap<String, String>(resourceVersions.size() + 1);
+        Map<String, String> versions = new HashMap<>(resourceVersions.size() + 1);
         versions.put("", "[none]");
         for(String version: resourceVersions)
         {

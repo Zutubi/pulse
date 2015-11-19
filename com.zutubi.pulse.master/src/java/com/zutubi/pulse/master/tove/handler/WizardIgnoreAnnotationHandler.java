@@ -13,13 +13,19 @@ import java.lang.annotation.Annotation;
 public class WizardIgnoreAnnotationHandler implements AnnotationHandler
 {
     @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        return false;
+    }
+
+    @Override
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         // FIXME kendo remove this old version
     }
 
     @Override
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
         field.addParameter("wizardIgnore", true);
     }

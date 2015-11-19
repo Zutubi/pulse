@@ -18,18 +18,15 @@ public interface OptionProvider
      * template (in the single select case where the user is forced to
      * choose from the drop-down).
      *
-     * @param instance   the current instance containing the field, which may
-     *                   be null if a new object is being created
-     * @param parentPath the path of the parent of the instance that the
-     *                   field is defined on
      * @param property   type information for the property we are providing
      *                   options for.  Note that the property type may be a
      *                   collection: options should be based on the target
      *                   type of the property's type.
+     * @param context    holds whatever contextual information is available
      * @return the empty option, or null if it is non-sensical to have such
      *         an option even in the templating case
      */
-    Object getEmptyOption(Object instance, String parentPath, TypeProperty property);
+    Object getEmptyOption(TypeProperty property, FormContext context);
 
     /**
      * Get the list of options to be presented to the user.  Each option is
@@ -38,17 +35,14 @@ public interface OptionProvider
      * For simple cases, the option itself can be a string that serves both
      * purposes.
      *
-     * @param instance   the current instance containing the field, which may
-     *                   be null if a new object is being created
-     * @param parentPath the path of the parent of the instance that the
-     *                   field is defined on
      * @param property   type information for the property we are providing
      *                   options for.  Note that the property type may be a
      *                   collection: options should be based on the target
      *                   type of the property's type.
+     * @param context    holds whatever contextual information is available
      * @return a list of the available options
      */
-    List getOptions(Object instance, String parentPath, TypeProperty property);
+    List getOptions(TypeProperty property, FormContext context);
 
     /**
      * Defines the key/property to be used to retrieve the option value from

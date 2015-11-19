@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.rest.wizards;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
@@ -20,10 +21,10 @@ public class DefaultWizard implements ConfigurationWizard
     private ConfigurationTemplateManager configurationTemplateManager;
 
     @Override
-    public WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete)
+    public WizardModel buildModel(CompositeType type, FormContext context)
     {
         WizardModel model = new WizardModel();
-        model.appendStep(wizardModelBuilder.buildStepForType("", type, parentPath, baseName, concrete));
+        model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
         return model;
     }
 

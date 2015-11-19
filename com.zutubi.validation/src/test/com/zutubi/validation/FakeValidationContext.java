@@ -138,4 +138,10 @@ public class FakeValidationContext implements ValidationContext
     {
         return config.isWritable();
     }
+
+    @Override
+    public boolean shouldIgnoreValidator(Validator validator)
+    {
+        return false;
+    }
 }

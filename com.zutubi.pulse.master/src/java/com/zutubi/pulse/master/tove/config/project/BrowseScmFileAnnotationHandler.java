@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.type.CompositeType;
@@ -19,6 +20,12 @@ public class BrowseScmFileAnnotationHandler implements AnnotationHandler
     private static final String PARAMETER_BASE_DIR = "baseDirField";
 
     @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        return false;
+    }
+
+    @Override
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
@@ -30,7 +37,7 @@ public class BrowseScmFileAnnotationHandler implements AnnotationHandler
     }
 
     @Override
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
         BrowseScmFileAction action = (BrowseScmFileAction) annotation;
         if (StringUtils.stringSet(action.baseDirField()))

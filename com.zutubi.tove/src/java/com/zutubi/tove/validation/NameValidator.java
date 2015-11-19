@@ -14,8 +14,19 @@ public class NameValidator extends StringFieldValidatorSupport
     private static final String STRATEGY_STRICT = VariableResolver.ResolutionStrategy.RESOLVE_STRICT.toString();
     private static final String STRATEGY_NON_STRICT = VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT.toString();
 
+    public NameValidator()
+    {
+        super(false);
+    }
+
     public void validateStringField(String s) throws ValidationException
     {
+        if (s == null || s.length() == 0)
+        {
+            addError("required");
+            return;
+        }
+
         ConfigSupport config = new ConfigSupport(getValidationContext());
         try
         {

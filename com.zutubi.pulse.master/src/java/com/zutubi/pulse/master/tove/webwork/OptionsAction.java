@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
@@ -73,11 +74,12 @@ public class OptionsAction extends ActionSupport
 
         OptionProvider optionProvider = OptionProviderFactory.build(type, property.getType(), getOptionAnnotation(property), objectFactory);
 
-         @SuppressWarnings({"unchecked"})
-         List<String> list = (List<String>) optionProvider.getOptions(instance, parentPath, property);
+        FormContext context = new FormContext(instance);
+        @SuppressWarnings({"unchecked"})
+         List<String> list = (List<String>) optionProvider.getOptions(property, context);
         if (configurationTemplateManager.isTemplatedPath(parentPath))
         {
-            Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, property);
+            Object emptyOption = optionProvider.getEmptyOption(property, context);
             if (emptyOption != null)
             {
                 list.add(0, (String) emptyOption);

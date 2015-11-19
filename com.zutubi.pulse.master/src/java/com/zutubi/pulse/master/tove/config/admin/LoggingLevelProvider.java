@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
-import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
+import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.List;
@@ -13,13 +14,13 @@ public class LoggingLevelProvider extends ListOptionProvider
 {
     private LogConfigurationManager logConfigurationManager;
 
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         // Not templatable.
         return null;
     }
 
-    public List<String> getOptions(Object instance, String path, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
         return logConfigurationManager.getAvailableConfigurations();
     }

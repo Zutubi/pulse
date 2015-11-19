@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.xwork.actions.DefaultAction;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
+import com.zutubi.pulse.master.xwork.actions.DefaultAction;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.LinkedList;
@@ -22,12 +23,12 @@ public class DefaultActionOptionProvider extends ListOptionProvider
         options.add(DefaultAction.BROWSE_ACTION);
     }
 
-    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public String getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }
 
-    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<String> getOptions(TypeProperty property, FormContext context)
     {
         return options;
     }

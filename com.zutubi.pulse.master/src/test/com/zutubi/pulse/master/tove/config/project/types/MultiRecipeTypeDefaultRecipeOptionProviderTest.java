@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 
 import java.util.Arrays;
 
@@ -11,12 +12,12 @@ public class MultiRecipeTypeDefaultRecipeOptionProviderTest extends PulseTestCas
 
     public void testNullInstance()
     {
-        assertEquals(0, provider.getOptions(null, null, null).size());
+        assertEquals(0, provider.getOptions(null, new FormContext("")).size());
     }
 
     public void testNoRecipes()
     {
-        assertEquals(0, provider.getOptions(new MultiRecipeTypeConfiguration(), null, null).size());
+        assertEquals(0, provider.getOptions(null, new FormContext(new MultiRecipeTypeConfiguration())).size());
     }
 
     public void testSimple()
@@ -25,6 +26,6 @@ public class MultiRecipeTypeDefaultRecipeOptionProviderTest extends PulseTestCas
         type.addRecipe(new RecipeConfiguration("default"));
         type.addRecipe(new RecipeConfiguration("absolutely"));
         type.addRecipe(new RecipeConfiguration("fabulous"));
-        assertEquals(Arrays.asList("absolutely", "default", "fabulous"), provider.getOptions(type, null, null));
+        assertEquals(Arrays.asList("absolutely", "default", "fabulous"), provider.getOptions(null, new FormContext(type)));
     }
 }

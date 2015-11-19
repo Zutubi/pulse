@@ -16,6 +16,12 @@ import java.util.Map;
  */
 public class FieldAnnotationHandler implements AnnotationHandler
 {
+    @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        return false;
+    }
+
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         // Collect all of the annotations fields in a map and add them to the descriptor.
@@ -30,7 +36,7 @@ public class FieldAnnotationHandler implements AnnotationHandler
     }
 
     @Override
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
         Map<String, Object> map = AnnotationUtils.collectPropertiesFromAnnotation(annotation);
         for (Map.Entry<String, Object> entry: map.entrySet())

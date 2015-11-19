@@ -16,6 +16,12 @@ import java.lang.annotation.Annotation;
 public class FieldScriptAnnotationHandler implements AnnotationHandler
 {
     @Override
+    public boolean requiresContext(Annotation annotation)
+    {
+        return false;
+    }
+
+    @Override
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
@@ -31,7 +37,7 @@ public class FieldScriptAnnotationHandler implements AnnotationHandler
     }
 
     @Override
-    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {
         FieldScript fieldScript = (FieldScript) annotation;
         String template = fieldScript.template();

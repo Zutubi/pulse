@@ -4,7 +4,9 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.Validator;
 import com.zutubi.validation.i18n.TextProvider;
+import com.zutubi.validation.validators.RequiredValidator;
 
 import java.util.*;
 
@@ -192,5 +194,19 @@ public class ConfigurationValidationContext implements ValidationContext
     public boolean isWritable()
     {
         return config.isWritable();
+    }
+
+    @Override
+    public boolean shouldIgnoreValidator(Validator validator)
+    {
+        if (template)
+        {
+            if (validator instanceof RequiredValidator)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

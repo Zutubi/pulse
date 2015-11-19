@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
 
 import java.util.Map;
@@ -16,13 +16,12 @@ public class DependencyProjectOptionProvider extends DefaultReferenceOptionProvi
     private ConfigurationProvider configurationProvider;
 
     @Override
-    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
+    public Map<String, String> getMap(TypeProperty property, FormContext context)
     {
-        Map<String, String> map = super.getMap(instance, path, property);
+        Map<String, String> map = super.getMap(property, context);
 
         // Lookup the project we are presently configuring.
-        Configuration c = configurationProvider.get(path, Configuration.class);
-        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
+        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(context.getClosestExistingPath(), ProjectConfiguration.class);
 
         if (map.containsKey(projectConfig.getConfigurationPath()))
         {

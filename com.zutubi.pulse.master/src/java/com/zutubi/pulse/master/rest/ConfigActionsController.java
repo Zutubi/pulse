@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -105,18 +106,22 @@ public class ConfigActionsController
             throw new NotFoundException("Type '" + type + "' does not have a property named '" + body.getPropertyName() + "'");
         }
 
-        Configuration instance = null;
+        FormContext context;
         if (StringUtils.stringSet(body.getBaseName()))
         {
-            instance = configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, body.getBaseName()));
+            context = new FormContext(configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, body.getBaseName())));
+        }
+        else
+        {
+            context = new FormContext(parentPath);
         }
 
         OptionProvider optionProvider = OptionProviderFactory.build(type, property.getType(), getOptionAnnotation(property), objectFactory);
         @SuppressWarnings("unchecked")
-        List<String> list = (List<String>) optionProvider.getOptions(instance, parentPath, property);
+        List<String> list = (List<String>) optionProvider.getOptions(property, context);
         if (configurationTemplateManager.isTemplatedPath(parentPath))
         {
-            Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, property);
+            Object emptyOption = optionProvider.getEmptyOption(property, context);
             if (emptyOption != null)
             {
                 list.add(0, (String) emptyOption);
@@ -331,7 +336,7 @@ public class ConfigActionsController
         if (context.action.hasArgument())
         {
             CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
-            model.setForm(formModelBuilder.createForm(null, null, argumentType, true));
+            model.setForm(formModelBuilder.createForm(argumentType));
 
             Configuration defaults = actionManager.prepare(context.actionName, context.instance);
             if (defaults != null)
