@@ -17,7 +17,6 @@
 
     function _embedCollections(item)
     {
-        var i;
         if (item.nested)
         {
             if (item.kind === "collection" && !item.type.keyed)
@@ -31,23 +30,42 @@
                 item.nestedName = item.collapsed.key;
                 item.nested = item.collapsed.nested;
             }
+        }
+    }
 
-            if (item.nested)
+    function _translateItem(item)
+    {
+        var i;
+
+        _embedCollections(item);
+
+        if (!item.deeplyValid)
+        {
+            item.spriteCssClass = "fa fa-exclamation";
+
+            console.dir(item);
+            if (item.validationErrors)
             {
-                for (i = 0; i < item.nested.length; i++)
-                {
-                    _embedCollections(item.nested[i]);
-                }
+                item.spriteCssClass += " k-invalid";
+            }
+
+        }
+
+        if (item.nested)
+        {
+            for (i = 0; i < item.nested.length; i++)
+            {
+                _translateItem(item.nested[i]);
             }
         }
     }
 
-    function _cloneAndEmbed(data)
+    function _cloneAndTranslate(data)
     {
         if (data)
         {
             data = jQuery.extend(true, {}, data);
-            _embedCollections(data);
+            _translateItem(data);
         }
 
         return data;
@@ -159,7 +177,7 @@
             dataSource = new kendo.data.HierarchicalDataSource({
                 transport: {
                     read: {
-                        url: window.baseUrl + "/api/config/" + Zutubi.admin.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type",
+                        url: window.baseUrl + "/api/config/" + Zutubi.admin.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type&filter=validationErrors",
                         dataType: "json",
                         headers: {
                             Accept: "application/json; charset=utf-8",
@@ -170,7 +188,7 @@
                 schema: {
                     parse: function(response) {
                         return jQuery.map(response, function(item) {
-                            _embedCollections(item);
+                            _translateItem(item);
                             return item;
                         });
                     },
@@ -377,7 +395,7 @@
         {
             var info;
 
-            data = _cloneAndEmbed(data);
+            data = _cloneAndTranslate(data);
             path = this._absoluteToConfigPath(path);
             info = this._infoForConfigPath(path);
 
@@ -470,7 +488,7 @@
                     info = that._infoForConfigPath(Zutubi.admin.parentPath(path));
                     if (info.found)
                     {
-                        that._addModel(_cloneAndEmbed(delta.models[delta.addedPaths[i]]), info.item);
+                        that._addModel(_cloneAndTranslate(delta.models[delta.addedPaths[i]]), info.item);
                     }
                 }
             }
@@ -524,7 +542,7 @@
                         info = that._infoForConfigPath(Zutubi.admin.parentPath(newPath));
                         if (info.found)
                         {
-                            that._addModel(_cloneAndEmbed(model), info.item, index);
+                            that._addModel(_cloneAndTranslate(model), info.item, index);
                         }
 
                         if (oldPath === that.configPath)
@@ -546,7 +564,7 @@
                     if (info.found)
                     {
                         // Update to a node, e.g. collection reorder. Refresh.
-                        that._updateItem(path, info.item, _cloneAndEmbed(model));
+                        that._updateItem(path, info.item, _cloneAndTranslate(model));
                     }
                 }
             }

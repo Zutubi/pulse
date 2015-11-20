@@ -101,7 +101,7 @@ public class ConfigModelBuilder
 
     private boolean isFieldSelected(String[] filters, String fieldName)
     {
-        return filters == null || ArrayUtils.contains(filters, fieldName);
+        return filters == null || ArrayUtils.contains(filters, fieldName.toLowerCase());
     }
 
     private String getLabel(String path, ComplexType type, ComplexType parentType, Record value)
@@ -117,7 +117,8 @@ public class ConfigModelBuilder
     private ConfigModel createCollectionModel(String path, CollectionType type, String label, Record record, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
-        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label);
+        boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
+        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label, deeplyValid);
         if (isFieldSelected(filters, "table"))
         {
             model.setTable(tableModelBuilder.createTable(type));
@@ -237,7 +238,8 @@ public class ConfigModelBuilder
     {
         String baseName = PathUtils.getBaseName(path);
         Configuration instance = configurationTemplateManager.getInstance(path);
-        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, instance.isConcrete());
+        boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
+        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, instance.isConcrete(), deeplyValid);
         if (isFieldSelected(filters, "properties"))
         {
             model.setProperties(getProperties(configurationTemplateManager.getTemplateOwnerPath(path), type, record));
@@ -398,7 +400,8 @@ public class ConfigModelBuilder
                 errors.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
         }
-        return errors;
+
+        return errors.isEmpty() ? null : errors;
     }
 
     public CompositeTypeModel buildCompositeTypeModel(CompositeType type, FormContext context)

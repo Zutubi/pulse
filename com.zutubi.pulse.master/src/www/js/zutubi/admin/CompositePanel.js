@@ -58,7 +58,7 @@
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");
 
-            if (composite.errors)
+            if (composite.validationErrors)
             {
                 that.form.showValidationErrors(composite.validationErrors);
             }

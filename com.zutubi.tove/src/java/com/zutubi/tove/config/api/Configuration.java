@@ -93,7 +93,7 @@ public interface Configuration
     boolean needsValidation();
 
     /**
-     * Mark this instance as validated, so it no longe {@link #needsValidation()}.
+     * Mark this instance as validated, so it no longer {@link #needsValidation()}.
      */
     void validated();
 

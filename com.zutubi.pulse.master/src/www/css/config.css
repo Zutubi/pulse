@@ -59,6 +59,17 @@
     color: #aaa;
 }
 
+/* Config trees */
+
+.k-treeview .fa {
+    vertical-align: middle;
+    line-height: 14px;
+}
+
+.k-invalid {
+    color: #b22;
+}
+
 /* Center pane */
 
 #center-pane-content h1 {

@@ -27,9 +27,9 @@ public class CompositeModel extends ConfigModel
     {
     }
 
-    public CompositeModel(String handle, String key, String label, boolean keyed, boolean concrete)
+    public CompositeModel(String handle, String key, String label, boolean keyed, boolean concrete, boolean deeplyValid)
     {
-        super(handle, key, label);
+        super(handle, key, label, deeplyValid);
         this.keyed = keyed;
         this.concrete = concrete;
     }

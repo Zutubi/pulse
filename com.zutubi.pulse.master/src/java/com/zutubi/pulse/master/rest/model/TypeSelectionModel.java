@@ -17,7 +17,7 @@ public class TypeSelectionModel extends ConfigModel
 
     public TypeSelectionModel(String key, String label)
     {
-        super(null, key, label);
+        super(null, key, label, true);
     }
 
     public CompositeTypeModel getType()
