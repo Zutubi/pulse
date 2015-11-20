@@ -47,7 +47,7 @@ import java.util.Map;
 @RequestMapping("/wizard")
 public class WizardController
 {
-    private static final String STEP_HIERARCHY = "meta.hierarcy";
+    private static final String STEP_HIERARCHY = "meta.hierarchy";
     private static final String FIELD_PARENT_TEMPLATE = "parentTemplate";
     private static final String FIELD_TEMPLATE = "isTemplate";
 
@@ -116,7 +116,7 @@ public class WizardController
         form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, "template project"));
         formDefaults.put(FIELD_TEMPLATE, false);
 
-        CustomWizardStepModel preludeStep = new CustomWizardStepModel("hierarcy", STEP_HIERARCHY, form);
+        CustomWizardStepModel preludeStep = new CustomWizardStepModel("hierarchy", STEP_HIERARCHY, form);
         preludeStep.setFormDefaults(formDefaults);
         model.prependStep(preludeStep);
 

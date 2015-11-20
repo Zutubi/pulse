@@ -54,6 +54,7 @@
                 structure: composite.type.form,
                 values: composite.properties,
                 dirtyChecking: composite.keyed,
+                markRequired: composite.concrete,
                 readOnly: !writable,
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");

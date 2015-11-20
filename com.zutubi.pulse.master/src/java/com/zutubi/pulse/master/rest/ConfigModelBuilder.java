@@ -117,8 +117,9 @@ public class ConfigModelBuilder
     private ConfigModel createCollectionModel(String path, CollectionType type, String label, Record record, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
+        boolean concrete = configurationTemplateManager.isConcrete(path);
         boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
-        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label, deeplyValid);
+        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label, concrete, deeplyValid);
         if (isFieldSelected(filters, "table"))
         {
             model.setTable(tableModelBuilder.createTable(type));
@@ -181,15 +182,16 @@ public class ConfigModelBuilder
     private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
-        TypeSelectionModel model = new TypeSelectionModel(baseName, label);
+        String closestExistingPath = path;
+        while (!configurationTemplateManager.pathExists(closestExistingPath))
+        {
+            closestExistingPath = PathUtils.getParentPath(closestExistingPath);
+        }
+
+        TypeSelectionModel model = new TypeSelectionModel(baseName, label, configurationTemplateManager.isConcrete(closestExistingPath));
+
         if (isFieldSelected(filters, "type"))
         {
-            String closestExistingPath = path;
-            while (!configurationTemplateManager.pathExists(closestExistingPath))
-            {
-                closestExistingPath = PathUtils.getParentPath(closestExistingPath);
-            }
-
             FormContext context = new FormContext(closestExistingPath);
             model.setType(buildCompositeTypeModel(compositeType, context));
         }
@@ -198,6 +200,7 @@ public class ConfigModelBuilder
         {
             model.setConfiguredDescendants(getConfiguredDescendants(path));
         }
+
         return model;
     }
 

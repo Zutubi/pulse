@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
@@ -11,6 +12,7 @@ public class CollectionTypeModel extends TypeModel
 {
     private CollectionType collectionType;
     private CompositeTypeModel targetType;
+    private String targetLabel;
 
     public CollectionTypeModel(CollectionType type)
     {
@@ -21,6 +23,7 @@ public class CollectionTypeModel extends TypeModel
         if (targetType instanceof CompositeType)
         {
             this.targetType = new CompositeTypeModel((CompositeType) targetType);
+            targetLabel = Messages.getInstance(targetType.getClazz()).format("label");
         }
     }
 
@@ -42,5 +45,10 @@ public class CollectionTypeModel extends TypeModel
     public CompositeTypeModel getTargetType()
     {
         return targetType;
+    }
+
+    public String getTargetLabel()
+    {
+        return targetLabel;
     }
 }

@@ -15,9 +15,9 @@ public class TypeSelectionModel extends ConfigModel
     private CompositeTypeModel type;
     private List<Pair<Integer, String>> configuredDescendants;
 
-    public TypeSelectionModel(String key, String label)
+    public TypeSelectionModel(String key, String label, boolean concrete)
     {
-        super(null, key, label, true);
+        super(null, key, label, concrete, true);
     }
 
     public CompositeTypeModel getType()

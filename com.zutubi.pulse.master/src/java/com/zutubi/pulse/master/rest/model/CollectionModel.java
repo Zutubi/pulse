@@ -21,9 +21,9 @@ public class CollectionModel extends ConfigModel
     {
     }
 
-    public CollectionModel(String key, String handle, String label, boolean deeplyValid)
+    public CollectionModel(String key, String handle, String label, boolean concrete, boolean deeplyValid)
     {
-        super(handle, key, label, deeplyValid);
+        super(handle, key, label, concrete, deeplyValid);
     }
 
     public CollectionTypeModel getType()

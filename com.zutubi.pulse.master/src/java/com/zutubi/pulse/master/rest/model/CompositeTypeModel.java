@@ -28,16 +28,7 @@ public class CompositeTypeModel extends TypeModel
     {
         super(type.getSymbolicName());
 
-        List<String> simplePropertyNames = type.getSimplePropertyNames();
-        if (simplePropertyNames.size() > 0)
-        {
-            simpleProperties = new ArrayList<>();
-            for (String propertyName: simplePropertyNames)
-            {
-                TypeProperty property = type.getProperty(propertyName);
-                simpleProperties.add(new PropertyModel(property));
-            }
-        }
+        simpleProperties = createProperties(type, type.getSimplePropertyNames());
 
         try
         {
@@ -60,16 +51,23 @@ public class CompositeTypeModel extends TypeModel
             // Defaults are not essential.
         }
 
-        List<String> nestedPropertyNames = type.getNestedPropertyNames();
-        if (nestedPropertyNames.size() > 0)
+        nestedProperties = createProperties(type, type.getNestedPropertyNames());
+    }
+
+    private List<PropertyModel> createProperties(CompositeType type, List<String> propertyNames)
+    {
+        List<PropertyModel> properties = null;
+        if (propertyNames.size() > 0)
         {
-            nestedProperties = new ArrayList<>();
-            for (String propertyName: nestedPropertyNames)
+            properties = new ArrayList<>();
+            for (String propertyName: propertyNames)
             {
                 TypeProperty property = type.getProperty(propertyName);
-                nestedProperties.add(new PropertyModel(property));
+                properties.add(new PropertyModel(property));
             }
         }
+
+        return properties;
     }
 
     public List<PropertyModel> getSimpleProperties()

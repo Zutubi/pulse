@@ -268,7 +268,7 @@
 
             panel.bind("add", function()
             {
-                that._showWizard(collection.type.targetType, panel.options.path);
+                that._showWizard(panel.options.path, collection.type.targetLabel, collection.concrete);
             });
 
             panel.bind("action", jQuery.proxy(that._doAction, that));
@@ -291,18 +291,19 @@
 
             that.contentPanel.bind("configure", function()
             {
-                that._showWizard(data, that.path);
+                that._showWizard(that.path, data.label, data.concrete);
             });
         },
 
-        _showWizard: function(type, path)
+        _showWizard: function(path, label, markRequired)
         {
             var that = this,
                 window;
 
             window = new Zutubi.admin.WizardWindow({
                 path: path,
-                label: type.label,
+                label: label,
+                markRequired: markRequired,
                 success: jQuery.proxy(that._wizardFinished, that)
             });
 

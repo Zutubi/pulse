@@ -104,7 +104,8 @@
                           '<p>click <em>check</em> below to test your configuration</p>' +
                           '<div class="k-wizard-check-form"></div>' +
                       '</div>',
-            stepIndexTemplate: '<li>#: label #</li>'
+            stepIndexTemplate: '<li>#: label #</li>',
+            markRequired: true
         },
 
         _create: function()
@@ -271,6 +272,18 @@
             });
         },
 
+        _shouldMarkRequired: function()
+        {
+            if (this.steps[0].key === "meta.hierarchy")
+            {
+                return this.steps[0].getValue().properties.isTemplate === false;
+            }
+            else
+            {
+                return this.options.markRequired;
+            }
+        },
+
         _showTypeAtIndex: function(index)
         {
             var that = this,
@@ -307,6 +320,7 @@
                 parentPath: that.options.path,
                 symbolicName: type.symbolicName,
                 structure: that._filterFields(type.form),
+                markRequired: that._shouldMarkRequired(),
                 values: step.valuesByType[index],
                 submits: submits,
                 defaultSubmit: defaultSubmit

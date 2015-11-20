@@ -269,6 +269,11 @@ table.k-form {
     margin: 4px;
 }
 
+.k-form .k-required::after {
+    content: ' *';
+    color: #c33;
+}
+
 input[type=checkbox].k-input {
     height: 2em;
     line-height: 2em;

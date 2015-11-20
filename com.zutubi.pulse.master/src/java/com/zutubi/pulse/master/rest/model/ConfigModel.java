@@ -19,20 +19,22 @@ public abstract class ConfigModel
     private final String handle;
     private final String key;
     private final String label;
+    private boolean concrete;
     private final boolean deeplyValid;
     private String iconClass;
     private List<ConfigModel> nested;
 
     protected ConfigModel()
     {
-        this(null, null, null, true);
+        this(null, null, null, true, true);
     }
 
-    protected ConfigModel(String handle, String key, String label, boolean deeplyValid)
+    protected ConfigModel(String handle, String key, String label, boolean concrete, boolean deeplyValid)
     {
         this.handle = handle;
         this.key = key;
         this.label = label;
+        this.concrete = concrete;
         this.deeplyValid = deeplyValid;
     }
 
@@ -49,6 +51,11 @@ public abstract class ConfigModel
     public String getLabel()
     {
         return label;
+    }
+
+    public boolean isConcrete()
+    {
+        return concrete;
     }
 
     public boolean isDeeplyValid()

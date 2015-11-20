@@ -10,6 +10,7 @@
         // options: {
         //    path: path we are adding to
         //    label: label of base type we are adding
+        //    markRequired: pass false to disable marking required fields
         //    success: function(delta) called when the wizard finishes with a delta that includes
         //             the added model
         //    cancel: (optional) function() called when user bails
@@ -33,6 +34,7 @@
 
         options: {
             label: "config",
+            markRequired: true,
             id: "wizard-window",
             width: 720
         },
@@ -109,7 +111,8 @@
             contentEl.append(wizardEl);
             that.wizard = wizardEl.kendoZaWizard({
                 structure: data,
-                path: that.options.path
+                path: that.options.path,
+                markRequired: that.options.markRequired
             }).data("kendoZaWizard");
 
             that.wizard.bind("posting", function()

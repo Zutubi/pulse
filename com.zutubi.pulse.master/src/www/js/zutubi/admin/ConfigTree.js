@@ -177,6 +177,7 @@
             dataSource = new kendo.data.HierarchicalDataSource({
                 transport: {
                     read: {
+                        // FIXME kendo we need very little of the type info, and it is heavyweight
                         url: window.baseUrl + "/api/config/" + Zutubi.admin.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type&filter=validationErrors",
                         dataType: "json",
                         headers: {

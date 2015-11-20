@@ -59,7 +59,8 @@
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
-            errorTemplate: '<li>#: message #</li>'
+            errorTemplate: '<li>#: message #</li>',
+            markRequired: true
         },
 
         _create: function()
@@ -141,6 +142,11 @@
             {
                 rowElement = $(this.fieldTemplate(fieldOptions));
                 fieldElement = rowElement.appendTo(this.tableBodyElement).find(SELECTOR_FIELD_WRAPPER);
+
+                if (fieldOptions.label === "name" || this.options.markRequired && fieldOptions.required)
+                {
+                    rowElement.find("label").addClass("k-required");
+                }
 
                 fieldType = FIELD_TYPES[fieldOptions.type];
                 if (fieldType)
