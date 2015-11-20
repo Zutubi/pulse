@@ -248,6 +248,11 @@ public class ConfigModelBuilder
             model.setFormattedProperties(getFormattedProperties(path, type));
         }
 
+        if (isFieldSelected(filters, "validationErrors"))
+        {
+            model.setValidationErrors(getValidationErrors(instance));
+        }
+
         if (isFieldSelected(filters, "type"))
         {
             model.setType(buildCompositeTypeModel(type, new FormContext(instance)));
@@ -376,6 +381,24 @@ public class ConfigModelBuilder
     private String getGetterMethodName(String name)
     {
         return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
+    }
+
+    private Map<String, List<String>> getValidationErrors(Configuration instance)
+    {
+        Map<String, List<String>> errors = new HashMap<>();
+        if (!instance.getInstanceErrors().isEmpty())
+        {
+            errors.put("", new ArrayList<>(instance.getInstanceErrors()));
+        }
+
+        for (Map.Entry<String, List<String>> entry: instance.getFieldErrors().entrySet())
+        {
+            if (!entry.getValue().isEmpty())
+            {
+                errors.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+        }
+        return errors;
     }
 
     public CompositeTypeModel buildCompositeTypeModel(CompositeType type, FormContext context)

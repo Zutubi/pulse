@@ -248,11 +248,11 @@
                             {
                                 if (details.key === "main")
                                 {
-                                    form.showValidationErrors(details);
+                                    form.showValidationErrors(details.validationErrors);
                                 }
                                 else
                                 {
-                                    checkForm.showValidationErrors(details);
+                                    checkForm.showValidationErrors(details.validationErrors);
                                 }
                                 return;
                             }

@@ -175,9 +175,12 @@
         {
             var that = this;
 
-            if (stepIndex === -1) {
-                jQuery.each(that.steps, function (index, step) {
-                    if (step.key === details.key) {
+            if (stepIndex === -1)
+            {
+                jQuery.each(that.steps, function (index, step)
+                {
+                    if (step.key === details.key)
+                    {
                         stepIndex = index;
                         return false;
                     }
@@ -191,7 +194,7 @@
             else
             {
                 that._showStepAtIndex(stepIndex);
-                that.form.showValidationErrors(details);
+                that.form.showValidationErrors(details.validationErrors);
             }
         },
 

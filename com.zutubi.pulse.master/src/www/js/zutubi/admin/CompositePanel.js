@@ -58,6 +58,11 @@
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");
 
+            if (composite.errors)
+            {
+                that.form.showValidationErrors(composite.validationErrors);
+            }
+
             that.form.bind("buttonClicked", jQuery.proxy(that._submitClicked, that));
 
             if (writable && composite.type.checkType)
@@ -161,7 +166,7 @@
                                 details = JSON.parse(jqXHR.responseText);
                                 if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
                                 {
-                                    that.form.showValidationErrors(details);
+                                    that.form.showValidationErrors(details.validationErrors);
                                     return;
                                 }
                             }

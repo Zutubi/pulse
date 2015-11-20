@@ -408,23 +408,24 @@
             status.text(message);
         },
 
-        showValidationErrors: function(errorDetails)
+        showValidationErrors: function(errors)
         {
-            var field, fieldErrors;
+            var field;
 
-            if (errorDetails.instanceErrors)
+            if (errors)
             {
-                this._showInstanceErrors(errorDetails.instanceErrors);
-            }
-
-            fieldErrors = errorDetails.fieldErrors;
-            if (fieldErrors)
-            {
-                for (field in fieldErrors)
+                for (field in errors)
                 {
-                    if (fieldErrors.hasOwnProperty(field))
+                    if (errors.hasOwnProperty(field))
                     {
-                        this._showFieldErrors(field, fieldErrors[field]);
+                        if (field === "")
+                        {
+                            this._showInstanceErrors(errors[field]);
+                        }
+                        else
+                        {
+                            this._showFieldErrors(field, errors[field]);
+                        }
                     }
                 }
             }

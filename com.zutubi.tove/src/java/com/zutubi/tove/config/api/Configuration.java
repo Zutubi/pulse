@@ -29,16 +29,16 @@ public interface Configuration
     /**
      * The value representing an undefined handle value.
      */
-    static final long UNDEFINED = 0;
+    long UNDEFINED = 0;
 
     /**
      * The internal meta property key for the handle property.
      */
-    static final String HANDLE_KEY    = "handle";
+    String HANDLE_KEY    = "handle";
     /**
      * The internal meta property key for the permanent property.
      */
-    static final String PERMANENT_KEY = "permanent";
+    String PERMANENT_KEY = "permanent";
 
     /**
      * Retrieve the named meta property.

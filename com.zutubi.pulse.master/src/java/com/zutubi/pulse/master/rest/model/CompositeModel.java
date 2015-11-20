@@ -18,6 +18,7 @@ public class CompositeModel extends ConfigModel
     private boolean concrete;
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
+    private Map<String, List<String>> validationErrors;
     private List<ActionModel> actions;
     private List<ActionModel> descendantActions;
     private List<ConfigurationLink> links;
@@ -71,6 +72,16 @@ public class CompositeModel extends ConfigModel
     public void setFormattedProperties(Map<String, Object> formattedProperties)
     {
         this.formattedProperties = formattedProperties;
+    }
+
+    public Map<String, List<String>> getValidationErrors()
+    {
+        return validationErrors;
+    }
+
+    public void setValidationErrors(Map<String, List<String>> validationErrors)
+    {
+        this.validationErrors = validationErrors;
     }
 
     public List<ActionModel> getActions()

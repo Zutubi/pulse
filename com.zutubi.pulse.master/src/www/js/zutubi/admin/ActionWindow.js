@@ -92,40 +92,38 @@
             return properties;
         },
 
-        _translateErrors: function(errorDetails)
+        _translateErrors: function(errors)
         {
-            var fieldErrors,
-                baseName,
+            var baseName,
                 field,
                 translated;
 
             if (this.action.action === CLONE)
             {
-                fieldErrors = errorDetails.fieldErrors;
-                if (fieldErrors)
+                if (errors)
                 {
                     baseName = Zutubi.admin.baseName(this.options.path);
                     translated = {};
-                    for (field in fieldErrors)
+                    for (field in errors)
                     {
-                        if (fieldErrors.hasOwnProperty(field))
+                        if (errors.hasOwnProperty(field))
                         {
                             if (field === baseName)
                             {
-                                translated[CLONE_KEY] = fieldErrors[field];
+                                translated[CLONE_KEY] = errors[field];
                             }
                             else
                             {
-                                translated[CLONE_KEY_PREFIX + field] = fieldErrors[field];
+                                translated[CLONE_KEY_PREFIX + field] = errors[field];
                             }
                         }
                     }
 
-                    errorDetails.fieldErrors = translated;
+                    errors = translated;
                 }
             }
 
-            return errorDetails;
+            return errors;
         },
 
         _execute: function()
@@ -162,7 +160,7 @@
                             details = JSON.parse(jqXHR.responseText);
                             if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
                             {
-                                that.form.showValidationErrors(that._translateErrors(details));
+                                that.form.showValidationErrors(that._translateErrors(details.validationErrors));
                                 return;
                             }
                         }

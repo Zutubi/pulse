@@ -53,15 +53,13 @@ public class ValidationException extends RuntimeException
 
     public static class Error extends ApiExceptionHandler.Error
     {
-        private final List<String> instanceErrors;
-        private final Map<String, List<String>> fieldErrors;
+        private final Map<String, List<String>> validationErrors;
         private final String key;
 
         public Error(ValidationException ex)
         {
             super(ex);
-            instanceErrors = new ArrayList<>();
-            fieldErrors = new HashMap<>();
+            validationErrors = new HashMap<>();
             key = null;
         }
 
@@ -70,43 +68,32 @@ public class ValidationException extends RuntimeException
             super(ex);
             if (instance == null)
             {
-                instanceErrors = new ArrayList<>();
-                fieldErrors = new HashMap<>();
+                validationErrors = new HashMap<>();
             }
             else
             {
-                instanceErrors = new ArrayList<>(instance.getInstanceErrors());
-                fieldErrors = new HashMap<>(instance.getFieldErrors());
+                validationErrors = new HashMap<>(instance.getFieldErrors());
+                validationErrors.put("", new ArrayList<>(instance.getInstanceErrors()));
             }
 
             this.key = key;
         }
 
-        public List<String> getInstanceErrors()
-        {
-            return instanceErrors;
-        }
-
         public void addInstanceError(String message)
         {
-            instanceErrors.add(message);
-        }
-
-        public Map<String, List<String>> getFieldErrors()
-        {
-            return fieldErrors;
+            addFieldError("", message);
         }
 
         public void addFieldError(String field, String message)
         {
-            List<String> errors = fieldErrors.get(field);
-            if (errors == null)
+            List<String> list = validationErrors.get(field);
+            if (list == null)
             {
-                errors = new ArrayList<>();
-                fieldErrors.put(field, errors);
+                list = new ArrayList<>();
+                validationErrors.put(field, list);
             }
 
-            errors.add(message);
+            list.add(message);
         }
 
         public String getKey()
@@ -116,20 +103,20 @@ public class ValidationException extends RuntimeException
 
         public boolean hasErrors()
         {
-            if (instanceErrors.size() > 0)
+            for (List<String> list: validationErrors.values())
             {
-                return true;
-            }
-
-            for (List<String> errors: fieldErrors.values())
-            {
-                if (errors.size() > 0)
+                if (list.size() > 0)
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public Map<String, List<String>> getValidationErrors()
+        {
+            return validationErrors;
         }
     }
 }
