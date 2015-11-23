@@ -143,7 +143,7 @@
                 rowElement = $(this.fieldTemplate(fieldOptions));
                 fieldElement = rowElement.appendTo(this.tableBodyElement).find(SELECTOR_FIELD_WRAPPER);
 
-                if (fieldOptions.label === "name" || this.options.markRequired && fieldOptions.required)
+                if (fieldOptions.label === "name" || (this.options.markRequired && fieldOptions.required))
                 {
                     rowElement.find("label").addClass("k-required");
                 }

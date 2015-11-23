@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.rest.wizards;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.Utils;
+import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.CompositeTypeModel;
 import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
@@ -22,6 +23,7 @@ import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A service that helps create and process wizard steps for types.
@@ -105,6 +107,17 @@ public class WizardModelBuilder
         }
 
         return Utils.convertProperties(actualType, templateOwnerPath, model.getProperties());
+    }
+
+    public MutableRecord buildAndValidateRecord(CompositeType type, String parentPath, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
+    {
+        MutableRecord record = buildRecord(templateOwnerPath, type, key, models.get(key));
+        Configuration instance = configurationTemplateManager.validate(parentPath, null, record, concrete, false);
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance, key);
+        }
+        return record;
     }
 
     public Configuration buildInstance(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException

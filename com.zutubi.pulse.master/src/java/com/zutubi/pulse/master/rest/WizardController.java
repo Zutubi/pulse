@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Sets;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.rest.model.forms.CheckboxFieldModel;
@@ -89,7 +88,6 @@ public class WizardController
     {
         TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
         CompositeType itemType = collectionType.getTargetType();
-        // FIXME kendo we pass true but don't yet know if this is a template.
         WizardModel model = buildModel(itemType, scope);
 
         TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
@@ -113,7 +111,7 @@ public class WizardController
 
         form.addField(new DropdownFieldModel(FIELD_PARENT_TEMPLATE, "parent template", getAllTemplates(hierarchy)));
         formDefaults.put(FIELD_PARENT_TEMPLATE, parentNode.getId());
-        form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, "template project"));
+        form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, "template " + StringUtils.stripSuffix(scope, "s")));
         formDefaults.put(FIELD_TEMPLATE, false);
 
         CustomWizardStepModel preludeStep = new CustomWizardStepModel("hierarchy", STEP_HIERARCHY, form);
@@ -247,11 +245,6 @@ public class WizardController
 
     private String insertConfig(String configPath, @RequestBody Map<String, CompositeModel> body) throws TypeException
     {
-        if (!body.keySet().equals(Sets.newHashSet((""))))
-        {
-            throw new IllegalArgumentException("Only single step wizards are currently supported");
-        }
-
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_CREATE);
 
         PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);

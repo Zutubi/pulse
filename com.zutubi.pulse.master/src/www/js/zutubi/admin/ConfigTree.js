@@ -43,7 +43,6 @@
         {
             item.spriteCssClass = "fa fa-exclamation";
 
-            console.dir(item);
             if (item.validationErrors)
             {
                 item.spriteCssClass += " k-invalid";

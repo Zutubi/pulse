@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Information about a type in a wizard. Wraps a {@link CompositeTypeModel} with extra
@@ -11,7 +10,7 @@ public class WizardTypeModel
 {
     private CompositeTypeModel type;
     private String label;
-    private List<WizardTypeFilter> filters;
+    private WizardTypeFilter filter;
 
     public WizardTypeModel(CompositeTypeModel type, String label)
     {
@@ -29,27 +28,22 @@ public class WizardTypeModel
         return label;
     }
 
-    public List<WizardTypeFilter> getFilters()
+    public WizardTypeFilter getFilter()
     {
-        return filters;
+        return filter;
     }
 
-    public void addTypeFilter(String stepKey, List<String> compatibleTypes)
+    public void setTypeFilter(String stepKey, Set<String> compatibleTypes)
     {
-        if (filters == null)
-        {
-            filters = new ArrayList<>();
-        }
-
-        filters.add(new WizardTypeFilter(stepKey, compatibleTypes));
+        filter = new WizardTypeFilter(stepKey, compatibleTypes);
     }
 
     public static class WizardTypeFilter
     {
         private String stepKey;
-        private List<String> compatibleTypes = new ArrayList<>();
+        private Set<String> compatibleTypes;
 
-        public WizardTypeFilter(String stepKey, List<String> compatibleTypes)
+        public WizardTypeFilter(String stepKey, Set<String> compatibleTypes)
         {
             this.stepKey = stepKey;
             this.compatibleTypes = compatibleTypes;
@@ -60,7 +54,7 @@ public class WizardTypeModel
             return stepKey;
         }
 
-        public List<String> getCompatibleTypes()
+        public Set<String> getCompatibleTypes()
         {
             return compatibleTypes;
         }

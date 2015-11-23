@@ -13,6 +13,7 @@
         POSTED = "posted",
         FINISHED = "finished",
         CANCELLED = "cancelled",
+        KEY_HIERARCHY = "meta.hierarchy",
 
     WizardStep = function(config)
     {
@@ -35,13 +36,17 @@
         {
             config.types.sort(Zutubi.admin.labelCompare);
 
-            this.types = jQuery.map(config.types, function(type) { return {
-                label: type.label,
-                symbolicName: type.type.symbolicName,
-                form: type.type.form,
-                checkType: type.type.checkType,
-                simpleProperties: type.type.simpleProperties
-            }; });
+            this.types = jQuery.map(config.types, function(type)
+            {
+                return {
+                    label: type.label,
+                    symbolicName: type.type.symbolicName,
+                    form: type.type.form,
+                    checkType: type.type.checkType,
+                    simpleProperties: type.type.simpleProperties,
+                    filter: type.filter
+                };
+            });
 
             this.valuesByType = jQuery.map(config.types, function(type)
             {
@@ -55,6 +60,25 @@
     };
 
     WizardStep.prototype = {
+        applyDefaults: function(composite)
+        {
+            var i;
+
+            for (i = 0; i < this.types.length; i++)
+            {
+                if (this.types[i].symbolicName === composite.type.symbolicName)
+                {
+                    break;
+                }
+            }
+
+            if (i < this.types.length)
+            {
+                this.types = [this.types[i]];
+                this.valuesByType = [this.valuesByType[i]];
+            }
+        },
+
         getValue: function()
         {
             var type = this.types[this.selectedTypeIndex],
@@ -76,6 +100,42 @@
         requiresValidation: function()
         {
             return this.kind === "typed";
+        },
+
+        indexOfTypeLabel: function(label)
+        {
+            var index = 0;
+
+            jQuery.each(this.types, function(i, type)
+            {
+                if (type.label === label)
+                {
+                    index = i;
+                    return false;
+                }
+            });
+
+            return index;
+        },
+
+        validTypeLabels: function(typesByKey)
+        {
+            var validTypes = jQuery.grep(this.types, function(type)
+            {
+                if (type.filter && typesByKey.hasOwnProperty(type.filter.stepKey))
+                {
+                    return jQuery.inArray(typesByKey[type.filter.stepKey], type.filter.compatibleTypes) >= 0;
+                }
+                else
+                {
+                    return true;
+                }
+            });
+
+            return jQuery.map(validTypes, function(type)
+            {
+                return type.label;
+            });
         }
     };
 
@@ -112,8 +172,7 @@
         {
             var that = this,
                 structure = that.options.structure,
-                steps = structure.steps,
-                i;
+                steps = structure.steps;
 
             that.steps = jQuery.map(steps, function(step)
             {
@@ -125,17 +184,7 @@
 
             that.element.html(that.template({}));
             that.stepIndexElement = that.element.find(".k-wizard-step-index");
-            if (steps.length === 1)
-            {
-                that.stepIndexElement.hide();
-            }
-            else
-            {
-                for (i = 0; i < steps.length; i++)
-                {
-                    that.stepIndexElement.append(that.stepIndexTemplate(steps[i]));
-                }
-            }
+            that._renderStepIndex();
 
             that.typeSelectWrapper = that.element.find(".k-wizard-type-select");
             that.typeSelectDropDown = that.typeSelectWrapper.children("input").kendoDropDownList({
@@ -147,6 +196,24 @@
             that.checkFormWrapper = that.element.find(".k-wizard-check-form");
 
             that._showStepAtIndex(0);
+        },
+
+        _renderStepIndex: function()
+        {
+            var i = 0;
+
+            this.stepIndexElement.empty();
+            if (this.steps.length === 1)
+            {
+                this.stepIndexElement.hide();
+            }
+            else
+            {
+                for (i = 0; i < this.steps.length; i++)
+                {
+                    this.stepIndexElement.append(this.stepIndexTemplate(this.steps[i]));
+                }
+            }
         },
 
         destroy: function()
@@ -223,11 +290,30 @@
             }
         },
 
+        _typesByKey: function()
+        {
+            var i,
+                step,
+                types = {};
+
+            for (i = 0; i < this.currentStepIndex; i++)
+            {
+                step = this.steps[i];
+                if (step.kind === "typed")
+                {
+                    types[step.key] = step.types[step.selectedTypeIndex].symbolicName;
+                }
+            }
+
+            return types;
+        },
+
         _showStepAtIndex: function(index)
         {
             var that = this,
                 step = that.steps[index],
-                items = that.stepIndexElement.children("li");
+                items = that.stepIndexElement.children("li"),
+                validTypeLabels;
 
             this._stashValuesAndCleanupForm();
 
@@ -235,18 +321,22 @@
             items.eq(index).addClass("active");
 
             this.currentStepIndex = index;
-            this._updateTypeSelect(step.types);
+            validTypeLabels = step.validTypeLabels(that._typesByKey());
+            if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0)
+            {
+                step.selectedTypeIndex = step.indexOfTypeLabel(validTypeLabels[0]);
+            }
+
+            this._updateTypeSelect(validTypeLabels);
             this._showTypeAtIndex(step.selectedTypeIndex);
         },
 
-        _updateTypeSelect: function(types)
+        _updateTypeSelect: function(labels)
         {
-            var labels,
-                dropDown = this.typeSelectDropDown;
+            var dropDown = this.typeSelectDropDown;
 
-            if (types.length > 1)
+            if (labels.length > 1)
             {
-                labels = jQuery.map(types, function(type) { return type.label; });
                 dropDown.setDataSource(labels);
                 this.typeSelectWrapper.show();
             }
@@ -258,23 +348,15 @@
 
         _typeSelected: function()
         {
-            var that = this,
-                step = that.steps[that.currentStepIndex],
-                typeLabel = that.typeSelectDropDown.value();
+            var step = this.steps[this.currentStepIndex],
+                typeLabel = this.typeSelectDropDown.value();
 
-            jQuery.each(step.types, function(i, type)
-            {
-                if (type.label === typeLabel)
-                {
-                    that._showTypeAtIndex(i);
-                    return false;
-                }
-            });
+            this._showTypeAtIndex(step.indexOfTypeLabel(typeLabel));
         },
 
         _shouldMarkRequired: function()
         {
-            if (this.steps[0].key === "meta.hierarchy")
+            if (this.steps[0].key === KEY_HIERARCHY)
             {
                 return this.steps[0].getValue().properties.isTemplate === false;
             }
@@ -297,7 +379,7 @@
             this._stashValuesAndCleanupForm();
 
             step.selectedTypeIndex = index;
-            this.typeSelectDropDown.value(this.typeSelectDropDown.dataSource.at(index));
+            this.typeSelectDropDown.value(step.types[index].label);
 
             if (stepIndex !== 0)
             {
@@ -434,6 +516,44 @@
             Zutubi.admin.reportError("Error stepping forward: " + Zutubi.admin.ajaxError(jqXHR));
         },
 
+        _findNestedComposite: function(parent, key)
+        {
+            var i, nested;
+
+            for (i = 0; i < parent.nested.length; i++)
+            {
+                nested = parent.nested[i];
+                if (nested.key === key && nested.kind === "composite")
+                {
+                    return nested;
+                }
+            }
+
+            return null;
+        },
+
+        _applyParentTemplate: function(parent)
+        {
+            var i, step, stepParent;
+
+            for (i = 0; i < this.steps.length; i++)
+            {
+                step = this.steps[i];
+                if (step.key === "")
+                {
+                    step.applyDefaults(parent);
+                }
+                else
+                {
+                    stepParent = this._findNestedComposite(parent, step.key);
+                    if (stepParent)
+                    {
+                        step.applyDefaults(stepParent);
+                    }
+                }
+            }
+        },
+
         _forward: function()
         {
             var that = this,
@@ -442,6 +562,31 @@
             if (that.currentStepIndex === that.steps.length - 1)
             {
                 that._finish();
+            }
+            else if (step.key === KEY_HIERARCHY)
+            {
+                // We need to fetch the template parent to apply restrictions/defaults from it.
+                that._mask(true);
+
+                Zutubi.admin.ajax({
+                    type: "GET",
+                    url: "/api/config/" + Zutubi.admin.encodePath(Zutubi.admin.parentPath(that.options.path) + "/" + step.getValue().properties.parentTemplate) + "?depth=1",
+                    success: function (data)
+                    {
+                        that._mask(false);
+                        if (data.length === 1)
+                        {
+                            that._applyParentTemplate(data[0]);
+                        }
+
+                        that._showStepAtIndex(that.currentStepIndex + 1);
+                    },
+                    error: function (jqXHR)
+                    {
+                        that._mask(false);
+                        that._handleError(jqXHR, that.currentStepIndex);
+                    }
+                });
             }
             else if (step.requiresValidation())
             {
@@ -465,8 +610,7 @@
                         that._mask(false);
                         that._handleError(jqXHR, that.currentStepIndex);
                     }
-
-                })
+                });
             }
             else
             {
