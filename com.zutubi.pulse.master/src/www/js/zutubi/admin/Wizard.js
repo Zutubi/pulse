@@ -297,6 +297,7 @@
             this._stashValuesAndCleanupForm();
 
             step.selectedTypeIndex = index;
+            this.typeSelectDropDown.value(this.typeSelectDropDown.dataSource.at(index));
 
             if (stepIndex !== 0)
             {
@@ -350,12 +351,24 @@
             that.type = type;
         },
 
+        _ignoredFieldNames: function(formStructure)
+        {
+            return jQuery.map(jQuery.grep(formStructure.fields, function(field)
+            {
+                return field.parameters.hasOwnProperty("wizardIgnore");
+            }), function(field)
+            {
+                return field.name;
+            });
+        },
+
         _filterFields: function(formStructure)
         {
+            var ignoreFieldNames = this._ignoredFieldNames(formStructure);
             return jQuery.extend({}, formStructure, {
                 fields: jQuery.grep(formStructure.fields, function(field)
                 {
-                    return !field.parameters.hasOwnProperty("wizardIgnore");
+                    return ignoreFieldNames.indexOf(field.name) < 0;
                 })
             });
         },
@@ -434,13 +447,13 @@
             {
                 that._mask(true);
 
-                // FIXME kendo need to update data with proper ignoredFields and concrete.
                 Zutubi.admin.ajax({
                     type: "POST",
                     url: "/api/action/validate/" + Zutubi.admin.encodePath(that.options.path),
                     data: {
-                        ignoredFields: [],
-                        composite: step.getValue()
+                        ignoredFields: that._ignoredFieldNames(step.types[step.selectedTypeIndex].form),
+                        composite: step.getValue(),
+                        concrete: that._shouldMarkRequired()
                     },
                     success: function ()
                     {

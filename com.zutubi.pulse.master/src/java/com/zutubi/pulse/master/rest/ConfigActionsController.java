@@ -155,7 +155,11 @@ public class ConfigActionsController
         }
 
         MutableRecord record = Utils.convertProperties(type, null, model.getComposite().getProperties());
-        configurationTemplateManager.validate(parentPath, model.getBaseName(), record, model.isConcrete(), false, model.getIgnoredFields());
+        Configuration instance = configurationTemplateManager.validate(parentPath, model.getBaseName(), record, model.isConcrete(), false, model.getIgnoredFields());
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance);
+        }
 
         return new ResponseEntity<>(parentPath, HttpStatus.OK);
     }
