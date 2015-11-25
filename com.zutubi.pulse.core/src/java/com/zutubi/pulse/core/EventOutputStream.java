@@ -3,14 +3,14 @@ package com.zutubi.pulse.core;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.CommandOutputEvent;
-import com.zutubi.pulse.core.events.GenericOutputEvent;
+import com.zutubi.pulse.core.events.SlaveCommandOutputEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  * An output stream that converts the output into events (either {@link CommandOutputEvent}s or
- * generic {@link GenericOutputEvent}s) and publishes them.  The stream attempts to combine small writes
+ * generic {@link SlaveCommandOutputEvent}s) and publishes them.  The stream attempts to combine small writes
  * into larger events to avoid unnecessary overhead, but can also be configured to automatically
  * flush after a delay to avoid excessive lag.
  */
@@ -46,9 +46,9 @@ public class EventOutputStream extends OutputStream implements Runnable
      * the given manager.  Autoflush is enabled with the default flush interval.
      *
      * @param eventManager manager used to publish events
-     * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link GenericOutputEvent}s
+     * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link SlaveCommandOutputEvent}s
      * @param buildId id of the build these events are part of (may be 0 for no build)
-     * @param id id to use for published events (either the recipe or stream id)
+     * @param id id to use for published events (either the recipe or command id)
      */
     public EventOutputStream(EventManager eventManager, boolean commandEvents, long buildId, long id)
     {
@@ -61,9 +61,9 @@ public class EventOutputStream extends OutputStream implements Runnable
      * be disabled by passing {@link #DISABLE_AUTO_FLUSH}.
      *
      * @param eventManager      manager used to publish events
-     * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link GenericOutputEvent}s
+     * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link SlaveCommandOutputEvent}s
      * @param buildId id of the build these events are part of (may be 0 for no build)
-     * @param id id to use for published events (either the recipe or stream id)
+     * @param id id to use for published events (either the recipe or command id)
      * @param autoflushInterval interval, in milliseconds, at which to
      *                          automatically flush any accumulated output
      */
@@ -151,7 +151,7 @@ public class EventOutputStream extends OutputStream implements Runnable
 
     private void sendEvent(byte[] sendBuffer)
     {
-        Event event = commandEvents ? new CommandOutputEvent(this, buildId, id, sendBuffer) : new GenericOutputEvent(this, id, sendBuffer);
+        Event event = commandEvents ? new CommandOutputEvent(this, buildId, id, sendBuffer) : new SlaveCommandOutputEvent(this, id, sendBuffer);
         eventManager.publish(event);
         offset = 0;
     }

@@ -56,6 +56,8 @@
 
     <bean id="serverRecipeService" class="com.zutubi.pulse.servercore.ServerRecipeService" init-method="init"/>
 
+    <bean id="slaveCommandRunner" class="com.zutubi.pulse.slave.SlaveCommandRunner" init-method="init"/>
+
     <bean id="synchronisationTaskFactory" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory"/>
     
     <bean id="synchronisationTaskRunnerService" class="com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService" init-method="init"/>

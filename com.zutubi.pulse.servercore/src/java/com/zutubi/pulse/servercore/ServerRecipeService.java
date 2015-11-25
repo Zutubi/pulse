@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A service for executing recipes on the master.  Manages a pool of threads to
+ * A service for executing recipes on a machine.  Manages a pool of threads to
  * run recipes for different agents.
  */
 public class ServerRecipeService extends BackgroundServiceSupport

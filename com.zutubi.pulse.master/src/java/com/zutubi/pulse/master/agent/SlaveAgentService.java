@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
 
@@ -42,7 +43,7 @@ public class SlaveAgentService implements AgentService
     private AgentConfiguration agentConfig;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
-    private SlaveOutputListener slaveOutputListener;
+    private SlaveCommandListener slaveCommandListener;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -217,7 +218,7 @@ public class SlaveAgentService implements AgentService
             outputStream = ByteStreams.nullOutputStream();
         }
 
-        long streamId = slaveOutputListener.registerStream(outputStream);
+        SlaveCommand command = slaveCommandListener.registerCommandWithStream(outputStream);
 
         // Now we can clear out the stream info rather than send the stream over hessian.
         context = new PulseExecutionContext(context);
@@ -225,11 +226,36 @@ public class SlaveAgentService implements AgentService
 
         try
         {
-            service.runCommand(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), context, commandLine, workingDir, streamId, timeout);
+            service.runCommand(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), context, commandLine, workingDir, command.getId(), timeout);
+
+            // We periodically wake up to check that the agent still knows about the command to guard against cases
+            // like an agent reboot during a hook command (and as a defense against bugs communicating the result back
+            // to the master).
+            while (!command.waitFor(60, TimeUnit.SECONDS))
+            {
+                if (!service.checkCommand(serviceTokenManager.getToken(), command.getId()))
+                {
+                    // The slave command events are processed synchronously (both forwarding slave side, and handling
+                    // master side), but there is still a window between waitFor returning and checkCommand running
+                    // where the command may have completed.  So we run a final waitFor here to ensure we didn't just
+                    // get unlucky.
+                    if (command.waitFor(1, TimeUnit.MILLISECONDS))
+                    {
+                        // Hit the race condition, the command is actually done.
+                        break;
+                    }
+
+                    throw new BuildException("Agent no longer knows about command we are waiting for (possible agent reboot)");
+                }
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new BuildException("Interrupted waiting for command to run: " + e.getMessage(), e);
         }
         finally
         {
-            slaveOutputListener.unregisterStream(streamId);
+            slaveCommandListener.unregisterCommand(command.getId());
         }
     }
 
@@ -265,8 +291,8 @@ public class SlaveAgentService implements AgentService
         this.masterLocationProvider = masterLocationProvider;
     }
 
-    public void setSlaveOutputListener(SlaveOutputListener slaveOutputListener)
+    public void setSlaveCommandListener(SlaveCommandListener slaveCommandListener)
     {
-        this.slaveOutputListener = slaveOutputListener;
+        this.slaveCommandListener = slaveCommandListener;
     }
 }
