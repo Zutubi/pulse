@@ -124,8 +124,17 @@ public interface SlaveService
      * @param context execution context for resolving properties in the workingDir
      * @param commandLine command (and arguments) to run
      * @param workingDir if not null, directory in which to run the command (may contain properties)
-     * @param streamId id of the stream to use in {@link com.zutubi.pulse.core.events.GenericOutputEvent}s
+     * @param commandId id of the command to use in {@link com.zutubi.pulse.core.events.SlaveCommandEvent}s
      * @param timeout if non-zero, a time limit in seconds to apply to the command
      */
-    void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout);
+    void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long commandId, int timeout);
+
+    /**
+     * Checks if a command with the given id is still running.
+     *
+     * @param token secure token for inter-agent communication
+     * @param commandId id of the command to check
+     * @return true if the command is running, false if it is unknown to the slave
+     */
+    boolean checkCommand(String token, long commandId);
 }

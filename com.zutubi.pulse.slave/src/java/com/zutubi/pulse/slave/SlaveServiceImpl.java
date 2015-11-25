@@ -3,10 +3,8 @@ package com.zutubi.pulse.slave;
 import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.EventOutputStream;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -17,7 +15,6 @@ import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
@@ -38,15 +35,12 @@ import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -71,6 +65,7 @@ public class SlaveServiceImpl implements SlaveService
     private PluginManager pluginManager;
     private PluginSynchroniser pluginSynchroniser;
     private ResourceLocatorExtensionManager resourceLocatorExtensionManager;
+    private SlaveCommandRunner slaveCommandRunner;
     private EventManager eventManager;
 
     private boolean firstStatus = true;
@@ -254,25 +249,17 @@ public class SlaveServiceImpl implements SlaveService
         return new FileInfo(new File(base, relativePath));
     }
 
-    public void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
+    public void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long commandId, int timeout)
     {
         serviceTokenManager.validateToken(token);
         updateMaster(master);
-        OutputStream outputStream = null;
-        try
-        {
-            outputStream = new EventOutputStream(eventManager, false, 0, streamId);
-            context.setOutputStream(outputStream);
-            ProcessWrapper.runCommand(commandLine, workingDir, context, timeout, TimeUnit.SECONDS);
-        }
-        catch (Exception e)
-        {
-            throw new BuildException(e);
-        }
-        finally
-        {
-            IOUtils.close(outputStream);
-        }
+        slaveCommandRunner.runCommand(context, commandLine, workingDir, commandId, timeout);
+    }
+
+    public boolean checkCommand(String token, long commandId)
+    {
+        serviceTokenManager.validateToken(token);
+        return slaveCommandRunner.isCommandRunning(commandId);
     }
 
     private MasterService updateMaster(String master)
@@ -359,6 +346,11 @@ public class SlaveServiceImpl implements SlaveService
     public void setResourceLocatorExtensionManager(ResourceLocatorExtensionManager resourceLocatorExtensionManager)
     {
         this.resourceLocatorExtensionManager = resourceLocatorExtensionManager;
+    }
+
+    public void setSlaveCommandRunner(SlaveCommandRunner slaveCommandRunner)
+    {
+        this.slaveCommandRunner = slaveCommandRunner;
     }
 
     public void setEventManager(EventManager eventManager)

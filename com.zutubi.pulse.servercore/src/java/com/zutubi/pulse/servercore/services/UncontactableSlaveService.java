@@ -95,7 +95,12 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
+    public void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long commandId, int timeout)
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
+    public boolean checkCommand(String token, long commandId)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

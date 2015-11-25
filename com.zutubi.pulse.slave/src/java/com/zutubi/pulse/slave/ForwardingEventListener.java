@@ -3,8 +3,8 @@ package com.zutubi.pulse.slave;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.events.GenericOutputEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
+import com.zutubi.pulse.core.events.SlaveCommandEvent;
 import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
@@ -58,7 +58,7 @@ public class ForwardingEventListener implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ GenericOutputEvent.class, RecipeEvent.class, SynchronisationMessageProcessedEvent.class};
+        return new Class[]{ SlaveCommandEvent.class, RecipeEvent.class, SynchronisationMessageProcessedEvent.class};
     }
 
     public void setEventManager(EventManager eventManager)
