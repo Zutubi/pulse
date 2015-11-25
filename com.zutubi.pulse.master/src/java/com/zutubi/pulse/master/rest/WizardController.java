@@ -32,10 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * RESTish controller for wizards: structured UIs for creating configuration. These are intended
@@ -137,7 +134,7 @@ public class WizardController
             }
         }, false, null);
 
-        templates.sort(new Sort.StringComparator());
+        Collections.sort(templates, new Sort.StringComparator());
         return templates;
     }
 
