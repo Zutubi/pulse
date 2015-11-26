@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core.util.api;
 
 import com.zutubi.util.logging.Logger;
-import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
-import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -11,6 +9,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 /**
  * XML Utilities used for working with a pull parser.
@@ -28,7 +29,7 @@ public class XMLStreamUtils
      */
     public static Map<String, String> getAttributes(XMLStreamReader reader)
     {
-        Map<String, String> attributes = new HashMap<String, String>();
+        Map<String, String> attributes = new HashMap<>();
         for (int i = 0; i < reader.getAttributeCount(); i++)
         {
             String name = reader.getAttributeLocalName(i);
@@ -102,20 +103,13 @@ public class XMLStreamUtils
      */
     public static void skipElement(XMLStreamReader reader) throws XMLStreamException
     {
-        int eventType = reader.getEventType();
-        if (eventType != START_ELEMENT)
-        {
-            throw new IllegalStateException("Expected reader to be at a start element, but instead found " + reader.getEventType());
-        }
-
-        Stack<String> tags = new Stack<String>();
-        tags.push(reader.getLocalName());
+        Stack<String> tags = readStartElement(reader);
 
         while (!tags.isEmpty())
         {
             // Unless the xml document is invalid, we can safely assume that tags.isEmpty()
             // will be true before reader.hasNext is false.
-            eventType = reader.next();
+            int eventType = reader.next();
 
             if (eventType == START_ELEMENT)
             {
@@ -229,7 +223,7 @@ public class XMLStreamUtils
      */
     public static Map<String, String> readElements(XMLStreamReader reader) throws XMLStreamException
     {
-        Map<String, String> elements = new HashMap<String, String>();
+        Map<String, String> elements = new HashMap<>();
 
         while (reader.isStartElement())
         {
@@ -260,52 +254,57 @@ public class XMLStreamUtils
      */
     public static String getElementText(XMLStreamReader reader) throws XMLStreamException
     {
-        int eventType = reader.getEventType();
-        if (eventType != START_ELEMENT)
-        {
-            throw new IllegalStateException("Expected reader to be at a start element, but instead found " + reader.getEventType());
-        }
-
-        Stack<String> tags = new Stack<String>();
-        tags.push(reader.getLocalName());
-
-        StringBuffer buffer = new StringBuffer();
+        Stack<String> tags = readStartElement(reader);
+        StringBuilder builder = new StringBuilder();
 
         while (!tags.isEmpty())
         {
             // Unless the xml document is invalid, we can safely assume that tags.isEmpty()
             // will be true before reader.hasNext is false.
-            eventType = reader.next();
+            int eventType = reader.next();
 
             if (eventType == START_ELEMENT)
             {
                 tags.push(reader.getLocalName());
-                buffer.append("<");
-                buffer.append(reader.getLocalName());
+                builder.append("<");
+                builder.append(reader.getLocalName());
                 for (int i = 0; i < reader.getAttributeCount(); i++)
                 {
-                    buffer.append(" ").append(reader.getAttributeName(i)).append("=\"").append(reader.getAttributeValue(i)).append("\"");
+                    builder.append(" ").append(reader.getAttributeName(i)).append("=\"").append(reader.getAttributeValue(i)).append("\"");
                 }
-                buffer.append(">");
+                builder.append(">");
             }
             else if (eventType == END_ELEMENT)
             {
                 tags.pop();
                 if (!tags.isEmpty())
                 {
-                    buffer.append("</").append(reader.getLocalName()).append(">");
+                    builder.append("</").append(reader.getLocalName()).append(">");
                 }
             }
             else
             {
                 if (reader.isCharacters())
                 {
-                    buffer.append(reader.getText());
+                    builder.append(reader.getText());
                 }
             }
         }
 
-        return buffer.toString();
+        return builder.toString();
+    }
+
+    private static Stack<String> readStartElement(XMLStreamReader reader)
+    {
+        int eventType = reader.getEventType();
+        if (eventType != START_ELEMENT)
+        {
+            throw new IllegalStateException("Expected reader to be at a start element, but instead found " + reader.getEventType());
+        }
+
+        Stack<String> tags = new Stack<>();
+        tags.push(reader.getLocalName());
+        return tags;
     }
 
     /**
