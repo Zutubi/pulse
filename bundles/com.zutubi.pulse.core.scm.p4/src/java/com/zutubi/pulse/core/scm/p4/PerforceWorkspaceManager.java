@@ -27,7 +27,8 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     private static final String PROPERTY_WORKSPACE_PREFIX = "pulse.p4.client.prefix";
     private static final String DEFAULT_WORKSPACE_PREFIX = "pulse" + WORKSPACE_NAME_SEPARATOR;
     private static final String TEMP_WORKSPACE_TAG = "temp" + WORKSPACE_NAME_SEPARATOR;
-    private static final String WORKSPACE_UNIQUE_SUFFIX = "$";
+    private static final String PROPERTY_WORKSPACE_SUFFIX = "pulse.p4.client.suffix";
+    private static final String WORKSPACE_UNIQUE_SUFFIX = System.getProperty(PROPERTY_WORKSPACE_SUFFIX, "$");
 
     private final Set<String> workspacesInUse = new HashSet<String>();
 
