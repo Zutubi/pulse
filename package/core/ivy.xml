@@ -20,7 +20,7 @@
 
         <!-- Internal plugins -->
         <dependency org="zutubi" name="com.zutubi.pulse.core.bundle" rev="latest.integration" conf="internal-bundles->bundle"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="4.4.1" conf="equinox-bundles->default"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="4.4.2" conf="equinox-bundles->default"/>
     </dependencies>
 </ivy-module>
 
