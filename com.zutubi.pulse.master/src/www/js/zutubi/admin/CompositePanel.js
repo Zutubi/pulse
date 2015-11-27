@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./Table.js
 
 (function($)
@@ -48,8 +49,8 @@
             that.view.render($(options.containerSelector));
 
             that.form = $("#composite-form").kendoZaForm({
-                parentPath: Zutubi.admin.parentPath(options.path),
-                baseName: Zutubi.admin.baseName(options.path),
+                parentPath: Zutubi.config.parentPath(options.path),
+                baseName: Zutubi.config.baseName(options.path),
                 symbolicName: composite.type.symbolicName,
                 structure: composite.type.form,
                 values: composite.properties,
@@ -145,12 +146,12 @@
             else
             {
                 properties = that.form.getValues();
-                Zutubi.admin.coerceProperties(properties, that.options.composite.type.simpleProperties);
+                Zutubi.config.coerceProperties(properties, that.options.composite.type.simpleProperties);
 
-                Zutubi.admin.ajax({
+                Zutubi.core.ajax({
                     type: "PUT",
                     maskAll: true,
-                    url: "/api/config/" + Zutubi.admin.encodePath(that.options.path) + "?depth=1",
+                    url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=1",
                     data: {kind: "composite", properties: properties},
                     success: function(data)
                     {
@@ -177,7 +178,7 @@
                             }
                         }
 
-                        Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                        Zutubi.admin.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 });
             }

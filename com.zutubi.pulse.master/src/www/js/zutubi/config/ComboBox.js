@@ -1,11 +1,12 @@
 // dependency: ./namespace.js
+// zutubi/core/package.js
 
 (function($)
 {
     var ui = kendo.ui,
         ComboBox = ui.ComboBox;
 
-    Zutubi.admin.ComboBox = ComboBox.extend({
+    Zutubi.config.ComboBox = ComboBox.extend({
         init: function(element, options)
         {
             var that = this,
@@ -26,9 +27,9 @@
                         transport: {
                             read: function(o)
                             {
-                                Zutubi.admin.ajax({
+                                Zutubi.core.ajax({
                                     method: "POST",
-                                    url: window.baseUrl + "/api/action/options/" + Zutubi.admin.encodePath(formOptions.parentPath),
+                                    url: window.baseUrl + "/api/action/options/" + Zutubi.config.encodePath(formOptions.parentPath),
                                     data: {
                                         symbolicName: formOptions.symbolicName,
                                         baseName: formOptions.baseName,
@@ -99,5 +100,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.ComboBox);
+    ui.plugin(Zutubi.config.ComboBox);
 }(jQuery));

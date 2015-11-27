@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -177,7 +178,7 @@
                 transport: {
                     read: {
                         // FIXME kendo we need very little of the type info, and it is heavyweight
-                        url: window.baseUrl + "/api/config/" + Zutubi.admin.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type&filter=validationErrors",
+                        url: window.baseUrl + "/api/config/" + Zutubi.config.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type&filter=validationErrors",
                         dataType: "json",
                         headers: {
                             Accept: "application/json; charset=utf-8",
@@ -199,7 +200,7 @@
             });
 
             dataSource.bind('error', function(e) {
-                Zutubi.admin.reportError('Could not load configuration tree: ' + Zutubi.admin.ajaxError(e.xhr));
+                Zutubi.admin.reportError('Could not load configuration tree: ' + Zutubi.core.ajaxError(e.xhr));
             });
 
             kendo.ui.progress(this.element, true);
@@ -329,8 +330,8 @@
         longestMatchingSubpath: function(path)
         {
             var info = this._infoForConfigPath(this._absoluteToConfigPath(path)),
-                collapsed = Zutubi.admin.baseName(info.path) === info.item.nestedName;
-            return collapsed ? Zutubi.admin.parentPath(info.path) : info.path;
+                collapsed = Zutubi.config.baseName(info.path) === info.item.nestedName;
+            return collapsed ? Zutubi.config.parentPath(info.path) : info.path;
         },
 
         _absoluteToConfigPath: function(path)
@@ -412,7 +413,7 @@
             }
             else if (data)
             {
-                path = Zutubi.admin.parentPath(path);
+                path = Zutubi.config.parentPath(path);
                 info = this._infoForConfigPath(path);
                 if (info.found)
                 {
@@ -485,7 +486,7 @@
                 for (i = 0; i < delta.addedPaths.length; i++)
                 {
                     path = that._absoluteToConfigPath(delta.addedPaths[i]);
-                    info = that._infoForConfigPath(Zutubi.admin.parentPath(path));
+                    info = that._infoForConfigPath(Zutubi.config.parentPath(path));
                     if (info.found)
                     {
                         that._addModel(_cloneAndTranslate(delta.models[delta.addedPaths[i]]), info.item);
@@ -503,8 +504,8 @@
                     {
                         if (info.embedded)
                         {
-                            info = that._infoForConfigPath(Zutubi.admin.parentPath(path));
-                            this._removeEmbedded(info.item, Zutubi.admin.baseName(path));
+                            info = that._infoForConfigPath(Zutubi.config.parentPath(path));
+                            this._removeEmbedded(info.item, Zutubi.config.baseName(path));
                         }
                         else
                         {
@@ -539,7 +540,7 @@
                             that.dataSource.remove(info.item);
                         }
 
-                        info = that._infoForConfigPath(Zutubi.admin.parentPath(newPath));
+                        info = that._infoForConfigPath(Zutubi.config.parentPath(newPath));
                         if (info.found)
                         {
                             that._addModel(_cloneAndTranslate(model), info.item, index);

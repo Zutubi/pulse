@@ -5,7 +5,7 @@
     var ui = kendo.ui,
         MultiSelect = ui.MultiSelect;
 
-    Zutubi.admin.ItemPicker = MultiSelect.extend({
+    Zutubi.config.ItemPicker = MultiSelect.extend({
         init: function(element, options)
         {
             var that = this,
@@ -136,5 +136,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.ItemPicker);
+    ui.plugin(Zutubi.config.ItemPicker);
 }(jQuery));

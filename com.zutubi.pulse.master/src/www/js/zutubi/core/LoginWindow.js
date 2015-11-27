@@ -4,7 +4,7 @@
 {
     var Observable = kendo.Observable;
 
-    Zutubi.admin.LoginWindow = Observable.extend({
+    Zutubi.core.LoginWindow = Observable.extend({
         // options: {
         //    success: function (no args) called after a successful auth
         //    cancel: function (no args) called after user bails

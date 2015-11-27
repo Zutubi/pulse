@@ -36,7 +36,7 @@
             textarea: "kendoZaTextArea"
         };
 
-    Zutubi.admin.Form = Widget.extend({
+    Zutubi.config.Form = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -171,10 +171,6 @@
                     }
 
                     this.fields.push(field);
-                }
-                else
-                {
-                    Zutubi.admin.reportWarning("Ignoring unsupported field type '" + fieldOptions.type + "'");
                 }
             }
         },
@@ -470,5 +466,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.Form);
+    ui.plugin(Zutubi.config.Form);
 }(jQuery));

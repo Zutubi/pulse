@@ -1,4 +1,5 @@
 // dependency: zutubi/namespace.js
+// dependency: zutubi/config/package.js
 
 if (window.Zutubi.admin === undefined)
 {
@@ -51,8 +52,8 @@ if (window.Zutubi.admin === undefined)
         function _showConfig(path, templated)
         {
             var rootIndex = templated ? 2 : 1,
-                rootPath = Zutubi.admin.subPath(path, 0, rootIndex),
-                configPath = Zutubi.admin.subPath(path, rootIndex);
+                rootPath = Zutubi.config.subPath(path, 0, rootIndex),
+                configPath = Zutubi.config.subPath(path, rootIndex);
 
             if (app.scopePanel)
             {
@@ -65,7 +66,7 @@ if (window.Zutubi.admin === undefined)
                 app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
                 app.configPanel.bind("pathselect", function(e)
                 {
-                    app.router.navigate("/config/" + Zutubi.admin.encodePath(e.path), true);
+                    app.router.navigate("/config/" + Zutubi.config.encodePath(e.path), true);
                 });
             }
 
@@ -97,7 +98,7 @@ if (window.Zutubi.admin === undefined)
 
             router.route("/config/projects(/)*path", function(path)
             {
-                var normalisedPath = Zutubi.admin.normalisedPath(path);
+                var normalisedPath = Zutubi.config.normalisedPath(path);
                 app.navbar.selectScope("projects", normalisedPath);
                 _showConfig("projects/" + normalisedPath, true);
             });
@@ -110,7 +111,7 @@ if (window.Zutubi.admin === undefined)
 
             router.route("/config/agents(/)*path", function(path)
             {
-                var normalisedPath = Zutubi.admin.normalisedPath(path);
+                var normalisedPath = Zutubi.config.normalisedPath(path);
                 app.navbar.selectScope("agents", normalisedPath);
                 if (path)
                 {
@@ -121,19 +122,19 @@ if (window.Zutubi.admin === undefined)
             router.route("/config/settings(/)*path", function(path)
             {
                 app.navbar.selectScope("settings");
-                _showConfig("settings/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("settings/" + Zutubi.config.normalisedPath(path), false);
             });
 
             router.route("/config/users(/)*path", function(path)
             {
                 app.navbar.selectScope("users");
-                _showConfig("users/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("users/" + Zutubi.config.normalisedPath(path), false);
             });
 
             router.route("/config/groups(/)*path", function(path)
             {
                 app.navbar.selectScope("groups");
-                _showConfig("groups/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("groups/" + Zutubi.config.normalisedPath(path), false);
             });
 
             router.route("/plugins(/)(:id)", function(id)
@@ -162,7 +163,7 @@ if (window.Zutubi.admin === undefined)
                 path = app.configPanel.getRootPath();
             }
 
-            label = Zutubi.admin.subPath(path, 0, 1);
+            label = Zutubi.config.subPath(path, 0, 1);
             label = label.substring(0, label.length - 1);
 
             window = new Zutubi.admin.WizardWindow({
@@ -170,7 +171,7 @@ if (window.Zutubi.admin === undefined)
                 label: label,
                 success: function(delta)
                 {
-                    app.router.navigate("/config/" + Zutubi.admin.encodePath(delta.addedPaths[0]), false);
+                    app.router.navigate("/config/" + Zutubi.config.encodePath(delta.addedPaths[0]), false);
                 }
             });
 
@@ -201,8 +202,8 @@ if (window.Zutubi.admin === undefined)
                 var rootPath = app.configPanel.getRootPath(),
                     configPath = app.configPanel.getConfigPath();
 
-                rootPath = Zutubi.admin.subPath(rootPath, 0, 1) + "/" + e.name;
-                app.router.navigate(Zutubi.admin.encodePath("/config/" + rootPath + "/" + configPath), true);
+                rootPath = Zutubi.config.subPath(rootPath, 0, 1) + "/" + e.name;
+                app.router.navigate(Zutubi.config.encodePath("/config/" + rootPath + "/" + configPath), true);
                 // Lazy setPaths will take care of choosing the longest valid config path.
                 app.configPanel.setPaths(rootPath, configPath, true);
             });
@@ -213,25 +214,6 @@ if (window.Zutubi.admin === undefined)
             });
 
             return navbar;
-        }
-
-        function _coerceInt(properties, name)
-        {
-            var value, newValue;
-            if (properties.hasOwnProperty(name))
-            {
-                value = properties[name];
-                if (value === "")
-                {
-                    newValue = null;
-                }
-                else
-                {
-                    newValue = Number(value);
-                }
-
-                properties[name] = newValue;
-            }
         }
 
         return {
@@ -302,80 +284,6 @@ if (window.Zutubi.admin === undefined)
                 app.router.start();
             },
 
-            normalisedPath: function(path)
-            {
-                if (!path)
-                {
-                    return "";
-                }
-
-                if (path.length > 0 && path[0] === "/")
-                {
-                    path = path.substring(1);
-                }
-                if (path.length > 0 && path[path.length - 1] === "/")
-                {
-                    path = path.substring(0, path.length - 1);
-                }
-
-                return path;
-            },
-
-            subPath: function(path, begin, end)
-            {
-                var elements = path.split("/");
-
-                if (typeof end === "undefined")
-                {
-                    end = elements.length;
-                }
-
-                elements = elements.slice(begin, end);
-                return elements.join("/");
-            },
-
-            parentPath: function(path)
-            {
-                var i = path.lastIndexOf("/");
-                if (i >= 0)
-                {
-                    return path.substring(0, i);
-                }
-
-                return null;
-            },
-
-            baseName: function(path)
-            {
-                var i = path.lastIndexOf("/");
-                if (i >= 0)
-                {
-                    return path.substring(i + 1);
-                }
-
-                return path;
-            },
-
-            encodePath: function(path)
-            {
-                var pieces, encodedPath, i;
-
-                pieces = path.split('/');
-                encodedPath = '';
-
-                for (i = 0; i < pieces.length; i++)
-                {
-                    if (encodedPath.length > 0)
-                    {
-                        encodedPath += '/';
-                    }
-
-                    encodedPath += encodeURIComponent(pieces[i]);
-                }
-
-                return encodedPath;
-            },
-
             reportSuccess: function(message)
             {
                 app.notificationWidget.success(message);
@@ -393,30 +301,12 @@ if (window.Zutubi.admin === undefined)
 
             openConfigPath: function(newPath)
             {
-                app.router.navigate("/config/" + Zutubi.admin.encodePath(newPath), false);
+                app.router.navigate("/config/" + Zutubi.config.encodePath(newPath), false);
             },
 
             replaceConfigPath: function(newPath)
             {
-                app.router.replace("/config/" + Zutubi.admin.encodePath(newPath), true);
-            },
-
-            coerceProperties: function(properties, propertyTypes)
-            {
-                var i,
-                    propertyType;
-
-                if (propertyTypes)
-                {
-                    for (i = 0; i < propertyTypes.length; i++)
-                    {
-                        propertyType = propertyTypes[i];
-                        if (propertyType.shortType === "int")
-                        {
-                            _coerceInt(properties, propertyType.name);
-                        }
-                    }
-                }
+                app.router.replace("/config/" + Zutubi.config.encodePath(newPath), true);
             },
 
             hasCollapsedCollection: function(data)

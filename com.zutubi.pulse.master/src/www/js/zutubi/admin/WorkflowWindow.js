@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -78,7 +79,7 @@
 
             that.mask(true);
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "GET",
                 url: window.baseUrl + that.options.url,
                 success: function (data)
@@ -91,7 +92,7 @@
                 error: function (jqXHR)
                 {
                     that.window.close();
-                    Zutubi.admin.reportError("Could not load: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },

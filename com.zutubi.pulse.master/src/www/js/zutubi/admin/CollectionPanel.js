@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./Table.js
 
 (function($)
@@ -133,10 +134,10 @@
         {
             var that = this;
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "PUT",
                 maskAll: true,
-                url: "/api/config/" + Zutubi.admin.encodePath(that.options.path) + "?depth=-1",
+                url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=-1",
                 data: {
                     kind: "collection",
                     nested: jQuery.map(that.table.getOrder(), function(key)
@@ -153,7 +154,7 @@
                 },
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not save order: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not save order: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         }

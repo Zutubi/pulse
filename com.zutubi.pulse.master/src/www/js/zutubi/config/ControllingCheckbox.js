@@ -4,9 +4,9 @@
 (function($)
 {
     var ui = kendo.ui,
-        Checkbox = Zutubi.admin.Checkbox;
+        Checkbox = Zutubi.config.Checkbox;
 
-    Zutubi.admin.ControllingCheckbox = Checkbox.extend({
+    Zutubi.config.ControllingCheckbox = Checkbox.extend({
         init: function(element, options)
         {
             var that = this;
@@ -93,5 +93,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.ControllingCheckbox);
+    ui.plugin(Zutubi.config.ControllingCheckbox);
 }(jQuery));

@@ -10,7 +10,7 @@
         KEYPRESS = "keypress" + ns,
         RESIZE = "resize" + ns;
 
-    Zutubi.admin.StringList = Widget.extend({
+    Zutubi.config.StringList = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -205,5 +205,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.StringList);
+    ui.plugin(Zutubi.config.StringList);
 }(jQuery));

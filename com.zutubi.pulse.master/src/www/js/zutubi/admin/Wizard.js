@@ -1,5 +1,5 @@
 // dependency: ./namespace.js
-// dependency: ./Form.js
+// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -87,7 +87,7 @@
                     properties: this.valuesByType[this.selectedTypeIndex]
                 };
 
-            Zutubi.admin.coerceProperties(value.properties, type.simpleProperties);
+            Zutubi.config.coerceProperties(value.properties, type.simpleProperties);
 
             if (type.symbolicName)
             {
@@ -513,7 +513,7 @@
                 }
             }
 
-            Zutubi.admin.reportError("Error stepping forward: " + Zutubi.admin.ajaxError(jqXHR));
+            Zutubi.admin.reportError("Error stepping forward: " + Zutubi.core.ajaxError(jqXHR));
         },
 
         _findNestedComposite: function(parent, key)
@@ -568,9 +568,9 @@
                 // We need to fetch the template parent to apply restrictions/defaults from it.
                 that._mask(true);
 
-                Zutubi.admin.ajax({
+                Zutubi.core.ajax({
                     type: "GET",
-                    url: "/api/config/" + Zutubi.admin.encodePath(Zutubi.admin.parentPath(that.options.path) + "/" + step.getValue().properties.parentTemplate) + "?depth=1",
+                    url: "/api/config/" + Zutubi.config.encodePath(Zutubi.config.parentPath(that.options.path) + "/" + step.getValue().properties.parentTemplate) + "?depth=1",
                     success: function (data)
                     {
                         that._mask(false);
@@ -592,9 +592,9 @@
             {
                 that._mask(true);
 
-                Zutubi.admin.ajax({
+                Zutubi.core.ajax({
                     type: "POST",
-                    url: "/api/action/validate/" + Zutubi.admin.encodePath(that.options.path),
+                    url: "/api/action/validate/" + Zutubi.config.encodePath(that.options.path),
                     data: {
                         ignoredFields: that._ignoredFieldNames(step.types[step.selectedTypeIndex].form),
                         composite: step.getValue(),
@@ -625,9 +625,9 @@
 
             that.trigger(POSTING);
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "POST",
-                url: "/api/wizard/" + Zutubi.admin.encodePath(that.options.path),
+                url: "/api/wizard/" + Zutubi.config.encodePath(that.options.path),
                 data: wizardData,
                 success: function (data)
                 {

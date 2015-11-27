@@ -6,7 +6,7 @@
         DropDownList = ui.DropDownList,
         NULL_VALUE = "/";
 
-    Zutubi.admin.DropDownList = DropDownList.extend({
+    Zutubi.config.DropDownList = DropDownList.extend({
         init: function(element, options)
         {
             var that = this,
@@ -92,5 +92,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.DropDownList);
+    ui.plugin(Zutubi.config.DropDownList);
 }(jQuery));

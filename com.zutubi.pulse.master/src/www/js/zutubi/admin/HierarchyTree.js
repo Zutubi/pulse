@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -82,7 +83,7 @@
 
             dataSource.bind('error', function(e)
             {
-                Zutubi.admin.reportError('Could not load hierarchy tree: ' + Zutubi.admin.ajaxError(e.xhr));
+                Zutubi.admin.reportError('Could not load hierarchy tree: ' + Zutubi.core.ajaxError(e.xhr));
             });
 
             kendo.ui.progress(this.element, true);

@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
-// dependency: ./ajax.js
+// dependency: zutubi/core/package.js
+// dependency: zutubi/config/package.js
 // dependency: ./ActionWindow.js
 // dependency: ./ConfigTree.js
 // dependency: ./ContextPanel.js
@@ -169,7 +170,7 @@
 
             that.path = path;
 
-            Zutubi.admin.navigate("/api/config/" + Zutubi.admin.encodePath(path) + "?depth=-1", [that, that.contextPanel], function(data)
+            Zutubi.admin.navigate("/api/config/" + Zutubi.config.encodePath(path) + "?depth=-1", [that, that.contextPanel], function(data)
             {
                 if (data.length === 1)
                 {
@@ -233,7 +234,7 @@
 
             that.contentPanel.bind("cancelled", function(e)
             {
-                that._openPath(Zutubi.admin.parentPath(that.path));
+                that._openPath(Zutubi.config.parentPath(that.path));
             });
 
             that.contentPanel.bind("saved", function(e)
@@ -364,14 +365,14 @@
         {
             var that = this;
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "POST",
                 maskAll: true,
-                url: "/api/action/" + (descendant ? "descendant" : "single") + "/" + action.action + "/" + Zutubi.admin.encodePath(path),
+                url: "/api/action/" + (descendant ? "descendant" : "single") + "/" + action.action + "/" + Zutubi.config.encodePath(path),
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },
@@ -422,10 +423,10 @@
                         this._openPath(this.configTree.longestMatchingSubpath(path));
                     }
                 }
-                else if (Zutubi.admin.parentPath(path) === this.path)
+                else if (Zutubi.config.parentPath(path) === this.path)
                 {
                     // We are showing this item in a collection.
-                    this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
+                    this.contentPanel.updateItem(Zutubi.config.baseName(path), data.model);
                 }
             }
         },
@@ -440,9 +441,9 @@
                 label: label,
                 confirm: function()
                 {
-                    Zutubi.admin.ajax({
+                    Zutubi.core.ajax({
                         type: "DELETE",
-                        url: "/api/config/" + Zutubi.admin.encodePath(path),
+                        url: "/api/config/" + Zutubi.config.encodePath(path),
                         success: function (delta)
                         {
                             that.applyDelta(delta);
@@ -450,7 +451,7 @@
                         },
                         error: function (jqXHR)
                         {
-                            Zutubi.admin.reportError("Could not delete configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                            Zutubi.admin.reportError("Could not delete configuration: " + Zutubi.core.ajaxError(jqXHR));
                         }
                     });
                 }
@@ -463,14 +464,14 @@
         {
             var that = this;
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "POST",
                 maskAll: true,
-                url: "/api/action/restore/" + Zutubi.admin.encodePath(path),
+                url: "/api/action/restore/" + Zutubi.config.encodePath(path),
                 success: jQuery.proxy(that._handleRestoreResult, that),
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },

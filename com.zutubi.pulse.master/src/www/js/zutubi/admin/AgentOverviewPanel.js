@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./OverviewPanel.js
 
 (function($)

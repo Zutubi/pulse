@@ -5,7 +5,7 @@
     var ui = kendo.ui,
         Button = ui.Button;
 
-    Zutubi.admin.Button = Button.extend({
+    Zutubi.config.Button = Button.extend({
         init: function(element, options)
         {
             var that = this;
@@ -18,5 +18,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.Button);
+    ui.plugin(Zutubi.config.Button);
 }(jQuery));

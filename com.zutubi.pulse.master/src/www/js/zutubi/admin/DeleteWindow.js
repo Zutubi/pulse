@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./WorkflowWindow.js
 
 (function($)
@@ -13,7 +14,7 @@
             that.taskTemplate = kendo.template("<tr><td>#= indent # #: path #</td><td>#: summary #</td></tr>");
 
             WorkflowWindow.fn.init.call(that, {
-                url: "/api/action/delete/" + Zutubi.admin.encodePath(options.path),
+                url: "/api/action/delete/" + Zutubi.config.encodePath(options.path),
                 label: options.label,
                 title: "confirm " + options.label,
                 continueLabel: "confirm " + options.label,

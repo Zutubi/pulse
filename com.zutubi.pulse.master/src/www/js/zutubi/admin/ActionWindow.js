@@ -1,6 +1,6 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./WorkflowWindow.js
-// dependency: ./Form.js
 
 (function($)
 {
@@ -27,7 +27,7 @@
                 actionPart = "single/" + options.action.action;
             }
 
-            that.url = "/api/action/" + actionPart + "/" + Zutubi.admin.encodePath(options.path);
+            that.url = "/api/action/" + actionPart + "/" + Zutubi.config.encodePath(options.path);
 
             WorkflowWindow.fn.init.call(that, {
                 url: that.url,
@@ -47,8 +47,8 @@
             that.action = data;
 
             that.form = wrapper.kendoZaForm({
-                parentPath: Zutubi.admin.parentPath(that.options.path),
-                baseName: Zutubi.admin.baseName(that.options.path),
+                parentPath: Zutubi.config.parentPath(that.options.path),
+                baseName: Zutubi.config.baseName(that.options.path),
                 structure: data.form,
                 values: data.formDefaults || [],
                 submits: []
@@ -72,7 +72,7 @@
             if (this.action.action === CLONE)
             {
                 properties = {};
-                properties[Zutubi.admin.baseName(this.options.path)] = this.form.getFieldNamed(CLONE_KEY).getValue();
+                properties[Zutubi.config.baseName(this.options.path)] = this.form.getFieldNamed(CLONE_KEY).getValue();
                 fields = this.form.getFields();
                 for (i = 0; i < fields.length; i++)
                 {
@@ -102,7 +102,7 @@
             {
                 if (errors)
                 {
-                    baseName = Zutubi.admin.baseName(this.options.path);
+                    baseName = Zutubi.config.baseName(this.options.path);
                     translated = {};
                     for (field in errors)
                     {
@@ -135,7 +135,7 @@
 
             that.mask(true);
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "POST",
                 url: that.url,
                 data: {
@@ -170,7 +170,7 @@
                         }
                     }
 
-                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         }

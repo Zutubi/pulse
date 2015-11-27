@@ -4,9 +4,9 @@
 (function($)
 {
     var ui = kendo.ui,
-        TextField = Zutubi.admin.TextField;
+        TextField = Zutubi.config.TextField;
 
-    Zutubi.admin.PasswordField = TextField.extend({
+    Zutubi.config.PasswordField = TextField.extend({
         init: function(element, options)
         {
             TextField.fn.init.call(this, element, options);
@@ -18,5 +18,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.PasswordField);
+    ui.plugin(Zutubi.config.PasswordField);
 }(jQuery));

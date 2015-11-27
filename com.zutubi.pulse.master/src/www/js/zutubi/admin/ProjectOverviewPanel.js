@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./OverviewPanel.js
 
 (function($)
@@ -80,7 +81,7 @@
             var agent = this.getSimple(stage, "agent", "");
             if (agent)
             {
-                agent = Zutubi.admin.subPath(agent, 1, 2);
+                agent = Zutubi.config.subPath(agent, 1, 2);
             }
             else
             {

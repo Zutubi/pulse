@@ -4,9 +4,9 @@
 (function($)
 {
     var ui = kendo.ui,
-        DropDownList = Zutubi.admin.DropDownList;
+        DropDownList = Zutubi.config.DropDownList;
 
-    Zutubi.admin.ControllingDropDownList = DropDownList.extend({
+    Zutubi.config.ControllingDropDownList = DropDownList.extend({
         init: function(element, options)
         {
             var that = this;
@@ -70,5 +70,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.ControllingDropDownList);
+    ui.plugin(Zutubi.config.ControllingDropDownList);
 }(jQuery));

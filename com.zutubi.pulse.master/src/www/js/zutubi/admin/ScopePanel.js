@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
-// dependency: ./ajax.js
+// dependency: zutubi/core/package.js
+// dependency: zutubi/config/package.js
 // dependency: ./ContextPanel.js
 // dependency: ./HierarchySelector.js
 // dependency: ./AgentOverviewPanel.js
@@ -128,7 +129,7 @@
 
             that.name = name;
 
-            Zutubi.admin.navigate("/api/config/" + Zutubi.admin.encodePath(that.scope + "/" + that.name) + "?depth=-1", [that, that.contextPanel], function(data)
+            Zutubi.admin.navigate("/api/config/" + Zutubi.config.encodePath(that.scope + "/" + that.name) + "?depth=-1", [that, that.contextPanel], function(data)
             {
                 if (data.length === 1)
                 {
@@ -170,7 +171,7 @@
             links.splice(0, 0, {
                 name: "config",
                 label: "configuration",
-                url: "admin/config/" + Zutubi.admin.encodePath(this.scope + "/" + this.name)
+                url: "admin/config/" + Zutubi.config.encodePath(this.scope + "/" + this.name)
             });
 
             // Deliberately pick out the subset of data we want to show in the scope view.

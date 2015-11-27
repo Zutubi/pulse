@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -105,7 +106,7 @@
         _linkClicked: function(e)
         {
             var targetOwner = $(e.target).text();
-            Zutubi.admin.openConfigPath(Zutubi.admin.subPath(this.options.path, 0, 1) + "/" + targetOwner + "/" + Zutubi.admin.subPath(this.options.path, 2));
+            Zutubi.admin.openConfigPath(Zutubi.config.subPath(this.options.path, 0, 1) + "/" + targetOwner + "/" + Zutubi.config.subPath(this.options.path, 2));
         },
 
         _showConfigureButton: function(type)

@@ -1,11 +1,14 @@
 // dependency: ./namespace.js
+// dependency: zutubi/core/package.js
 
 (function($)
 {
     var ui = kendo.ui,
-        Widget = ui.Widget;
+        Widget = ui.Widget,
+        CHARS_PER_ROW = 60,
+        MAX_ROWS = 10;
 
-    Zutubi.admin.TextField = Widget.extend({
+    Zutubi.config.TextArea = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -16,32 +19,50 @@
         },
 
         options: {
-            name: "ZaTextField",
-            template: '<input class="k-input k-textbox" type="text" id="#: id #" name="#: name #">'
+            name: "ZaTextArea",
+            template: '<textarea class="k-input k-textbox" id="#: id #" name="#: name #" autocomplete="off">'
         },
 
         _create: function()
         {
-            var options = this.options, width = "100%";
+            var options = this.options,
+                width = "100%";
 
             this.template = kendo.template(options.template);
             this.element.html(this.template(options.structure));
-            this.inputElement = this.element.find("input");
+            this.inputElement = this.element.find("textarea");
 
-            if (options.structure.size)
+            if (options.structure.cols)
             {
-                width = options.structure.size + "px";
+                width = options.structure.cols + "ch";
             }
+
             this.inputElement.css("width", width);
 
-            if (options.structure.readOnly || (options.structure.parameters && options.structure.parameters.noOverride))
+            if (options.structure.rows)
             {
-                this.inputElement.attr("readonly", "");
+                this.inputElement.prop("rows", options.structure.rows);
             }
 
             if (typeof options.value !== "undefined")
             {
                 this.bindValue(options.value);
+            }
+        },
+
+        autoSize: function()
+        {
+            var width = CHARS_PER_ROW + "ch",
+                value = this.getValue(),
+                rows;
+
+            if (value)
+            {
+                rows = Math.ceil(value.length / CHARS_PER_ROW);
+                rows = Math.max(0, Math.min(rows, MAX_ROWS));
+
+                this.inputElement.css("width", width);
+                this.inputElement.prop("rows", rows);
             }
         },
 
@@ -58,6 +79,10 @@
             }
 
             this.inputElement.prop("value", value);
+            if (this.options.structure.autoSize)
+            {
+                this.autoSize();
+            }
         },
 
         getValue: function()
@@ -76,13 +101,8 @@
             {
                 this.inputElement.addClass("k-state-disabled");
             }
-        },
-
-        isEnabled: function()
-        {
-            return !this.inputElement.prop("disabled");
         }
     });
 
-    ui.plugin(Zutubi.admin.TextField);
+    ui.plugin(Zutubi.config.TextArea);
 }(jQuery));

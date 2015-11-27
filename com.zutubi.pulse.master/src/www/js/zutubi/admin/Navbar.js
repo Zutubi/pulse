@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./HierarchySelector.js
 
 (function($)
@@ -267,7 +268,7 @@
             else
             {
                 this.hierarchyCrumb.setScope(scope);
-                this.hierarchyCrumb.select(Zutubi.admin.subPath(hierarchyPath, 0, 1));
+                this.hierarchyCrumb.select(Zutubi.config.subPath(hierarchyPath, 0, 1));
                 this.hierarchyCrumbItem.show();
             }
 

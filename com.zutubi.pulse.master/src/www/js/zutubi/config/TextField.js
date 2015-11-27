@@ -5,7 +5,7 @@
     var ui = kendo.ui,
         Widget = ui.Widget;
 
-    Zutubi.admin.Checkbox = Widget.extend({
+    Zutubi.config.TextField = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -16,17 +16,28 @@
         },
 
         options: {
-            name: "ZaCheckbox",
-            template: '<input class="k-input" type="checkbox" id="#: id #" name="#: name #" value="true">'
+            name: "ZaTextField",
+            template: '<input class="k-input k-textbox" type="text" id="#: id #" name="#: name #">'
         },
 
         _create: function()
         {
-            var options = this.options;
+            var options = this.options, width = "100%";
 
             this.template = kendo.template(options.template);
             this.element.html(this.template(options.structure));
             this.inputElement = this.element.find("input");
+
+            if (options.structure.size)
+            {
+                width = options.structure.size + "px";
+            }
+            this.inputElement.css("width", width);
+
+            if (options.structure.readOnly || (options.structure.parameters && options.structure.parameters.noOverride))
+            {
+                this.inputElement.attr("readonly", "");
+            }
 
             if (typeof options.value !== "undefined")
             {
@@ -41,21 +52,17 @@
 
         bindValue: function(value)
         {
-            // FIXME kendo this is hackish
-            if (value === "true")
+            if (value === null)
             {
-                value = true;
+                value = "";
             }
-            else if (value === "false")
-            {
-                value = false;
-            }
-            this.inputElement.prop("checked", value);
+
+            this.inputElement.prop("value", value);
         },
 
         getValue: function()
         {
-            return this.inputElement.prop("checked");
+            return this.inputElement.prop("value");
         },
 
         enable: function(enable)
@@ -69,8 +76,13 @@
             {
                 this.inputElement.addClass("k-state-disabled");
             }
+        },
+
+        isEnabled: function()
+        {
+            return !this.inputElement.prop("disabled");
         }
     });
 
-    ui.plugin(Zutubi.admin.Checkbox);
+    ui.plugin(Zutubi.config.TextField);
 }(jQuery));

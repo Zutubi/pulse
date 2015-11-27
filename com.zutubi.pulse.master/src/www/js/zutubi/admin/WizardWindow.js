@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: zutubi/config/package.js
 // dependency: ./Wizard.js
 
 (function($)
@@ -81,9 +82,9 @@
 
             that.mask(true);
 
-            Zutubi.admin.ajax({
+            Zutubi.core.ajax({
                 type: "GET",
-                url: "/api/wizard/" + Zutubi.admin.encodePath(that.options.path),
+                url: "/api/wizard/" + Zutubi.config.encodePath(that.options.path),
                 success: function (data)
                 {
                     that.mask(false);
@@ -92,7 +93,7 @@
                 error: function (jqXHR)
                 {
                     that.close();
-                    Zutubi.admin.reportError("Could not get wizard information: " + Zutubi.admin.ajaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not get wizard information: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },
