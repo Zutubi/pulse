@@ -6,7 +6,6 @@ import org.springframework.beans.factory.FactoryBean;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * A factory bean that provides access to the systems Data Source.
@@ -25,7 +24,7 @@ public class DataSourceBeanFactory implements FactoryBean
             {
                 if (dataSource == null)
                 {
-                    dataSource = createDataSource();
+                    dataSource = databaseConfig.createDataSource();
 
                     // handle some custom processing for embedded hsql databases.
                     if (isHsqldb())
@@ -62,41 +61,8 @@ public class DataSourceBeanFactory implements FactoryBean
             HSQLDBUtils.shutdown(dataSource);
             dataSource.close();
             HSQLDBUtils.updateMaxSize(databaseConfig.getUrl());
-            dataSource = createDataSource();
+            dataSource = databaseConfig.createDataSource();
         }
-    }
-
-    private BasicDataSource createDataSource() throws IOException
-    {
-        BasicDataSource dataSource = new BasicDataSource();
-
-        // We don't set the driver class as it is loaded earlier (potentially
-        // from a dynamic classpath).
-        dataSource.setUrl(databaseConfig.getUrl());
-        dataSource.setUsername(databaseConfig.getUsername());
-        dataSource.setPassword(databaseConfig.getPassword());
-
-        dataSource.setInitialSize(databaseConfig.getPoolInitialSize());
-        dataSource.setMaxActive(databaseConfig.getPoolMaxActive());
-        dataSource.setMaxIdle(databaseConfig.getPoolMaxIdle());
-        dataSource.setMinIdle(databaseConfig.getPoolMinIdle());
-        dataSource.setMaxWait(databaseConfig.getPoolMaxWait());
-        dataSource.setValidationQuery(databaseConfig.getPoolValidationQuery());
-        dataSource.setTestOnBorrow(databaseConfig.getPoolTestOnBorrow());
-        dataSource.setTestWhileIdle(databaseConfig.getPoolTestWhileIdle());
-        dataSource.setTimeBetweenEvictionRunsMillis(databaseConfig.getPoolTimeBetweenEvictionRunsMillis());
-        dataSource.setNumTestsPerEvictionRun(databaseConfig.getPoolNumTestsPerEvitionRun());
-        dataSource.setMinEvictableIdleTimeMillis(databaseConfig.getPoolMinEvictableIdleTimeMillis());
-
-        // configure the dataSource using the custom connection properties.
-        Properties connectionProperties = databaseConfig.getConnectionProperties();
-        for (Object o : connectionProperties.keySet())
-        {
-            String propertyName = (String) o;
-            dataSource.addConnectionProperty(propertyName, connectionProperties.getProperty(propertyName));
-        }
-
-        return dataSource;
     }
 
     public Class getObjectType()
