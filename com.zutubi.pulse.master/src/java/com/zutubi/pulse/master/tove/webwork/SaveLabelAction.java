@@ -27,6 +27,8 @@ import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 /**
  * A custom action for saving labels.  Checks for label renames, and if one is detected prompts the
  * user to possibly rename other labels.
+ *
+ * FIXME kendo reimplement this somehow
  */
 public class SaveLabelAction extends SaveAction
 {

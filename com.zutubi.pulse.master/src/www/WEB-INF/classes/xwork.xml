@@ -606,14 +606,6 @@
             <result name="error" type="flexjson">configurationErrors</result>
         </global-results>
 
-        <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayAction">
-            <interceptor-ref name="ajaxConfigStack"/>
-            <result name="custom" type="customVelocity"/>
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
-            <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
-        </action>
-
         <action name="dependentOptions" class="com.zutubi.pulse.master.tove.webwork.DependentOptionsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <result name="success" type="flexjson">options</result>
@@ -645,12 +637,6 @@
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="rename" type="flexjson">configurationPanel</result>
-        </action>
-
-        <action name="delete" class="com.zutubi.pulse.master.tove.webwork.DeleteAction">
-            <result name="confirm" type="flexjson">newPanel</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
         <action name="restore" class="com.zutubi.pulse.master.tove.webwork.RestoreAction">
