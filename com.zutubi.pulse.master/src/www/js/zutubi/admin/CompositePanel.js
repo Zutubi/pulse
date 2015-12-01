@@ -186,7 +186,7 @@
 
         _checkClicked: function()
         {
-            Zutubi.admin.checkConfig(this.options.path, this.options.composite.type, this.form, this.checkForm);
+            Zutubi.config.checkConfig(this.options.path, this.options.composite.type, this.form, this.checkForm, Zutubi.admin.reportError);
         }
     });
 }(jQuery));

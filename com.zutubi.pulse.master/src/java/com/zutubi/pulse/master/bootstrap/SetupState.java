@@ -12,6 +12,7 @@ public enum SetupState
     RESTORE,
     LICENSE,
     UPGRADE,
-    SETUP,
+    ADMIN,
+    SETTINGS,
     STARTING,
 }

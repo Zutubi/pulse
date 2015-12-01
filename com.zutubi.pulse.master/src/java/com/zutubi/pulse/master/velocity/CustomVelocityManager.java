@@ -47,7 +47,7 @@ public class CustomVelocityManager extends VelocityManager
 
         // Since this managers lifecycle is controlled via velocity, we need to ensure
         // that if a new instance is created after the startup that we are aware of it.
-        StartupManager startupManager = SpringComponentContext.getBean("startupManager");
+        StartupManager startupManager = SpringComponentContext.getOptionalBean("startupManager");
         if (startupManager != null)
         {
             systemStarted = startupManager.isSystemStarted();

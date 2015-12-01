@@ -17,12 +17,14 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
+import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.links.LinkManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
@@ -59,6 +61,9 @@ public class ConfigModelBuilder
     private ObjectFactory objectFactory;
     private SystemPaths systemPaths;
     private MasterConfigurationRegistry configurationRegistry;
+    private TypeRegistry typeRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationDocsManager configurationDocsManager;
 
     public ConfigModel buildModel(String[] filters, String path, int depth) throws TypeException
     {
@@ -80,13 +85,20 @@ public class ConfigModelBuilder
         else
         {
             CompositeType compositeType = (CompositeType) type;
-            if (record == null)
+            if (configurationTemplateManager.isPersistent(path))
             {
-                model = createTypeSelectionModel(path, compositeType, label, filters);
+                if (record == null)
+                {
+                    model = createTypeSelectionModel(path, compositeType, label, filters);
+                }
+                else
+                {
+                    model = createCompositeModel(path, compositeType, label, parentType == null || parentType.hasSignificantKeys(), record, filters);
+                }
             }
             else
             {
-                model = createCompositeModel(path, compositeType, label, parentType == null || parentType.hasSignificantKeys(), record, filters);
+                model = createTransientModel(path, compositeType, label);
             }
         }
 
@@ -183,12 +195,21 @@ public class ConfigModelBuilder
     {
         String baseName = PathUtils.getBaseName(path);
         String closestExistingPath = path;
-        while (!configurationTemplateManager.pathExists(closestExistingPath))
+        boolean concrete = configurationTemplateManager.isConcrete(closestExistingPath);
+        if (configurationTemplateManager.isPersistent(path))
         {
-            closestExistingPath = PathUtils.getParentPath(closestExistingPath);
+            while (!configurationTemplateManager.pathExists(closestExistingPath))
+            {
+                closestExistingPath = PathUtils.getParentPath(closestExistingPath);
+            }
+        }
+        else
+        {
+            closestExistingPath = null;
+            concrete = true;
         }
 
-        TypeSelectionModel model = new TypeSelectionModel(baseName, label, configurationTemplateManager.isConcrete(closestExistingPath));
+        TypeSelectionModel model = new TypeSelectionModel(baseName, label, concrete);
 
         if (isFieldSelected(filters, "type"))
         {
@@ -430,6 +451,8 @@ public class ConfigModelBuilder
             typeModel.addSubType(buildCompositeTypeModel(extension, context));
         }
 
+        typeModel.setDocs(new DocModel(configurationDocsManager.getDocs(type)));
+
         return typeModel;
     }
 
@@ -537,6 +560,32 @@ public class ConfigModelBuilder
                 model.addDescendantAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths), false));
             }
         }
+    }
+
+    public TransientModel buildTransientModel(Class<? extends Configuration> clazz)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Request for model of unregistered class '" + clazz + "'");
+        }
+
+        List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
+        if (paths.size() != 1)
+        {
+            throw new IllegalArgumentException("No unambiguous path found for type '" + type.getSymbolicName() + "'");
+        }
+
+        String path = paths.get(0);
+        ComplexType parentType = configurationTemplateManager.getType(PathUtils.getParentPath(path));
+        return createTransientModel(path, type, ToveUtils.getDisplayName(path, type, parentType, null));
+    }
+
+    private TransientModel createTransientModel(String path, CompositeType compositeType, String label)
+    {
+        TransientModel model = new TransientModel(PathUtils.getBaseName(path), label);
+        model.setType(buildCompositeTypeModel(compositeType, new FormContext((String) null)));
+        return model;
     }
 
     private List<ConfigModel> getNested(final String[] filters, final String path, final ComplexType type, final Record record, final int depth)
@@ -683,6 +732,21 @@ public class ConfigModelBuilder
     public void setLinkManager(LinkManager linkManager)
     {
         this.linkManager = linkManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setConfigurationDocsManager(ConfigurationDocsManager configurationDocsManager)
+    {
+        this.configurationDocsManager = configurationDocsManager;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>

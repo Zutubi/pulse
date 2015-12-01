@@ -11,36 +11,58 @@ import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.master.license.LicenseHolder;
+import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.migrate.MigrationManager;
+import com.zutubi.pulse.master.model.Role;
+import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.rest.wizards.UserConfigurationCreator;
 import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.setup.*;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.PropertiesWriter;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Works through the setup process, gradually starting Pulse as more bits and
@@ -60,6 +82,15 @@ public class DefaultSetupManager implements SetupManager
     private MigrationManager migrationManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
+    private LicenseManager licenseManager;
+    private ThreadFactory threadFactory;
+
+    /**
+     * Note these are not available until we {@link #initialiseConfigurationPersistence()}.
+     */
+
+    private ConfigurationReferenceManager configurationReferenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * Contexts for Stage A: the config subsystem.
@@ -110,7 +141,7 @@ public class DefaultSetupManager implements SetupManager
         return state;
     }
 
-    public void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask)
+    public void init(ProcessSetupStartupTask processSetupStartupTask)
     {
         try
         {
@@ -122,7 +153,17 @@ public class DefaultSetupManager implements SetupManager
             createExternalConfigFileIfRequired();
 
             initialiseConfigurationSystem();
+        }
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
+    }
 
+    public void startSetupWorkflow()
+    {
+        try
+        {
             if (isDataRequired())
             {
                 printConsoleMessage("No data path configured, requesting via web UI...");
@@ -196,7 +237,35 @@ public class DefaultSetupManager implements SetupManager
         configurationRegistry.initSetup();
     }
 
-    public void requestDataComplete()
+    @Override
+    public SetupDataConfiguration getDefaultData() throws IOException
+    {
+        String data;
+        SetupDataConfiguration config = new SetupDataConfiguration();
+        String userHome = System.getProperty(EnvConfig.USER_HOME);
+        if (StringUtils.stringSet(userHome))
+        {
+            String userConfig = configurationManager.getEnvConfig().getDefaultPulseConfigDir(MasterConfigurationManager.CONFIG_DIR);
+            data = FileSystemUtils.composeFilename(userConfig, "data");
+        }
+        else
+        {
+            data = "data";
+        }
+
+        config.setData(FileSystemUtils.normaliseSeparators(new File(data).getCanonicalPath()));
+        return config;
+    }
+
+    @Override
+    public void setData(SetupDataConfiguration data) throws IOException
+    {
+        File home = new File(data.getData());
+        configurationManager.setPulseData(home);
+        requestDataComplete();
+    }
+
+    private void requestDataComplete()
     {
         try
         {
@@ -288,46 +357,86 @@ public class DefaultSetupManager implements SetupManager
         requestDbComplete();
     }
 
-    public void requestDbComplete()
+    @Override
+    public void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException
     {
-        try
+        Data data = configurationManager.getData();
+        if (!db.getType().isEmbedded())
         {
-            state = SetupState.WAITING;
+            DriverRegistry registry = configurationManager.getDriverRegistry();
 
-            loadContexts(dataContextsA);
-            loadContexts(dataContextsB);
-
-            // create the database based on the hibernate configuration.
-            databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
-            if (databaseConsole.isEmbedded())
+            if (db.getDriverFile() != null)
             {
-                printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
+                File driverFile = new File(db.getDriverFile());
+                registry.register(db.getType().getJDBCClassName(db), driverFile);
             }
-            else
-            {
-                printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
-            }
+        }
 
-            if (!databaseConsole.schemaExists())
+        File databaseConfig = new File(data.getUserConfigRoot(), "database.properties");
+        Properties p = db.getDatabaseProperties();
+
+        IOUtils.write(p, databaseConfig, "Generated by Pulse setup wizard");
+        requestDbComplete();
+    }
+
+    @Override
+    public void migrateComplete()
+    {
+        requestDbComplete();
+    }
+
+    private void requestDbComplete()
+    {
+        state = SetupState.WAITING;
+
+        threadFactory.newThread(new Runnable()
+        {
+            @Override
+            public void run()
             {
-                printConsoleMessage("Database schema does not exist, initialising...");
+                SecurityUtils.loginAsSystem();
                 try
                 {
-                    databaseConsole.createSchema();
-                }
-                catch (SQLException e)
-                {
-                    throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
-                }
-                printConsoleMessage("Database initialised.");
-            }
+                    loadContexts(dataContextsA);
+                    loadContexts(dataContextsB);
 
-            handleRestorationProcess();
-        }
-        catch (Exception e)
-        {
-            setupCallback.finaliseSetup(e);
-        }
+                    // create the database based on the hibernate configuration.
+                    databaseConsole = SpringComponentContext.getBean("databaseConsole");
+                    if (databaseConsole.isEmbedded())
+                    {
+                        printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
+                    }
+                    else
+                    {
+                        printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
+                    }
+
+                    if (!databaseConsole.schemaExists())
+                    {
+                        printConsoleMessage("Database schema does not exist, initialising...");
+                        try
+                        {
+                            databaseConsole.createSchema();
+                        }
+                        catch (SQLException e)
+                        {
+                            throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
+                        }
+                        printConsoleMessage("Database initialised.");
+                    }
+
+                    handleRestorationProcess();
+                }
+                catch (Exception e)
+                {
+                    setupCallback.finaliseSetup(e);
+                }
+                finally
+                {
+                    SecurityUtils.logout();
+                }
+            }
+        }).run();
     }
 
     private void ensureDriversRegisteredAndLoaded()
@@ -441,7 +550,22 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void requestLicenseComplete()
+    @Override
+    public void setLicense(final SetupLicenseConfiguration license)
+    {
+        SecurityUtils.runAsSystem(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                String licenseKey = license.getLicense().replaceAll("\n", "");
+                licenseManager.installLicense(licenseKey);
+                requestLicenseComplete();
+            }
+        });
+    }
+
+    private void requestLicenseComplete()
     {
         try
         {
@@ -475,8 +599,8 @@ public class DefaultSetupManager implements SetupManager
         PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
         DelegatingHandleAllocator handleAllocator = SpringComponentContext.getBean("handleAllocator");
         ConfigurationPersistenceManager configurationPersistenceManager = SpringComponentContext.getBean("configurationPersistenceManager");
-        ConfigurationReferenceManager configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
-        ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
+        configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
+        configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
         ConfigurationRefactoringManager configurationRefactoringManager = SpringComponentContext.getBean("configurationRefactoringManager");
         MasterConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = SpringComponentContext.getBean("configurationExtensionManager");
@@ -534,15 +658,14 @@ public class DefaultSetupManager implements SetupManager
                     SpringComponentContext.pop();
                     loadContexts(setupContexts);
 
-                    if (isSetupRequired())
+                    if (isAdminRequired())
                     {
-                        printConsoleMessage("Database empty, requesting setup via web UI...");
-                        state = SetupState.SETUP;
-                        initialInstallation = true;
+                        printConsoleMessage("No admin configured, requesting via UI...");
+                        state = SetupState.ADMIN;
                         showPrompt();
                         return;
                     }
-                    requestSetupComplete(false);
+                    requestAdminComplete();
                 }
             });
         }
@@ -552,39 +675,200 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void requestSetupComplete(boolean setupWizard)
+    @Override
+    public UserConfiguration setAdminUser(final AdminUserConfiguration admin) throws Exception
+    {
+        return SecurityUtils.callAsSystem(new Callable<UserConfiguration>()
+        {
+            @Override
+            public UserConfiguration call()
+            {
+                UserConfiguration adminUser = new UserConfiguration();
+                adminUser.setPermanent(true);
+                adminUser.setLogin(admin.getLogin());
+                adminUser.setName(admin.getName());
+                adminUser.setPassword(new Md5PasswordEncoder().encodePassword(admin.getPassword(), null));
+                adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
+                if (StringUtils.stringSet(admin.getEmailAddress()))
+                {
+                    EmailContactConfiguration emailContact = new EmailContactConfiguration(UserConfigurationCreator.CONTACT_NAME, admin.getEmailAddress());
+                    emailContact.setPrimary(true);
+                    adminUser.getPreferences().addContact(emailContact);
+                }
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
+
+                // Special all-users group.
+                BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, Role.USER);
+                allUsersGroup.setPermanent(true);
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
+
+                // Special anonymous users group.
+                BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, Role.GUEST);
+                anonymousUsersGroup.setPermanent(true);
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
+
+                // create an administrators group (for convenience)
+                UserGroupConfiguration adminGroup = new UserGroupConfiguration(UserManager.ADMINS_GROUP_NAME);
+                adminGroup.addServerPermission(ServerPermission.ADMINISTER);
+                adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, adminGroup);
+
+                // and a project admins group that has admin access to all projects
+                UserGroupConfiguration projectAdmins = new UserGroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
+                projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
+                projectAdmins.addServerPermission(ServerPermission.CREATE_PROJECT);
+                projectAdmins.addServerPermission(ServerPermission.DELETE_PROJECT);
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
+
+                // and a developers group that has personal build access (for convenience)
+                UserGroupConfiguration developersGroup = new UserGroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
+                developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
+                configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
+
+                printConsoleMessage("Admin user and default groups created.");
+                requestAdminComplete();
+                return adminUser;
+            }
+        });
+    }
+
+    private void requestAdminComplete()
     {
         try
         {
-            if (setupWizard)
+            if (isSettingsRequired())
             {
-                printConsoleMessage("Setup wizard complete.");
+                printConsoleMessage("Requesting initial settings via UI...");
+                state = SetupState.SETTINGS;
+                initialInstallation = true;
+                showPrompt();
+                return;
             }
 
-            state = SetupState.STARTING;
-
-            // Load the remaining contexts.  Note that the subsystems created
-            // within should generally wait for the configuration system to
-            // start (by listening for an appropriate event).
-            loadContexts(startupContexts);
-
-            // Fire up the extension managers.  These need most systems available
-            // (e.g. the command extension manager requires the file loader), but
-            // must come before the final init of the configuration as they are
-            // required when instantiating config objects.
-            PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
-            pluginManager.initialiseExtensions();
-
-            DefaultConfigurationProvider configurationProvider = SpringComponentContext.getBean("configurationProvider");
-            configurationProvider.init();
-            this.configurationProvider = configurationProvider;
-
-            setupCallback.finaliseSetup(null);
+            requestSetupComplete();
         }
         catch (Exception e)
         {
             setupCallback.finaliseSetup(e);
         }
+
+    }
+
+    @Override
+    public ServerSettingsConfiguration getDefaultServerSettings()
+    {
+        ServerSettingsConfiguration settings = new ServerSettingsConfiguration();
+        SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
+        settings.setBaseUrl(systemConfig.getHostUrl());
+        return settings;
+    }
+
+    @Override
+    public void setServerSettings(final ServerSettingsConfiguration settings) throws Exception
+    {
+        SecurityUtils.callAsSystem(new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
+            {
+                GlobalConfiguration global = new GlobalConfiguration();
+                global.setConfigurationPath(GlobalConfiguration.SCOPE_NAME);
+                global.setPermanent(true);
+                global.setBaseUrl(settings.getBaseUrl());
+                global.setMasterHost(getMasterHost(settings.getBaseUrl()));
+
+                EmailConfiguration email = global.getEmail();
+                CompositeType emailType = configurationTemplateManager.getType(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, "email"), CompositeType.class);
+                for (String propertyName : emailType.getSimplePropertyNames())
+                {
+                    TypeProperty property = emailType.getProperty(propertyName);
+                    property.setValue(email, property.getValue(settings));
+                }
+
+                configurationTemplateManager.save(global);
+                return null;
+            }
+        });
+
+        printConsoleMessage("Setup complete.");
+        requestSetupComplete();
+    }
+
+    private String getMasterHost(String baseUrl)
+    {
+        String masterHost = null;
+        if (baseUrl != null)
+        {
+            // Pull out just the host part
+            try
+            {
+                URL url = new URL(baseUrl);
+                masterHost = url.getHost();
+            }
+            catch (MalformedURLException e)
+            {
+                // Nice try
+            }
+        }
+
+        if (masterHost == null)
+        {
+            // So much for that plan...let's try and get the host name
+            try
+            {
+                InetAddress address = InetAddress.getLocalHost();
+                masterHost = address.getCanonicalHostName();
+            }
+            catch (UnknownHostException e)
+            {
+                // Oh well, we tried
+                masterHost = "localhost";
+            }
+        }
+
+        return masterHost;
+    }
+
+    private void requestSetupComplete()
+    {
+        state = SetupState.STARTING;
+
+        threadFactory.newThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                SecurityUtils.loginAsSystem();
+                try
+                {
+                    // Load the remaining contexts.  Note that the subsystems created
+                    // within should generally wait for the configuration system to
+                    // start (by listening for an appropriate event).
+                    loadContexts(startupContexts);
+
+                    // Fire up the extension managers.  These need most systems available
+                    // (e.g. the command extension manager requires the file loader), but
+                    // must come before the final init of the configuration as they are
+                    // required when instantiating config objects.
+                    PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
+                    pluginManager.initialiseExtensions();
+
+                    DefaultConfigurationProvider configurationProvider = SpringComponentContext.getBean("configurationProvider");
+                    configurationProvider.init();
+                    DefaultSetupManager.this.configurationProvider = configurationProvider;
+
+                    setupCallback.finaliseSetup(null);
+                }
+                catch (Exception e)
+                {
+                    setupCallback.finaliseSetup(e);
+                }
+                finally
+                {
+                    SecurityUtils.logout();
+                }
+            }
+        }).run();
     }
 
     private void loadContexts(List<String> contexts)
@@ -593,7 +877,7 @@ public class DefaultSetupManager implements SetupManager
         SpringComponentContext.autowire(this);
 
         // xwork object factory refresh - need to ensure that it has a reference to the latest spring context.
-        SpringObjectFactory objFact = (SpringObjectFactory) SpringComponentContext.getBean("xworkObjectFactory");
+        SpringObjectFactory objFact = SpringComponentContext.getOptionalBean("xworkObjectFactory");
         if (objFact != null)
         {
             objFact.setApplicationContext(SpringComponentContext.getContext());
@@ -616,10 +900,16 @@ public class DefaultSetupManager implements SetupManager
         return upgradeManager.isUpgradeRequired();
     }
 
-    private boolean isSetupRequired()
+    private boolean isAdminRequired()
     {
         ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
         return configurationTemplateManager.getRecord(MasterConfigurationRegistry.USERS_SCOPE).size() == 0;
+    }
+
+    private boolean isSettingsRequired()
+    {
+        ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
+        return !configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).isPermanent();
     }
 
     private void updateVersionIfNecessary()
@@ -862,5 +1152,15 @@ public class DefaultSetupManager implements SetupManager
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
+    }
+
+    public void setLicenseManager(LicenseManager licenseManager)
+    {
+        this.licenseManager = licenseManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

@@ -1,6 +1,9 @@
-package com.zutubi.pulse.master.rest;
+package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.rest.ConfigModelBuilder;
+import com.zutubi.pulse.master.rest.FormModelBuilder;
+import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.actions.ActionHandler;
 import com.zutubi.pulse.master.rest.actions.CloneHandler;
 import com.zutubi.pulse.master.rest.actions.PullUpHandler;
@@ -227,17 +230,7 @@ public class ConfigActionsController
 
         @SuppressWarnings("unchecked")
         ConfigurationCheckHandler<Configuration> handler = (ConfigurationCheckHandler<Configuration>) instantiator.instantiate(checkType, checkRecord);
-        CheckResultModel result;
-        try
-        {
-            handler.test(instance);
-            result = new CheckResultModel();
-        }
-        catch (Exception e)
-        {
-            LOG.debug(e);
-            result = new CheckResultModel(e);
-        }
+        CheckResultModel result = Utils.runCheck(handler, instance);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

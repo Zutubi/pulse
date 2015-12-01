@@ -1,8 +1,10 @@
-package com.zutubi.pulse.master.rest;
+package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.zutubi.pulse.master.rest.ConfigModelBuilder;
+import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CollectionModel;

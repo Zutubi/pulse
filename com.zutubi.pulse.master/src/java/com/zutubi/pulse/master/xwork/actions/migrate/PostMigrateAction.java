@@ -28,7 +28,7 @@ public class PostMigrateAction extends MigrateActionSupport
 
     public String execute() throws Exception
     {
-        setupManager.requestDbComplete();
+        setupManager.migrateComplete();
         
         return super.execute();
     }

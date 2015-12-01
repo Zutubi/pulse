@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <link href="${base}/css/reset.css?#version()" rel="stylesheet"/>
+
+    <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/setupa.css?#version()" rel="stylesheet"/>
+
+    <script>
+        window.baseUrl = "${base}";
+        adminPath = "/${path}/";
+    </script>
+
+    #javascript()
+        zutubi/setup/package.js
+    #end
+
+    <title>Pulse Setup</title>
+</head>
+<body>
+    <div id="notification"></div>
+    <div id="container">
+        <div id="right-column">
+            <div id="verbose-docs"></div>
+        </div>
+        <div id="left-column">
+            <div id="main-view"></div>
+        </div>
+    </div>
+
+    <div id="footer">
+        <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+        <b>::</b> copyright &copy; 2005-2015 <a href="http://zutubi.com/">zutubi pty ltd</a>
+    </div>
+
+    <script>
+        Zutubi.setup.init();
+
+        $(document).ready(function()
+        {
+            Zutubi.setup.start();
+        });
+    </script>
+</body>
+</html>

@@ -63,7 +63,11 @@
                     fields = form.getFields();
                     for (i = 0; i < fields.length; i++)
                     {
-                        fields[i].enable(enable);
+                        field = fields[i];
+                        if (field !== this)
+                        {
+                            field.enable(enable);
+                        }
                     }
                 }
             }

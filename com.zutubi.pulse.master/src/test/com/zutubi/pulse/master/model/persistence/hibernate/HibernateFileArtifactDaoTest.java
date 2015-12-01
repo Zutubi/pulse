@@ -16,8 +16,8 @@ public class HibernateFileArtifactDaoTest extends MasterPersistenceTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        artifactDao = (ArtifactDao) SpringComponentContext.getBean("artifactDao");
-        fileArtifactDao = (FileArtifactDao) SpringComponentContext.getBean("fileArtifactDao");
+        artifactDao = SpringComponentContext.getBean("artifactDao");
+        fileArtifactDao = SpringComponentContext.getBean("fileArtifactDao");
     }
 
     public void testSaveAndLoad()

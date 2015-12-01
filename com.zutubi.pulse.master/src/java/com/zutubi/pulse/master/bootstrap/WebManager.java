@@ -3,6 +3,11 @@ package com.zutubi.pulse.master.bootstrap;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.security.SecurityManager;
+import com.zutubi.pulse.servercore.jetty.JettyServerManager;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.springframework.web.context.support.XmlWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 /**
  * The web manager is responsible for handling processes related
@@ -15,12 +20,16 @@ public class WebManager
 
     private boolean mainDeployed = false;
 
+    private JettyServerManager jettyServerManager;
+
     /**
      * Load the setup process' xwork configuration.
      */
     public void deploySetup()
     {
         loadXworkConfiguration("xwork-setup.xml");
+
+        deployApi("setup-api");
     }
 
     /**
@@ -34,6 +43,23 @@ public class WebManager
         // enable security only when the standard xwork file is loaded.
         SecurityManager securityManager = SpringComponentContext.getBean("securityManager");
         securityManager.secure();
+
+        deployApi("api");
+    }
+
+    public void deployApi(String servletName)
+    {
+        XmlWebApplicationContext xmlWebApplicationContext = new XmlWebApplicationContext();
+        xmlWebApplicationContext.setParent(SpringComponentContext.getContext());
+
+        DispatcherServlet servlet = new DispatcherServlet(xmlWebApplicationContext);
+        // This allows the ApiExceptionHandler to process no-handler-found just like other
+        // exceptions.
+        servlet.setThrowExceptionIfNoHandlerFound(true);
+
+        ServletHolder servletHolder = new ServletHolder(servletName, servlet);
+        WebAppContext webAppContext = jettyServerManager.getContextHandler(WebAppContext.class);
+        webAppContext.addServlet(servletHolder,  "/" + servletName + "/*");
     }
 
     public boolean isMainDeployed()
@@ -46,5 +72,10 @@ public class WebManager
         com.opensymphony.xwork.config.ConfigurationManager.clearConfigurationProviders();
         com.opensymphony.xwork.config.ConfigurationManager.addConfigurationProvider(new XmlConfigurationProvider(name));
         com.opensymphony.xwork.config.ConfigurationManager.getConfiguration().reload();
+    }
+
+    public void setJettyServerManager(JettyServerManager jettyServerManager)
+    {
+        this.jettyServerManager = jettyServerManager;
     }
 }

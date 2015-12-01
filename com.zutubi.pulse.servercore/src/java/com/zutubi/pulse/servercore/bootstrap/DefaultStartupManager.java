@@ -119,7 +119,7 @@ public class DefaultStartupManager implements StartupManager
             startTime = System.currentTimeMillis();
 
             // send a message to the rest of the system that all is good to go.
-            EventManager eventManager = (EventManager) SpringComponentContext.getBean("eventManager");
+            EventManager eventManager = SpringComponentContext.getBean("eventManager");
             eventManager.publish(new SystemStartedEvent(this));
 
             runStartupTasks(postStartupTasks);
@@ -137,7 +137,7 @@ public class DefaultStartupManager implements StartupManager
         {
             System.err.println("You appear to be running the GNU Classpath JVM (libgcj/gij).  Due to missing\n" +
                     "features in this VM, Pulse does currently not support it.  Please consider\n" +
-                    "installing another JVM (a free one is provided by Sun for Linux systems).");
+                    "installing another JVM (a free one is provided by Oracle for Linux systems).");
             System.exit(1);
         }
     }

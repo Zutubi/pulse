@@ -1,17 +1,21 @@
 package com.zutubi.pulse.master.rest;
 
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
+import com.zutubi.pulse.master.rest.model.CheckResultModel;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +23,9 @@ import java.util.Map;
  */
 public class Utils
 {
-    static String getConfigPath(HttpServletRequest request)
+    private static final Logger LOG = Logger.getLogger(Utils.class);
+
+    public static String getConfigPath(HttpServletRequest request)
     {
         String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -33,7 +39,7 @@ public class Utils
         return path;
     }
 
-    static ComplexType getType(String configPath, ConfigurationTemplateManager configurationTemplateManager)
+    public static ComplexType getType(String configPath, ConfigurationTemplateManager configurationTemplateManager)
     {
         try
         {
@@ -55,7 +61,7 @@ public class Utils
         return record;
     }
 
-    static Record getComposite(String path, ConfigurationTemplateManager configurationTemplateManager)
+    public static Record getComposite(String path, ConfigurationTemplateManager configurationTemplateManager)
     {
         Record record = getRecord(path, configurationTemplateManager);
         if (!StringUtils.stringSet(record.getSymbolicName()))
@@ -66,19 +72,7 @@ public class Utils
         return record;
     }
 
-    static Record getMap(String path, ConfigurationTemplateManager configurationTemplateManager)
-    {
-        Record record = getRecord(path, configurationTemplateManager);
-
-        if (!(configurationTemplateManager.getType(path) instanceof MapType))
-        {
-            throw new IllegalArgumentException("Path '" + path + "' does not address a map");
-        }
-
-        return record;
-    }
-
-    static PostContext getPostContext(String configPath, ConfigurationTemplateManager configurationTemplateManager)
+    public static PostContext getPostContext(String configPath, ConfigurationTemplateManager configurationTemplateManager)
     {
         CompositeType postableType;
         String parentPath;
@@ -150,6 +144,34 @@ public class Utils
                     result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
                 }
             }
+        }
+
+        return result;
+    }
+
+    public static Map<String, Object> getSimplePropertyValues(CompositeType type, Configuration instance) throws Exception
+    {
+        Map<String, Object> values = new HashMap<>();
+        for (TypeProperty property: type.getProperties(SimpleType.class))
+        {
+            values.put(property.getName(), property.getValue(instance));
+        }
+
+        return values;
+    }
+
+    public static CheckResultModel runCheck(ConfigurationCheckHandler<Configuration> handler, Configuration instance)
+    {
+        CheckResultModel result;
+        try
+        {
+            handler.test(instance);
+            result = new CheckResultModel();
+        }
+        catch (Exception e)
+        {
+            LOG.debug(e);
+            result = new CheckResultModel(e);
         }
 
         return result;

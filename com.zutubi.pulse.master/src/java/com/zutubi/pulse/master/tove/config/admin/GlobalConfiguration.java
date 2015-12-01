@@ -44,7 +44,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private BackupConfiguration backup = new BackupConfiguration();
     private RepositoryConfiguration repository = new RepositoryConfiguration();
     private AgentPingConfiguration agentPing = new AgentPingConfiguration();
-    private Map<String, ResourceConfiguration> resources = new HashMap<String, ResourceConfiguration>();
+    private Map<String, ResourceConfiguration> resources = new HashMap<>();
 
 
     public String getBaseUrl()

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.EqualityAssertions;
@@ -14,6 +13,8 @@ import com.zutubi.util.Constants;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 
 public class CleanupConfigurationTest extends MasterPersistenceTestCase
 {
@@ -29,8 +30,8 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        projectDao = (ProjectDao) SpringComponentContext.getBean("projectDao");
-        buildResultDao = (BuildResultDao) SpringComponentContext.getBean("buildResultDao");
+        projectDao = SpringComponentContext.getBean("projectDao");
+        buildResultDao = SpringComponentContext.getBean("buildResultDao");
 
         p1 = new Project();
         p2 = new Project();
@@ -42,7 +43,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, STATUS_RELEASE);
         b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, STATUS_INTEGRATION);
         b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, STATUS_MILESTONE);
-        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, STATUS_RELEASE);
+        createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY, ResultState.FAILURE, STATUS_RELEASE);
         // Create a build that has started but is not in progress yet: -1 timestamp
         createBuild(p1, 6, -1, ResultState.PENDING, STATUS_INTEGRATION);
     }

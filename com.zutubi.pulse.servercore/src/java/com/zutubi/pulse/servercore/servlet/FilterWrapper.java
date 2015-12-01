@@ -71,7 +71,7 @@ public class FilterWrapper implements Filter
             throw new ServletException("Required init parameter " + DELEGATE_CLASS_NAME + " is missing.");
         }
 
-        ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
+        ObjectFactory objectFactory = SpringComponentContext.getBean("objectFactory");
         return objectFactory.buildBean(className, Filter.class);
     }
 

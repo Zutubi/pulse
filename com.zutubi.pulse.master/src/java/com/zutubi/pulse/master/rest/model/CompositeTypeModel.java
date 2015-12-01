@@ -19,6 +19,7 @@ public class CompositeTypeModel extends TypeModel
     private List<CompositeTypeModel> subTypes;
     private FormModel form;
     private CompositeTypeModel checkType;
+    private DocModel docs;
 
     public CompositeTypeModel()
     {
@@ -80,6 +81,11 @@ public class CompositeTypeModel extends TypeModel
         return simplePropertyDefaults;
     }
 
+    public void setSimplePropertyDefaults(Map<String, Object> simplePropertyDefaults)
+    {
+        this.simplePropertyDefaults = simplePropertyDefaults;
+    }
+
     public List<PropertyModel> getNestedProperties()
     {
         return nestedProperties;
@@ -118,6 +124,16 @@ public class CompositeTypeModel extends TypeModel
     public void setCheckType(CompositeTypeModel checkType)
     {
         this.checkType = checkType;
+    }
+
+    public DocModel getDocs()
+    {
+        return docs;
+    }
+
+    public void setDocs(DocModel docs)
+    {
+        this.docs = docs;
     }
 
     public static class PropertyModel

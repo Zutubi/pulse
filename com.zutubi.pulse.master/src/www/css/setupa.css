@@ -1,0 +1,106 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    color: #555;
+}
+
+/* Main column layout */
+
+#container {
+    height: auto;
+    overflow: hidden;
+}
+
+#left-column {
+    margin-right: 360px;
+}
+
+#right-column {
+    float: right;
+    width: 340px;
+}
+
+/* Content */
+
+h1 {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+}
+
+.k-input-panel {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Docs */
+
+#verbose-docs {
+    background-color: #fffcee;
+    padding: 0.6em;
+    margin: 0.4em;
+}
+
+#verbose-docs h3 {
+    font-weight: bold;
+    margin-bottom: 0.4em;
+}
+
+#verbose-docs p, #verbose-docs ul {
+    margin: 0.4em 0;
+}
+
+#verbose-docs ul {
+    padding-left: 2em;
+    list-style-type: circle;
+}
+
+#verbose-docs li {
+    margin: 0.3em 0;
+}
+
+/* Extra properties */
+
+.config-file {
+    max-width: 600px;
+    margin: 2em auto;
+}
+
+.config-file p {
+    margin: 0.6em;
+}
+
+.prop-info {
+    color: #162caa;
+}
+
+.prop-error {
+    color: #aa082a;
+}
+
+.filename {
+    font-family: monospace;
+}
+
+/* Footer bar */
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    line-height: 20px;
+    border-top: solid 1px #eee;
+}
+
+#footer a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #aaa;
+}

@@ -33,7 +33,7 @@ public class ExportImportSanityTest extends ZutubiTestCase
 
         MutableConfiguration configuration = new MutableConfiguration();
 
-        List<String> mappings = (List<String>) SpringComponentContext.getBean("hibernateMappings");
+        List<String> mappings = SpringComponentContext.getBean("hibernateMappings");
         configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();
@@ -69,7 +69,7 @@ public class ExportImportSanityTest extends ZutubiTestCase
 
         MutableConfiguration configuration = new MutableConfiguration();
 
-        List<String> mappings = (List<String>) SpringComponentContext.getBean("hibernateMappings");
+        List<String> mappings = SpringComponentContext.getBean("hibernateMappings");
         configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();

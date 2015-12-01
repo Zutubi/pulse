@@ -44,7 +44,7 @@ public class LastAccessFilter implements Filter
         // Sadly this class defies wiring as it is initialised too early.
         if (lastAccessManager == null && SpringComponentContext.containsBean(BEAN_LAST_ACCESS_MANAGER))
         {
-            lastAccessManager = SpringComponentContext.getBean(BEAN_LAST_ACCESS_MANAGER);
+            lastAccessManager = SpringComponentContext.getOptionalBean(BEAN_LAST_ACCESS_MANAGER);
         }
         return lastAccessManager;
     }

@@ -26,5 +26,5 @@
     </mvc:annotation-driven>
 
     <context:component-scan base-package="com.zutubi.pulse.master.rest.errors"/>
-    <context:component-scan base-package="com.zutubi.pulse.master.rest.controllers.main"/>
+    <context:component-scan base-package="com.zutubi.pulse.master.rest.controllers.setup"/>
 </beans>

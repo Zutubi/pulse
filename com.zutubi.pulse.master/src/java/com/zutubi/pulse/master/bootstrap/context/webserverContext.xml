@@ -16,7 +16,9 @@ This context exports:
 
     <bean id="jettyServerManager" class="com.zutubi.pulse.servercore.jetty.JettyServerManager"/>
 
-    <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager"/>
+    <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager">
+        <property name="jettyServerManager" ref="jettyServerManager"/>
+    </bean>
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.bootstrap.StartupTokenManager">
         <property name="adminTokenManager" ref="adminTokenManager"/>

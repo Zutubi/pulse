@@ -55,7 +55,7 @@ public class OptionAnnotationHandler extends FieldAnnotationHandler
         String parentPath = field.getParentPath();
         TypeProperty fieldTypeProperty = field.getProperty();
 
-        FormContext context = new FormContext((Configuration) instance);
+        FormContext context = instance == null ? new FormContext(parentPath) : new FormContext((Configuration) instance);
         List optionList = optionProvider.getOptions(fieldTypeProperty, context);
         field.setList(optionList);
 

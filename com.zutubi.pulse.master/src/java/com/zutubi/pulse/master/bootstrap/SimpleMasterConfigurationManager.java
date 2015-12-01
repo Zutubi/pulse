@@ -171,7 +171,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         getSystemConfig().setDataPath(f.getAbsolutePath());
 
         // this object is instantiated before the eventManager, so the wiring needs to be manual.
-        EventManager eventManager = (EventManager) SpringComponentContext.getBean("eventManager");
+        EventManager eventManager = SpringComponentContext.getBean("eventManager");
         eventManager.publish(new DataDirectoryChangedEvent(this));
 
         // refresh the data instance.

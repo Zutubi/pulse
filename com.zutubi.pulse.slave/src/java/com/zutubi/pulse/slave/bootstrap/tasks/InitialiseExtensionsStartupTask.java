@@ -12,7 +12,7 @@ public class InitialiseExtensionsStartupTask implements StartupTask
 {
     public void execute()
     {
-        PluginManager pluginManager = (PluginManager) SpringComponentContext.getBean("pluginManager");
+        PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
         pluginManager.initialiseExtensions();
     }
 

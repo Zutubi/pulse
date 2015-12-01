@@ -20,7 +20,7 @@ import com.zutubi.validation.annotations.Required;
 public class SetupLicenseConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
-    @TextArea(rows = 10, cols = 80)
+    @TextArea(rows = 10, cols = 60)
     private String license;
 
     public String getLicense()
@@ -43,20 +43,20 @@ public class SetupLicenseConfiguration extends AbstractConfiguration implements 
             License l = decoder.decode(licenseKey.getBytes());
             if (l == null)
             {
-                context.addFieldError("license", "license.key.invalid");
+                context.addFieldError("license", context.getText("license.key.invalid"));
             }
             else if (l.isExpired() && l.isEvaluation())
             {
-                context.addFieldError("license", "license.key.expired");
+                context.addFieldError("license", context.getText("license.key.expired"));
             }
             else if(!l.canRunVersion(Version.getVersion()))
             {
-                context.addFieldError("license", "license.key.cannot.run");
+                context.addFieldError("license", context.getText("license.key.cannot.run"));
             }
         }
         catch (LicenseException e)
         {
-            context.addFieldError("license", "license.decode.error");
+            context.addFieldError("license", context.getText("license.decode.error"));
         }
     }
 }

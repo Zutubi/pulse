@@ -63,7 +63,25 @@ public class SpringComponentContext
         return getContext() != null && getContext().containsBean(name);
     }
 
+    @SuppressWarnings("unchecked")
     public static <U> U getBean(String name)
+    {
+        U bean = null;
+        if (getContext() != null)
+        {
+            bean = (U) getContext().getBean(name);
+        }
+
+        if (bean == null)
+        {
+            throw new IllegalArgumentException("Request for unknown bean '" + name + "'");
+        }
+
+        return bean;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <U> U getOptionalBean(String name)
     {
         if (getContext() != null)
         {
@@ -71,6 +89,7 @@ public class SpringComponentContext
         }
         return null;
     }
+
 
     public static void autowire(Object bean)
     {

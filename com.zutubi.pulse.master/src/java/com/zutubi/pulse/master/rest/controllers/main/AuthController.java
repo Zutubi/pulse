@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.rest;
+package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.zutubi.pulse.master.security.CustomRememberMeServices;
 import com.zutubi.pulse.master.security.SecurityUtils;

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
+import com.zutubi.pulse.master.tove.config.setup.*;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.io.IOException;
 
@@ -15,17 +17,27 @@ public interface SetupManager
 {
     SetupState getCurrentState();
 
-    void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask);
+    void init(ProcessSetupStartupTask processSetupStartupTask);
 
-    void requestDataComplete() throws IOException;
+    void startSetupWorkflow();
 
-    void requestDbComplete();
+    SetupDataConfiguration getDefaultData() throws IOException;
+
+    void setData(SetupDataConfiguration data) throws IOException;
+
+    void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException;
+
+    void migrateComplete();
 
     void requestRestoreComplete(boolean restored);
 
-    void requestLicenseComplete();
+    void setLicense(SetupLicenseConfiguration license);
 
     void requestUpgradeComplete(boolean changes);
 
-    void requestSetupComplete(boolean setupWizard);
+    UserConfiguration setAdminUser(AdminUserConfiguration admin) throws Exception;
+
+    ServerSettingsConfiguration getDefaultServerSettings();
+
+    void setServerSettings(ServerSettingsConfiguration settings) throws Exception;
 }

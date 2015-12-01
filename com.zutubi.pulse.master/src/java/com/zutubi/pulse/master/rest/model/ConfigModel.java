@@ -12,6 +12,7 @@ import java.util.List;
 @JsonSubTypes({
         @JsonSubTypes.Type(CollectionModel.class),
         @JsonSubTypes.Type(CompositeModel.class),
+        @JsonSubTypes.Type(TransientModel.class),
         @JsonSubTypes.Type(TypeSelectionModel.class)
 })
 public abstract class ConfigModel

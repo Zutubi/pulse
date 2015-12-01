@@ -7,8 +7,7 @@ import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
 
 /**
- *
- *
+ * Used to configure common server settings during the setup wizard.
  */
 @SymbolicName("zutubi.serverSettingsConfig")
 @Form(fieldOrder = {"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})

@@ -23,8 +23,8 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         super.setUp();
 
         SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/master/bootstrap/testBootstrapContext.xml");
-        dataSource = (BasicDataSource) SpringComponentContext.getBean("dataSource");
-        databaseConfig = (DatabaseConfig) SpringComponentContext.getBean("databaseConfig");
+        dataSource = SpringComponentContext.getBean("dataSource");
+        databaseConfig = SpringComponentContext.getBean("databaseConfig");
 
         // initialise required schema.
         DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();

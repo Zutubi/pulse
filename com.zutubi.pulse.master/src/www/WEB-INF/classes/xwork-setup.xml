@@ -9,7 +9,7 @@
         <default-action-ref name="default"/>
 
         <action name="default" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
-            <result name="success" type="redirect">/setup/setup.action</result>
+            <result name="success" type="redirect">/setup/app.action</result>
         </action>
 
         <action name="404" class="com.zutubi.pulse.master.xwork.actions.FourOhFourAction">
@@ -21,59 +21,12 @@
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="setup" class="com.zutubi.pulse.master.xwork.actions.setup.SetupWorkflowAction">
-            <result name="data" type="redirect">/setup/setupData!input.action</result>
-            <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
-            <result name="license" type="redirect">/setup/setupLicense!input.action</result>
-            <result name="setup" type="redirect">/setupconfig/init/?wizard</result>
-            <result name="waiting" type="redirect">/startup/starting.action</result>
-            <result name="starting" type="redirect">/startup/starting.action</result>
-            <result name="migrate" type="redirect">/migrate/preview!input.action</result>
-            <result name="migrateInProgress" type="redirect">/migrate/execute.action</result>
-            <result name="restore" type="redirect">/restore/preview.action</result>
-            <result name="restoreInProgress" type="redirect">/restore/execute.action</result>
-            <result name="upgrade" type="redirect">/upgrade/preview.action</result>
-            <result name="upgradeInProgress" type="redirect">/upgrade/execute.action</result>
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="setupData" class="com.zutubi.pulse.master.xwork.actions.setup.SetupDataAction">
-            <result name="input" type="velocity">/setup/configure-pulsedata.vm</result>
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="setupDatabaseType" class="com.zutubi.pulse.master.xwork.actions.setup.SetupDatabaseTypeAction">
-            <result name="input" type="velocity">/setup/configure-databasetype.vm</result>
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="setupLicense" class="com.zutubi.pulse.master.xwork.actions.setup.SetupLicenseAction">
-            <result name="input" type="velocity">/setup/configure-license.vm</result>
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.setup.SetupActionSupport">
-            <result name="success" type="velocity">/system-setup.vm</result>
+        <action name="app" class="com.zutubi.pulse.master.xwork.actions.setup.SetupAppAction">
+            <result name="success" type="velocity">app.vm</result>
+            <result name="redirect" type="redirect">/</result>
         </action>
     </package>
 
-    <package name="setupconfig" namespace="/setupconfig" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="wizard" class="com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction">
-            <interceptor-ref name="configWizardStack"/>
-            <result name="step" type="velocity">wizard.vm</result>
-            <result name="input" type="velocity">wizard.vm</result>
-            <result name="success" type="redirect">/setup/execute.action</result>
-        </action>
-
-        <action name="check" class="com.zutubi.pulse.master.tove.webwork.CheckAction">
-            <interceptor-ref name="ajaxStack"/>
-            <result name="input" type="flexjson">configurationErrors</result>
-            <result name="success" type="flexjson">checkResponse</result>
-        </action>
-    </package>
-    
     <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 

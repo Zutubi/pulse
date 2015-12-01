@@ -4,6 +4,7 @@
     <!-- No decorator -->
     <excludes>
         <pattern>/admin/*</pattern>
+        <pattern>/setup/*</pattern>
         <pattern>/ajax/*</pattern>
         <pattern>/api/*</pattern>
         <pattern>/personal/*</pattern>

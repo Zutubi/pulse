@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
-import java.util.Map;
+import javax.servlet.http.HttpSession;
 import java.util.concurrent.Callable;
 
 /**
@@ -77,13 +77,13 @@ public class SecurityUtils
      * Hackish utility to force storage of the current authentication in the session. Under normal
      * operation this is handled by Spring Security filters, but this can be useful when filters are
      * not available (e.g. during setup to log in as admin).
-     * 
+     *
      * @param session session map to save into
      */
     @SuppressWarnings("unchecked")
-    public static void saveAuthenticationInSession(Map session)
+    public static void saveAuthenticationInSession(HttpSession session)
     {
-        session.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
     /**

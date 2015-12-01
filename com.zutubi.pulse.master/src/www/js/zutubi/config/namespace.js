@@ -115,6 +115,63 @@ if (window.Zutubi.config === undefined)
                         }
                     }
                 }
+            },
+
+            checkConfig: function(path, type, form, checkForm, errorCb)
+            {
+                var properties = form.getValues(),
+                    checkProperties = checkForm.getValues(),
+                    url = path ? "/api/action/check/" + Zutubi.config.encodePath(path) : "/setup-api/setup/check";
+
+                form.clearMessages();
+
+                Zutubi.config.coerceProperties(properties, type.simpleProperties);
+                Zutubi.config.coerceProperties(checkProperties, type.checkType.simpleProperties);
+
+                Zutubi.core.ajax({
+                    type: "POST",
+                    maskAll: true,
+                    url: url,
+                    data: {
+                        main: {kind: "composite", properties: properties, type: {symbolicName: type.symbolicName}},
+                        check: {kind: "composite", properties: checkProperties}
+                    },
+                    success: function (data)
+                    {
+                        var message = data.success ? "configuration ok" : (data.message || "check failed");
+                        checkForm.showStatus(data.success, message);
+                    },
+                    error: function (jqXHR)
+                    {
+                        var details;
+
+                        if (jqXHR.status === 422)
+                        {
+                            try
+                            {
+                                details = JSON.parse(jqXHR.responseText);
+                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                                {
+                                    if (details.key === "main")
+                                    {
+                                        form.showValidationErrors(details.validationErrors);
+                                    }
+                                    else
+                                    {
+                                        checkForm.showValidationErrors(details.validationErrors);
+                                    }
+                                    return;
+                                }
+                            }
+                            catch(e)
+                            {
+                                // Do nothing.
+                            }
+                        }
+
+                        errorCb("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
+                    }
+                });
             }
         }
     }(jQuery));
