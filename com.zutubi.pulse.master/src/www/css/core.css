@@ -1,0 +1,11 @@
+/* Styles for the Zutubi.core JS package. */
+
+.k-property-table th, .k-property-table td {
+    padding: 0.5em;
+    border: solid 1px #eee;
+}
+
+.k-property-table th {
+    font-weight: bold;
+    text-align: right;
+}

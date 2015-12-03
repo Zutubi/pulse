@@ -6,28 +6,29 @@
     <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/setupa.css?#version()" rel="stylesheet"/>
 
     <script>
         window.baseUrl = "${base}";
-        adminPath = "/${path}/";
     </script>
 
     #javascript()
         zutubi/setup/package.js
     #end
 
-    <title>Pulse Setup</title>
+    <title>:: pulse :: setup</title>
 </head>
 <body>
     <div id="notification"></div>
     <div id="container">
-        <div id="right-column">
-            <div id="verbose-docs"></div>
-        </div>
         <div id="left-column">
             <div id="main-view"></div>
+        </div>
+        <div id="right-column">
+            <div id="verbose-docs"></div>
+            <div id="task-list-wrapper"></div>
         </div>
     </div>
 

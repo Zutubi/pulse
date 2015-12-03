@@ -12,18 +12,25 @@ import java.util.Map;
 public class SetupModel
 {
     private String status;
+    private String statusMessage;
     private TransientModel input;
     private ProgressModel progress;
     private Map<String, Object> properties;
 
-    public SetupModel(String status)
+    public SetupModel(String status, String statusMessage)
     {
         this.status = status;
+        this.statusMessage = statusMessage;
     }
 
     public String getStatus()
     {
         return status;
+    }
+
+    public String getStatusMessage()
+    {
+        return statusMessage;
     }
 
     public TransientModel getInput()

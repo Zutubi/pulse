@@ -17,6 +17,8 @@ public interface SetupManager
 {
     SetupState getCurrentState();
 
+    String getStatusMessage();
+
     void init(ProcessSetupStartupTask processSetupStartupTask);
 
     void startSetupWorkflow();
@@ -29,7 +31,11 @@ public interface SetupManager
 
     void migrateComplete();
 
-    void requestRestoreComplete(boolean restored);
+    void executeRestore();
+
+    void abortRestore();
+
+    void postRestore();
 
     void setLicense(SetupLicenseConfiguration license);
 

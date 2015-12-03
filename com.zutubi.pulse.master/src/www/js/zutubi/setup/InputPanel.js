@@ -59,6 +59,11 @@
 
                 that.checkForm.bind("buttonClicked", jQuery.proxy(that._checkClicked, that));
             }
+
+            if (model.type.docs)
+            {
+                that.htmlDocs = model.type.docs.verbose;
+            }
         },
 
         events: [

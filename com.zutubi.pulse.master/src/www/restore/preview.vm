@@ -8,13 +8,7 @@
 <div id="rightcolumn">
     <div id="description-warning">
         <div id="description">
-            <h3>Warning</h3>
-            <p>
-               If you are importing data from a 1.2.x installation, this restore will drop all
-               existing tables in your specified Pulse database.  If you have any custom tables in
-               the same database as Pulse, please ensure that you back them up before continuing
-               with this restore.
-            </p>
+
         </div>
     </div>
 </div>

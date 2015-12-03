@@ -184,11 +184,9 @@
 
             parentElement.append(this.buttonTemplate({name: name, value: name, id: id}));
             element = parentElement.find("button").last();
-            button = element.kendoZaButton({structure: {value: name}}).data("kendoZaButton");
-            button.bind("click", function(e)
-            {
-                that._buttonClicked(e.sender.structure.value);
-            });
+            button = element.kendoZaButton({
+                click: jQuery.proxy(that._buttonClicked, that, name)
+            }).data("kendoZaButton");
 
             that.submits.push(button);
         },

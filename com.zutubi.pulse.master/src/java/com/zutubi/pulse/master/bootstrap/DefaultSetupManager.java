@@ -30,6 +30,7 @@ import com.zutubi.pulse.master.tove.config.setup.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
+import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
@@ -57,8 +58,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -86,48 +87,47 @@ public class DefaultSetupManager implements SetupManager
     private ThreadFactory threadFactory;
 
     /**
-     * Note these are not available until we {@link #initialiseConfigurationPersistence()}.
+     * Note this is not available until we {@link #initialiseConfigurationPersistence()}.
      */
-
-    private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * Contexts for Stage A: the config subsystem.
      */
-    private List<String> configContexts = new LinkedList<String>();
+    private List<String> configContexts = new ArrayList<>();
 
-    private List<String> migrationContext = new LinkedList<String>();
+    private List<String> migrationContext = new ArrayList<>();
 
     /**
      * Contexts for Stage B: database
      */
-    private List<String> dataContextsA = new LinkedList<String>();
-    private List<String> dataContextsB = new LinkedList<String>();
+    private List<String> dataContextsA = new ArrayList<>();
+    private List<String> dataContextsB = new ArrayList<>();
 
     /**
      * Contexts for Stage C: restore
      */
-    private List<String> restoreContexts = new LinkedList<String>();
+    private List<String> restoreContexts = new ArrayList<>();
 
-    private List<String> licenseContexts = new LinkedList<String>();
+    private List<String> licenseContexts = new ArrayList<>();
 
     /**
      * Contexts for Stage D: the upgrade system.
      */
-    private List<String> upgradeContexts = new LinkedList<String>();
+    private List<String> upgradeContexts = new ArrayList<>();
 
     /**
      * Contexts for Stage E: setup / configuration.
      */
-    private List<String> setupContexts = new LinkedList<String>();
+    private List<String> setupContexts = new ArrayList<>();
 
     /**
      * Contexts for Stage F: application startup.
      */
-    private List<String> startupContexts = new LinkedList<String>();
+    private List<String> startupContexts = new ArrayList<>();
 
     private SetupState state = SetupState.WAITING;
+    private String statusMessage;
 
     private boolean promptShown = false;
     private DatabaseConsole databaseConsole;
@@ -136,9 +136,16 @@ public class DefaultSetupManager implements SetupManager
     // Note that this is null until part way through startup
     private ConfigurationProvider configurationProvider;
 
+    @Override
     public SetupState getCurrentState()
     {
         return state;
+    }
+
+    @Override
+    public String getStatusMessage()
+    {
+        return statusMessage;
     }
 
     public void init(ProcessSetupStartupTask processSetupStartupTask)
@@ -147,6 +154,7 @@ public class DefaultSetupManager implements SetupManager
         {
             this.setupCallback = processSetupStartupTask;
 
+            statusMessage("System initializing...");
             state = SetupState.WAITING;
 
             // record the startup configuration so that it can be reused next time.
@@ -166,7 +174,7 @@ public class DefaultSetupManager implements SetupManager
         {
             if (isDataRequired())
             {
-                printConsoleMessage("No data path configured, requesting via web UI...");
+                statusMessage("No data path configured, requesting via web UI...");
 
                 // request data input.
                 state = SetupState.DATA;
@@ -201,10 +209,10 @@ public class DefaultSetupManager implements SetupManager
                 configFile = configFile.getCanonicalFile();
             }
 
-            printConsoleMessage("Using config file '%s'.", configFile.getAbsolutePath());
+            statusMessage("Using config file '%s'.", configFile.getAbsolutePath());
             if (!configFile.isFile())
             {
-                printConsoleMessage("Config file does not exist, creating a default one.");
+                statusMessage("Config file does not exist, creating a default one.");
 
                 // copy the template file into the config location.
                 SystemPaths paths = configurationManager.getSystemPaths();
@@ -273,12 +281,12 @@ public class DefaultSetupManager implements SetupManager
             // to ensure that it is initialised. If we are working with an already existing directory,
             // then it will have been initialised and no re-initialisation is required (or allowed).
             Data d = configurationManager.getData();
-            printConsoleMessage("Using data path '%s'.", d.getData().getAbsolutePath());
+            statusMessage("Using data path '%s'.", d.getData().getAbsolutePath());
             if (!d.isInitialised())
             {
-                printConsoleMessage("Empty data directory, initialising...");
+                statusMessage("Empty data directory, initialising...");
                 configurationManager.getData().init(configurationManager.getSystemPaths());
-                printConsoleMessage("Data directory initialised.");
+                statusMessage("Data directory initialised.");
             }
 
             eventManager.publish(new DataDirectoryLocatedEvent(this));
@@ -321,7 +329,7 @@ public class DefaultSetupManager implements SetupManager
         File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
         if (!databaseConfig.exists())
         {
-            printConsoleMessage("No database setup, requesting details via web UI...");
+            statusMessage("No database setup, requesting details via web UI...");
             state = SetupState.DATABASE;
             showPrompt();
             return;
@@ -337,7 +345,7 @@ public class DefaultSetupManager implements SetupManager
 
         if (isDatabaseMigrationRequested())
         {
-            printConsoleMessage("Database migration requested, requesting details via web UI.");
+            statusMessage("Database migration requested, requesting details via web UI.");
             state = SetupState.MIGRATE;
 
             showPrompt();
@@ -387,6 +395,7 @@ public class DefaultSetupManager implements SetupManager
 
     private void requestDbComplete()
     {
+        statusMessage("Intializing data subsystem...");
         state = SetupState.WAITING;
 
         threadFactory.newThread(new Runnable()
@@ -404,16 +413,16 @@ public class DefaultSetupManager implements SetupManager
                     databaseConsole = SpringComponentContext.getBean("databaseConsole");
                     if (databaseConsole.isEmbedded())
                     {
-                        printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
+                        statusMessage("Using embedded database (only recommended for evaluation purposes).");
                     }
                     else
                     {
-                        printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
+                        statusMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
                     }
 
                     if (!databaseConsole.schemaExists())
                     {
-                        printConsoleMessage("Database schema does not exist, initialising...");
+                        statusMessage("Database schema does not exist, initialising...");
                         try
                         {
                             databaseConsole.createSchema();
@@ -422,7 +431,7 @@ public class DefaultSetupManager implements SetupManager
                         {
                             throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
                         }
-                        printConsoleMessage("Database initialised.");
+                        statusMessage("Database initialised.");
                     }
 
                     handleRestorationProcess();
@@ -502,7 +511,7 @@ public class DefaultSetupManager implements SetupManager
         {
             if (databaseConsole.isEmbedded())
             {
-                printConsoleMessage("Compacting embedded database.  This may take some time.");
+                statusMessage("Compacting embedded database.  This may take some time.");
             }
 
             databaseConsole.postRestoreHook(restored);
@@ -513,10 +522,10 @@ public class DefaultSetupManager implements SetupManager
 
             loadContexts(licenseContexts);
 
-            printConsoleMessage("Checking license...");
+            statusMessage("Checking license...");
             if (isLicenseRequired())
             {
-                printConsoleMessage("No valid license found, requesting via web UI...");
+                statusMessage("No valid license found, requesting via web UI...");
                 //TODO: we need to provide some feedback to the user about what / why there current license
                 //TODO: (if one exists) is not sufficient.
                 state = SetupState.LICENSE;
@@ -569,7 +578,7 @@ public class DefaultSetupManager implements SetupManager
     {
         try
         {
-            printConsoleMessage("License accepted.");
+            statusMessage("License accepted.");
 
             // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
             databaseConsole.postSchemaHook();
@@ -577,7 +586,7 @@ public class DefaultSetupManager implements SetupManager
 
             if (isUpgradeRequired())
             {
-                printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
+                statusMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
                 state = SetupState.UPGRADE;
                 showPrompt();
                 return;
@@ -599,7 +608,7 @@ public class DefaultSetupManager implements SetupManager
         PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
         DelegatingHandleAllocator handleAllocator = SpringComponentContext.getBean("handleAllocator");
         ConfigurationPersistenceManager configurationPersistenceManager = SpringComponentContext.getBean("configurationPersistenceManager");
-        configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
+        ConfigurationReferenceManager configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
         configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
         ConfigurationRefactoringManager configurationRefactoringManager = SpringComponentContext.getBean("configurationRefactoringManager");
         MasterConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
@@ -649,7 +658,7 @@ public class DefaultSetupManager implements SetupManager
                 {
                     if (changes)
                     {
-                        printConsoleMessage("Upgrade complete.");
+                        statusMessage("Upgrade complete.");
                     }
                     databaseConsole.postUpgradeHook(changes);
 
@@ -660,7 +669,7 @@ public class DefaultSetupManager implements SetupManager
 
                     if (isAdminRequired())
                     {
-                        printConsoleMessage("No admin configured, requesting via UI...");
+                        statusMessage("No admin configured, requesting via UI...");
                         state = SetupState.ADMIN;
                         showPrompt();
                         return;
@@ -725,7 +734,7 @@ public class DefaultSetupManager implements SetupManager
                 developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
                 configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
-                printConsoleMessage("Admin user and default groups created.");
+                statusMessage("Admin user and default groups created.");
                 requestAdminComplete();
                 return adminUser;
             }
@@ -738,7 +747,7 @@ public class DefaultSetupManager implements SetupManager
         {
             if (isSettingsRequired())
             {
-                printConsoleMessage("Requesting initial settings via UI...");
+                statusMessage("Requesting initial settings via UI...");
                 state = SetupState.SETTINGS;
                 initialInstallation = true;
                 showPrompt();
@@ -790,7 +799,7 @@ public class DefaultSetupManager implements SetupManager
             }
         });
 
-        printConsoleMessage("Setup complete.");
+        statusMessage("Setup complete.");
         requestSetupComplete();
     }
 
@@ -925,10 +934,15 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public static void printConsoleMessage(String format, Object... args)
+    public void statusMessage(String format, Object... args)
     {
-        String date = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date()) + "] ";
-        System.err.printf(date + format + "\n", args);
+        statusMessage = String.format(format, args);
+        System.err.println(dateStamp() + statusMessage);
+    }
+
+    public static String dateStamp()
+    {
+        return "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date()) + "] ";
     }
 
     /**
@@ -965,7 +979,7 @@ public class DefaultSetupManager implements SetupManager
             //          installation or possibly a restore) results in possibly inconsistent behaviour.  It may be
             //          worth while always using the calculated host url since this is being printed on the local host.
 
-            printConsoleMessage("Now go to %s and follow the prompts.", baseUrl);
+            System.err.printf(dateStamp() + "Now go to %s and follow the prompts.\n", baseUrl);
             promptShown = true;
         }
     }
@@ -1025,7 +1039,7 @@ public class DefaultSetupManager implements SetupManager
         return null;
     }
 
-    public void handleRestorationProcess()
+    private void handleRestorationProcess()
     {
         loadContexts(restoreContexts);
 
@@ -1034,16 +1048,16 @@ public class DefaultSetupManager implements SetupManager
             File archive = getArchiveFile();
             try
             {
-                printConsoleMessage("Restoring from archive file: " + archive.getCanonicalPath());
+                statusMessage("Restoring from archive file: " + archive.getCanonicalPath());
             }
             catch (IOException e)
             {
-                printConsoleMessage("Restoring from archive file: " + archive.getAbsolutePath());
+                statusMessage("Restoring from archive file: " + archive.getAbsolutePath());
             }
 
             if (!archive.exists() || archive.length() == 0)
             {
-                printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist or is blank.");
+                statusMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist or is blank.");
                 // shutdown, the archive is invalid.
                 shutdownManager.shutdown(true, true);
                 return;
@@ -1067,14 +1081,89 @@ public class DefaultSetupManager implements SetupManager
         requestRestoreComplete(false);
     }
 
-    public void doCancelRestorationRequest() throws IOException
+    @Override
+    public void executeRestore()
     {
-        requestRestoreComplete(false);
+        if (state == SetupState.RESTORE)
+        {
+            Monitor monitor = restoreManager.getMonitor();
+            if (!monitor.isStarted())
+            {
+                threadFactory.newThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            restoreManager.restoreArchive();
+                        }
+                        catch (ArchiveException e)
+                        {
+                            LOG.severe(e);
+                        }
+                    }
+                }).run();
+
+                while (!monitor.isStarted())
+                {
+                    try
+                    {
+                        Thread.sleep(1000);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // Ignore.
+                    }
+                }
+            }
+        }
     }
 
-    public void doCompleteRestoration() throws IOException
+    @Override
+    public void abortRestore()
     {
-        requestRestoreComplete(true);
+        if (state == SetupState.RESTORE)
+        {
+            Monitor monitor = restoreManager.getMonitor();
+            if (!monitor.isStarted())
+            {
+                statusMessage("Restore aborted, starting normally.");
+                state = SetupState.WAITING;
+
+                threadFactory.newThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        requestRestoreComplete(false);
+                    }
+                }).run();
+            }
+        }
+    }
+
+    @Override
+    public void postRestore()
+    {
+        if (state == SetupState.RESTORE)
+        {
+            Monitor monitor = restoreManager.getMonitor();
+            if (monitor.isFinished())
+            {
+                statusMessage("Restore complete.");
+                state = SetupState.WAITING;
+
+                threadFactory.newThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        requestRestoreComplete(true);
+                    }
+                }).run();
+            }
+        }
     }
 
     //---( end )

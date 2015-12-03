@@ -22,7 +22,7 @@ public class SystemStartedMessageStartupTask implements StartupTask
         SystemConfiguration sysConfig = configurationManager.getSystemConfig();
 
         //TODO: I18N this message.
-        DefaultSetupManager.printConsoleMessage("Pulse %s is now available on port %s at context path '%s' [base URL configured as: %s]", Version.getVersion().getVersionNumber(), sysConfig.getServerPort(), sysConfig.getContextPath(), globalConfig.getBaseUrl());
+        System.err.printf(DefaultSetupManager.dateStamp() + "Pulse %s is now available on port %s at context path '%s' [base URL configured as: %s]\n", Version.getVersion().getVersionNumber(), sysConfig.getServerPort(), sysConfig.getContextPath(), globalConfig.getBaseUrl());
     }
 
     public boolean haltOnFailure()

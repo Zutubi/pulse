@@ -30,8 +30,6 @@ public interface RestoreManager
      * @param backup    the file that contains a valid backup of the pulse.
      * @return an archive.
      * @throws ArchiveException on error
-     *
-     * @see #createArchive() 
      */
     Archive prepareRestore(File backup) throws ArchiveException;
 
@@ -60,30 +58,9 @@ public interface RestoreManager
     File getBackedupArchive();
 
     /**
-     * Create a new archive based on the current state of the system.
-     * @return a handle to the archive.
-     *
-     * @throws ArchiveException on error.
-     */
-    Archive createArchive() throws ArchiveException;
-
-    /**
      * The archive that was provided by the latest {@link RestoreManager#prepareRestore(java.io.File)} call.
      * @return an archive, or null if prepareRestore has not been called.
      */
     Archive getArchive();
-
-    //--( proposed interface to make this manager re-usable / available during normal running. )---
-/*
-    void restoreArchive(Archive archive);
-
-    void cancelRestoreOnRestart();
-
-    void requestRestoreOnRestart(Archive archive);
-
-    boolean isRestoreOnRestartRequested();
-
-    Archive getArchiveToBeRestoredOnRestart();
-*/
 
 }

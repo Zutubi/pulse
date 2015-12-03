@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.controllers.setup;
 
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
@@ -15,6 +16,7 @@ import com.zutubi.pulse.master.rest.model.CheckResultModel;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.TransientModel;
 import com.zutubi.pulse.master.rest.model.setup.SetupModel;
+import com.zutubi.pulse.master.restore.Archive;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.security.SecurityUtils;
@@ -44,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -65,18 +68,12 @@ public class SetupController
     private MasterConfigurationRegistry configurationRegistry;
     @Autowired
     private ConfigurationManager configurationManager;
-    @Autowired(required = false)
-    private RestoreManager restoreManager;
-    @Autowired(required = false)
-    private MigrationManager migrationManager;
-    @Autowired(required = false)
-    private UpgradeManager upgradeManager;
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public ResponseEntity<SetupModel[]> get() throws Exception
     {
         SetupState state = setupManager.getCurrentState();
-        SetupModel model = new SetupModel(state.toString().toLowerCase());
+        SetupModel model = new SetupModel(state.toString().toLowerCase(), setupManager.getStatusMessage());
 
         switch (state)
         {
@@ -102,6 +99,7 @@ public class SetupController
                 break;
             case MIGRATE:
             {
+                MigrationManager migrationManager = SpringComponentContext.getBean("migrationManager");
                 Monitor monitor = migrationManager.getMonitor();
                 model.setProgressMonitor(monitor);
                 if (!monitor.isStarted())
@@ -111,8 +109,16 @@ public class SetupController
                 break;
             }
             case RESTORE:
+            {
+                RestoreManager restoreManager = SpringComponentContext.getBean("restoreManager");
                 model.setProgressMonitor(restoreManager.getMonitor());
+
+                Archive archive = restoreManager.getArchive();
+                model.addProperty("archiveCreated", archive.getCreated());
+                model.addProperty("archiveName", getArchiveName(archive));
+                model.addProperty("archiveLocation", getArchiveLocation(archive));
                 break;
+            }
             case ADMIN:
                 model.setInput(configModelBuilder.buildTransientModel(AdminUserConfiguration.class));
                 break;
@@ -124,6 +130,7 @@ public class SetupController
                 break;
             }
             case UPGRADE:
+                UpgradeManager upgradeManager = SpringComponentContext.getBean("upgradeContext");
                 model.setProgressMonitor(upgradeManager.getMonitor());
                 break;
             case STARTING:
@@ -144,6 +151,38 @@ public class SetupController
         {
             return new File(envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR));
         }
+    }
+
+    public String getArchiveName(Archive archive)
+    {
+        if (archive.getOriginal() != null)
+        {
+            return archive.getOriginal().getName();
+        }
+        return "n/a";
+    }
+
+    public String getArchiveLocation(Archive archive)
+    {
+        File original = archive.getOriginal();
+        if (original != null)
+        {
+            try
+            {
+                File resolved = original.getCanonicalFile();
+                return resolved.getParentFile().getAbsolutePath();
+            }
+            catch (IOException e)
+            {
+                if (original.getParentFile() != null)
+                {
+                    return original.getParentFile().getAbsolutePath();
+                }
+                return "unknown";
+            }
+        }
+
+        return "n/a";
     }
 
     @RequestMapping(value = "/data", method = RequestMethod.POST)
@@ -189,6 +228,27 @@ public class SetupController
     {
         ServerSettingsConfiguration instance = convertAndValidate(ServerSettingsConfiguration.class, model);
         setupManager.setServerSettings(instance);
+        return get();
+    }
+
+    @RequestMapping(value = "/restore", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postRestore() throws Exception
+    {
+        setupManager.executeRestore();
+        return get();
+    }
+
+    @RequestMapping(value = "/restoreAbort", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postRestoreAbort() throws Exception
+    {
+        setupManager.abortRestore();
+        return get();
+    }
+
+    @RequestMapping(value = "/restoreContinue", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postRestoreContinue() throws Exception
+    {
+        setupManager.postRestore();
         return get();
     }
 

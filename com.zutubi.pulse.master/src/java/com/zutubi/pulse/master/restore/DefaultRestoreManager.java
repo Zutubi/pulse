@@ -12,7 +12,7 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ public class DefaultRestoreManager implements RestoreManager
 
     private Data paths = null;
 
-    private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
+    private List<ArchiveableComponent> archiveableComponents = new ArrayList<>();
 
     private JobManager jobManager = null;
 
@@ -43,7 +43,7 @@ public class DefaultRestoreManager implements RestoreManager
 
     public void setRestorableComponents(List<ArchiveableComponent> components)
     {
-        archiveableComponents = new LinkedList<ArchiveableComponent>(components);
+        archiveableComponents = new ArrayList<>(components);
     }
 
     public Monitor getMonitor()
@@ -62,7 +62,7 @@ public class DefaultRestoreManager implements RestoreManager
 
             archive = factory.importArchive(source);
 
-            List<Task> tasks = new LinkedList<Task>();
+            List<Task> tasks = new ArrayList<>();
 
             for (ArchiveableComponent component : archiveableComponents)
             {
@@ -173,27 +173,6 @@ public class DefaultRestoreManager implements RestoreManager
                 LOG.severe("Unable to create backup directory '" + backupRoot.getAbsolutePath() + "'");
             }
         }
-    }
-
-    public Archive createArchive() throws ArchiveException
-    {
-        File archiveDirectory = new File(paths.getData(), "archives");
-        ArchiveFactory factory = new ArchiveFactory();
-        factory.setTmpDirectory(tmpDirectory);
-
-        Archive archive = factory.createArchive();
-
-        // now we fill the archive.
-        for (ArchiveableComponent component : archiveableComponents)
-        {
-            String name = component.getName();
-            File archiveComponentBase = new File(archive.getBase(), name);
-            component.backup(archiveComponentBase);
-        }
-
-        factory.exportArchive(archive, archiveDirectory);
-
-        return archive;
     }
 
     public void setJobManager(JobManager jobManager)

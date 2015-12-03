@@ -11,16 +11,15 @@ body {
 
 #container {
     height: auto;
-    overflow: hidden;
+    display: flex;
 }
 
 #left-column {
-    margin-right: 360px;
+    flex: 1 1 auto;
 }
 
 #right-column {
-    float: right;
-    width: 340px;
+    flex: 0 0 340px;
 }
 
 /* Content */
@@ -61,6 +60,21 @@ h1 {
     margin: 0.3em 0;
 }
 
+/* Waiting screen */
+
+#waiting-message {
+    text-align: center;
+    font-size: 1.2em;
+}
+
+#waiting-message p {
+    margin: 1em 0;
+}
+
+#waiting-message b {
+    font-weight: bold;
+}
+
 /* Extra properties */
 
 .config-file {
@@ -82,6 +96,67 @@ h1 {
 
 .filename {
     font-family: monospace;
+}
+
+/* Common preview styles */
+
+.preview-actions {
+    text-align: center;
+    border-top: solid 1px #eee;
+}
+
+.preview-actions button {
+    margin: 0.4em;
+}
+
+/* Common progress styles */
+
+#progress-view {
+    max-width: 600px;
+    margin: 1em auto;
+    font-size: 1.1em;
+}
+
+#progress-view th, #progress-view td {
+    padding: 0.5em;
+}
+
+#progress-view th {
+    font-weight: bold;
+    text-align: right;
+}
+
+.k-task-list {
+    margin: 1em 0.5em;
+}
+
+.k-task-list h2 {
+    font-size: 1.3em;
+}
+
+.k-task-list ul {
+    margin: 0.5em 0;
+    padding: 0.5em 1em;
+    background-color: #f8f8f8;
+}
+
+.k-task-list li {
+    margin: 0.5em 0;
+}
+
+/* Restore preview */
+
+#restore-view {
+    max-width: 600px;
+    margin: 1em auto;
+}
+
+#archive-table {
+    margin: 1em;
+}
+
+#restore-view p {
+    margin: 1em;
 }
 
 /* Footer bar */

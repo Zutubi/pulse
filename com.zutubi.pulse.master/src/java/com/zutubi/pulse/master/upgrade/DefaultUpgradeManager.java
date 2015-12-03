@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.util.monitor.*;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The default implementation of the upgrade manager interface for the Pulse server.
@@ -12,11 +13,13 @@ public class DefaultUpgradeManager implements UpgradeManager
 {
     private static final Logger LOG = Logger.getLogger(UpgradeManager.class);
 
-    private List<UpgradeableComponentSource> upgradeableSources = new LinkedList<UpgradeableComponentSource>();
+    private static final AtomicBoolean upgradeExecuted = new AtomicBoolean(false);
 
-    private List<UpgradeableComponent> upgradeableComponents = new LinkedList<UpgradeableComponent>();
+    private List<UpgradeableComponentSource> upgradeableSources = new ArrayList<>();
 
-    private List<UpgradeTaskGroup> groups = new LinkedList<UpgradeTaskGroup>();
+    private List<UpgradeableComponent> upgradeableComponents = new ArrayList<>();
+
+    private List<UpgradeTaskGroup> groups = new ArrayList<>();
 
     private JobRunner<UpgradeTask> runner;
 
@@ -93,9 +96,9 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public List<UpgradeTaskGroup> prepareUpgrade()
     {
-        groups = new LinkedList<UpgradeTaskGroup>();
+        groups = new ArrayList<>();
 
-        List<UpgradeableComponent> components = new LinkedList<UpgradeableComponent>();
+        List<UpgradeableComponent> components = new ArrayList<>();
         components.addAll(upgradeableComponents);
         for (UpgradeableComponentSource source : upgradeableSources)
         {
@@ -117,7 +120,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        runner = new JobRunner<UpgradeTask>();
+        runner = new JobRunner<>();
 
         return Collections.unmodifiableList(groups);
     }
@@ -131,6 +134,12 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public void executeUpgrade()
     {
+        if (!upgradeExecuted.compareAndSet(false, true))
+        {
+            // Upgrade already executed, ignore request.
+            return;
+        }
+
         assertUpgradePrepared();
 
         Monitor<UpgradeTask> monitor = runner.getMonitor();
@@ -252,8 +261,9 @@ public class DefaultUpgradeManager implements UpgradeManager
 
         private JobListener<UpgradeTask> listener = new DelegateJobListener();
 
-        private Map<UpgradeTask, JobListener<UpgradeTask>> taskListeners = new HashMap<UpgradeTask, JobListener<UpgradeTask>>();
+        private Map<UpgradeTask, JobListener<UpgradeTask>> taskListeners = new HashMap<>();
 
+        @SuppressWarnings("unchecked")
         public UpgradeTaskGroupJobAdapter(List<UpgradeTaskGroup> groups)
         {
             this.groups = groups.iterator();
@@ -305,6 +315,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             return tasks.hasNext() || groups.hasNext();
         }
 
+        @SuppressWarnings("unchecked")
         public UpgradeTask next()
         {
             if (tasks.hasNext())
