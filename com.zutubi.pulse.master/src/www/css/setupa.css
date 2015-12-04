@@ -7,6 +7,11 @@ body {
     color: #555;
 }
 
+h2 {
+    font-size: 1.3em;
+    margin: 0.6em 0;
+}
+
 /* Main column layout */
 
 #container {
@@ -32,6 +37,10 @@ h1 {
 .k-input-panel {
     max-width: 600px;
     margin: 0 auto;
+}
+
+.k-input-panel p {
+    margin: 0.5em 0;
 }
 
 /* Docs */
@@ -140,11 +149,6 @@ h1 {
     font-size: 1.1em;
 }
 
-#progress-view h2 {
-    font-size: 1.3em;
-    margin: 0.6em 0;
-}
-
 #progress-view th, #progress-view td {
     padding: 0.5em;
 }
@@ -167,10 +171,6 @@ h1 {
 
 .k-task-list {
     margin: 1em 0.5em;
-}
-
-.k-task-list h2 {
-    font-size: 1.3em;
 }
 
 .k-task-list ul {

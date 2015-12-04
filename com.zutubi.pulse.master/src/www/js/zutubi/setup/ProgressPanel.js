@@ -132,14 +132,16 @@
                 this.taskTable.find("tr").remove();
                 this.taskTable.html(template(task));
 
-                if (task.status === "running") {
+                if (task.status === "running")
+                {
                     this.taskTable.append('<tr><th>progress</th><td><div id="task-progress"></div></td></tr>');
                     $("#task-progress").kendoProgressBar({
                         type: "percent",
                         value: task.percentComplete < 0 ? false : task.percentComplete
                     });
                 }
-                else if (task.status === "failed") {
+                else if (task.status === "failed")
+                {
                     message = "Task Failed: " + (task.statusMessage || "unknown reason");
                     this.taskTable.append('<tr><th>message</th><td>' + kendo.htmlEncode(message) + '</td></tr>');
                 }
@@ -158,7 +160,7 @@
             {
                 return "fa-check";
             }
-            else if (status === "failure")
+            else if (status === "failed")
             {
                 return "fa-exclamation-triangle";
             }

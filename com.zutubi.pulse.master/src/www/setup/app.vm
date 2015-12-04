@@ -27,8 +27,6 @@
             <div id="main-view"></div>
         </div>
         <div id="right-column">
-            <div id="verbose-docs"></div>
-            <div id="task-list-wrapper"></div>
         </div>
     </div>
 

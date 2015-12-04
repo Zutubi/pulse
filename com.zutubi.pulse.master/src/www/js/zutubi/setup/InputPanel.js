@@ -3,13 +3,14 @@
 (function($)
 {
     var Observable = kendo.Observable,
-        NEXT = "next";
+        SUBMIT = "submit";
 
     Zutubi.setup.InputPanel = Observable.extend({
         init: function (options)
         {
             var that = this,
-                model = options.model;
+                model = options.model,
+                el;
 
             that.options = options;
 
@@ -18,6 +19,7 @@
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-input-panel">' +
                     '<h1>#: label #</h1>' +
+                    '<p id="intro-docs" style="display:none"></p>' +
                     '<div id="main-form"></div>' +
                     '<div style="display:none" id="check-wrapper" class="k-check-wrapper">' +
                         '<h1>check configuration</h1>' +
@@ -39,11 +41,10 @@
                 symbolicName: model.type.symbolicName,
                 structure: model.type.form,
                 values: model.type.simplePropertyDefaults || {},
-                submits: ["next"]
+                submits: options.submits || ["next"]
             }).data("kendoZaForm");
 
-
-            that.form.bind("buttonClicked", jQuery.proxy(that._nextClicked, that));
+            that.form.bind("buttonClicked", jQuery.proxy(that._submitClicked, that));
 
             if (model.type.checkType)
             {
@@ -62,12 +63,19 @@
 
             if (model.type.docs)
             {
+                if (model.type.docs.brief)
+                {
+                    el = $("#intro-docs");
+                    el.html(model.type.docs.brief);
+                    el.show();
+                }
+
                 that.htmlDocs = model.type.docs.verbose;
             }
         },
 
         events: [
-            NEXT
+            SUBMIT
         ],
 
         destroy: function()
@@ -80,14 +88,15 @@
             this.form.showValidationErrors(errors);
         },
 
-        _nextClicked: function()
+        _submitClicked: function(e)
         {
             var values = this.form.getValues();
 
             Zutubi.config.coerceProperties(values, this.options.model.type.simpleProperties);
 
-            this.trigger(NEXT, {
+            this.trigger(SUBMIT, {
                 status: this.options.status,
+                submit: e.value,
                 values: values
             });
         },

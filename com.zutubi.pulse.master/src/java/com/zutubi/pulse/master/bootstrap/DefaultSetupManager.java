@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.bootstrap;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.license.LicenseManager;
+import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.model.UserManager;
@@ -360,11 +362,6 @@ public class DefaultSetupManager implements SetupManager
         return migrationManager.isRequested();
     }
 
-    public void doCancelMigrationRequest()
-    {
-        requestDbComplete();
-    }
-
     @Override
     public void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException
     {
@@ -388,14 +385,75 @@ public class DefaultSetupManager implements SetupManager
     }
 
     @Override
-    public void migrateComplete()
+    public void executeMigrate(final MigrateDatabaseTypeConfiguration config)
+    {
+        if (state == SetupState.MIGRATE)
+        {
+            Monitor monitor = migrationManager.getMonitor();
+            if (monitor == null || !monitor.isStarted())
+            {
+                threadFactory.newThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            if (!config.getType().isEmbedded())
+                            {
+                                if (TextUtils.stringSet(config.getDriverFile()))
+                                {
+                                    // install the driver... this should be handled elsewhere...
+                                    DriverRegistry driverRegistry = configurationManager.getDriverRegistry();
+
+                                    File driverFile = new File(config.getDriverFile());
+                                    driverRegistry.register(config.getDriver(), driverFile);
+                                }
+                            }
+
+                            Properties props = config.getDatabaseProperties();
+                            migrationManager.scheduleMigration(props);
+                            migrationManager.runMigration();
+                        }
+                        catch (IOException e)
+                        {
+                            LOG.severe(e);
+                        }
+                    }
+                }).start();
+
+                while (monitor == null || !monitor.isStarted())
+                {
+                    try
+                    {
+                        Thread.sleep(200);
+                        monitor = migrationManager.getMonitor();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // Ignore.
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void abortMigrate()
+    {
+        migrationManager.cancelMigration();
+        requestDbComplete();
+    }
+
+    @Override
+    public void postMigrate()
     {
         requestDbComplete();
     }
 
     private void requestDbComplete()
     {
-        statusMessage("Intializing data subsystem...");
+        statusMessage("Initializing data subsystem...");
         state = SetupState.WAITING;
 
         threadFactory.newThread(new Runnable()

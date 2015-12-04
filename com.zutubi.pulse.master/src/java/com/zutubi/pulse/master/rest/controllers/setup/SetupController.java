@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.bootstrap.SetupState;
+import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.model.User;
@@ -29,7 +30,6 @@ import com.zutubi.pulse.master.tove.config.setup.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
-import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -76,7 +76,7 @@ public class SetupController
     @Autowired
     private MasterConfigurationRegistry configurationRegistry;
     @Autowired
-    private ConfigurationManager configurationManager;
+    private MasterConfigurationManager configurationManager;
     @Autowired
     private ServerMessagesHandler serverMessagesHandler;
 
@@ -114,10 +114,33 @@ public class SetupController
                 MigrationManager migrationManager = SpringComponentContext.getBean("migrationManager");
                 Monitor monitor = migrationManager.getMonitor();
                 model.setProgressMonitor(monitor);
-                if (!monitor.isStarted())
+                if (monitor == null || !monitor.isStarted())
                 {
                     model.setInput(configModelBuilder.buildTransientModel(MigrateDatabaseTypeConfiguration.class));
                 }
+
+                DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
+                String url = databaseConfig.getUrl();
+                MigrateDatabaseTypeConfiguration configuration;
+                if (url.startsWith("jdbc:mysql"))
+                {
+                    configuration = DatabaseType.MYSQL.getDatabaseConfiguration(databaseConfig.getProperties());
+                }
+                else if (url.startsWith("jdbc:postgresql"))
+                {
+                    configuration = DatabaseType.POSTGRESQL.getDatabaseConfiguration(databaseConfig.getProperties());
+                }
+                else
+                {
+                    configuration = DatabaseType.EMBEDDED.getDatabaseConfiguration(databaseConfig.getProperties());
+                }
+
+                model.addProperty("databaseType", configuration.getType().getPrettyName());
+                model.addProperty("host", configuration.getHost());
+                model.addProperty("port", configuration.getPort());
+                model.addProperty("database", configuration.getDatabase());
+                model.addProperty("user", configuration.getUser());
+
                 break;
             }
             case RESTORE:
@@ -284,6 +307,28 @@ public class SetupController
     public ResponseEntity<SetupModel[]> postRestoreContinue() throws Exception
     {
         setupManager.postRestore();
+        return get();
+    }
+
+    @RequestMapping(value = "/migrate", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postMigrate(@RequestBody CompositeModel body) throws Exception
+    {
+        MigrateDatabaseTypeConfiguration config = convertAndValidate(MigrateDatabaseTypeConfiguration.class, body);
+        setupManager.executeMigrate(config);
+        return get();
+    }
+
+    @RequestMapping(value = "/migrateAbort", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postMigrateAbort() throws Exception
+    {
+        setupManager.abortMigrate();
+        return get();
+    }
+
+    @RequestMapping(value = "/migrateContinue", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postMigrateContinue() throws Exception
+    {
+        setupManager.postMigrate();
         return get();
     }
 

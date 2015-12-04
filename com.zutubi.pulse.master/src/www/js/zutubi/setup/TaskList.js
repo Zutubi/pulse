@@ -6,7 +6,7 @@
         Widget = ui.Widget,
         ICON_CLS = {
             success: "fa-check-circle",
-            failure: "fa-exclamation-circle",
+            failed: "fa-exclamation-circle",
             aborted: "fa-minus-circle",
             running: "fa-spinner fa-spin",
             pending: "fa-circle-o"

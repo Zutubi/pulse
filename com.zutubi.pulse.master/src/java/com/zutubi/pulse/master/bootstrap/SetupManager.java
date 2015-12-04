@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
+import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.setup.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
@@ -29,7 +30,11 @@ public interface SetupManager
 
     void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException;
 
-    void migrateComplete();
+    void executeMigrate(MigrateDatabaseTypeConfiguration config) throws IOException;
+
+    void abortMigrate();
+
+    void postMigrate();
 
     void executeRestore();
 

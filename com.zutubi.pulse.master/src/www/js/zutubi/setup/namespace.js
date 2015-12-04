@@ -7,13 +7,18 @@ if (window.Zutubi.setup === undefined)
     {
         var app = {},
             propertyRenderers = {},
+            CONTACT_SUPPORT = 'If you believe this to be a bug, please contact <a href="mailto:support@zutubi.com">' +
+                'support@zutubi.com</a>.  To help us diagnose the issue please include the above details and attach ' +
+                'your server logs (from $PULSE_HOME/logs).',
             SUCCESS_MESSAGES = {
-                restore: 'The restore succeeded, please click continue to resume server startup.'
+                migrate: 'Migration complete, please click continue to resume server startup.',
+                restore: 'The restore succeeded, please click continue to resume server startup.',
+                upgrade: 'All upgrade tasks are complete, please click continue to resume server startup.'
             },
             FAILURE_MESSAGES = {
-                restore: 'The restore has failed, please see above for details.  If you believe this to be a bug, please ' +
-                         'contact <a href="mailto:support@zutubi.com">support@zutubi.com</a>.  To help us diagnose the ' +
-                         'issue please include the above details and attach your server logs (from $PULSE_HOME/logs).'
+                migrate: 'The migration has failed, please see above for details.  ' + CONTACT_SUPPORT,
+                restore: 'The restore has failed, please see above for details.  ' + CONTACT_SUPPORT,
+                upgrade: 'One or more upgrade tasks failed, please see above for details.  ' + CONTACT_SUPPORT
             };
 
         function _createNotificationWidget()
@@ -39,15 +44,15 @@ if (window.Zutubi.setup === undefined)
                 app.panel = null;
             }
 
-            if (app.taskList)
+            if (app.rightPanel)
             {
-                app.taskList.destroy();
-                app.taskList = null;
+                app.rightPanel.destroy();
+                app.rightPanel = null;
             }
 
             $(".temp").remove();
             app.mainView.empty();
-            app.verboseDocs.hide();
+            app.rightColumn.empty();
             app.rightColumn.css("flex-basis", "0");
         }
 
@@ -58,9 +63,10 @@ if (window.Zutubi.setup === undefined)
 
         function _showDocs(html)
         {
+            var verboseDocs = $('<div id="verbose-docs"></div>');
+            verboseDocs.html(html);
+            app.rightColumn.append(verboseDocs);
             _showRightColumn();
-            app.verboseDocs.html(html);
-            app.verboseDocs.show();
         }
 
         function _pollStatus()
@@ -114,6 +120,48 @@ if (window.Zutubi.setup === undefined)
             }
         }
 
+        function _postForm(action, values)
+        {
+            kendo.ui.progress(app.mainView, true);
+            Zutubi.core.ajax({
+                method: 'POST',
+                url: '/setup-api/setup/' + action,
+                data: {
+                    kind: "composite",
+                    properties: values
+                },
+                success: function(data)
+                {
+                    kendo.ui.progress(app.mainView, false);
+                    Zutubi.setup.renderStatus(data[0]);
+                },
+                error: function(jqXHR)
+                {
+                    var details;
+
+                    kendo.ui.progress(app.mainView, false);
+                    if (jqXHR.status === 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                app.panel.showValidationErrors(details.validationErrors);
+                                return;
+                            }
+                        }
+                        catch (e)
+                        {
+                            // Do nothing.
+                        }
+                    }
+
+                    Zutubi.setup.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
+                }
+            })
+        }
+
         function _showInputPanel(data)
         {
             app.panel = new Zutubi.setup.InputPanel({
@@ -122,46 +170,55 @@ if (window.Zutubi.setup === undefined)
                 model: data.input
             });
 
-            app.panel.bind("next", function(e)
+            app.panel.bind("submit", function(e)
             {
-                kendo.ui.progress(app.mainView, true);
-                Zutubi.core.ajax({
-                    method: 'POST',
-                    url: '/setup-api/setup/' + e.status,
-                    data: {
-                        kind: "composite",
-                        properties: e.values
-                    },
-                    success: function(data)
-                    {
-                        kendo.ui.progress(app.mainView, false);
-                        Zutubi.setup.renderStatus(data[0]);
-                    },
-                    error: function(jqXHR)
-                    {
-                        var details;
+                _postForm(e.status, e.values);
+            });
+        }
 
-                        kendo.ui.progress(app.mainView, false);
-                        if (jqXHR.status === 422)
-                        {
-                            try
-                            {
-                                details = JSON.parse(jqXHR.responseText);
-                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                                {
-                                    app.panel.showValidationErrors(details.validationErrors);
-                                    return;
-                                }
-                            }
-                            catch (e)
-                            {
-                                // Do nothing.
-                            }
-                        }
+        function _showMigratePanel(data)
+        {
+            var existingDb = $('<div><h2>Existing Database Properties</h2><div id="db-table-wrapper"></div></div>');
 
-                        Zutubi.setup.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
-                    }
-                })
+            app.rightColumn.append(existingDb);
+            app.rightPanel = $("#db-table-wrapper").kendoZaPropertyTable({
+                id: "current-db-properties",
+                data: [{
+                    key: 'Database Type',
+                    value: data.properties.databaseType
+                }, {
+                    key: 'Host',
+                    value: data.properties.host
+                }, {
+                    key: 'Port',
+                    value: data.properties.port
+                }, {
+                    key: 'Database',
+                    value: data.properties.database
+                }, {
+                    key: 'User',
+                    value: data.properties.user
+                }]
+            }).data("kendoZaPropertyTable");
+            _showRightColumn();
+
+            app.panel = new Zutubi.setup.InputPanel({
+                containerSelector: "#main-view",
+                status: data.status,
+                model: data.input,
+                submits: ["migrate database", "abort migrate (normal startup)"]
+            });
+
+            app.panel.bind("submit", function(e)
+            {
+                if (e.submit === "migrate database")
+                {
+                    _postForm("migrate", e.values);
+                }
+                else
+                {
+                    Zutubi.setup.postAndUpdate("migrateAbort", "Aborting migration...");
+                }
             });
         }
 
@@ -175,7 +232,7 @@ if (window.Zutubi.setup === undefined)
 
         function _showProgressPanel(data)
         {
-            var list;
+            var list, taskList;
 
             if (!app.panel || app.panel.options.type !== data.status)
             {
@@ -184,9 +241,9 @@ if (window.Zutubi.setup === undefined)
                     app.panel.destroy();
                 }
 
-                if (app.taskList)
+                if (app.rightPanel)
                 {
-                    app.taskList.destroy();
+                    app.rightPanel.destroy();
                 }
 
                 app.panel = new Zutubi.setup.ProgressPanel({
@@ -199,11 +256,13 @@ if (window.Zutubi.setup === undefined)
                 app.panel.bind("continue", jQuery.proxy(Zutubi.setup.postAndUpdate, app, data.status + "Continue", "Continuing startup..."));
 
                 _showRightColumn();
-                app.taskList = app.taskListWrapper.kendoZaTaskList({id: "task-list" }).data("kendoZaTaskList");
+                taskList = $('<div></div>');
+                app.rightColumn.append(taskList);
+                app.rightPanel = taskList.kendoZaTaskList({id: "task-list" }).data("kendoZaTaskList");
             }
 
             app.panel.setProgress(data.progress);
-            app.taskList.setData(data.progress.tasks);
+            app.rightPanel.setData(data.progress.tasks);
 
             _pollStatus();
         }
@@ -229,8 +288,6 @@ if (window.Zutubi.setup === undefined)
                 app.leftColumn = $("#left-column");
                 app.rightColumn = $("#right-column");
                 app.mainView = $("#main-view");
-                app.verboseDocs = $("#verbose-docs");
-                app.taskListWrapper = $("#task-list-wrapper");
             },
 
             start: function()
@@ -253,7 +310,19 @@ if (window.Zutubi.setup === undefined)
             {
                 _clear();
 
-                if (data.input)
+                if (data.progress && data.progress.status !== "pending")
+                {
+                    _showProgressPanel(data);
+                }
+                else if (data.status === "migrate")
+                {
+                    _showMigratePanel(data);
+                }
+                else if (data.status === "restore")
+                {
+                    _showRestorePanel(data);
+                }
+                else if (data.input)
                 {
                     _showInputPanel(data);
 
@@ -262,15 +331,7 @@ if (window.Zutubi.setup === undefined)
                         propertyRenderers[data.status](data);
                     }
                 }
-                else if (data.progress && data.progress.status !== "pending")
-                {
-                    _showProgressPanel(data);
-                }
-                else if(data.status === "restore")
-                {
-                    _showRestorePanel(data);
-                }
-                else if(data.status === "waiting")
+                else if (data.status === "waiting")
                 {
                     _showWaitingMessage(data.statusMessage, data.errorMessages);
                     _pollStatus();
