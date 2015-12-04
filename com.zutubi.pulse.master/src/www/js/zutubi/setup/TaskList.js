@@ -8,7 +8,7 @@
             success: "fa-check-circle",
             failure: "fa-exclamation-circle",
             aborted: "fa-minus-circle",
-            running: "fa-spinner",
+            running: "fa-spinner fa-spin",
             pending: "fa-circle-o"
         };
 

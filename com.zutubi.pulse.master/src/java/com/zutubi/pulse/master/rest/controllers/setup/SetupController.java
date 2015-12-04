@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.rest.controllers.setup;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -27,6 +30,8 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
@@ -48,6 +53,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * RESTish API controller for server setup.
@@ -56,6 +63,8 @@ import java.util.Collections;
 @RequestMapping("/setup")
 public class SetupController
 {
+    private static final int MAX_ERRORS = 5;
+
     @Autowired
     private SetupManager setupManager;
     @Autowired
@@ -68,6 +77,8 @@ public class SetupController
     private MasterConfigurationRegistry configurationRegistry;
     @Autowired
     private ConfigurationManager configurationManager;
+    @Autowired
+    private ServerMessagesHandler serverMessagesHandler;
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public ResponseEntity<SetupModel[]> get() throws Exception
@@ -78,6 +89,7 @@ public class SetupController
         switch (state)
         {
             case WAITING:
+                addErrorMessages(model);
                 break;
             case DATA:
             {
@@ -134,10 +146,33 @@ public class SetupController
                 model.setProgressMonitor(upgradeManager.getMonitor());
                 break;
             case STARTING:
+                addErrorMessages(model);
                 break;
         }
 
         return new ResponseEntity<>(new SetupModel[]{model}, HttpStatus.OK);
+    }
+
+    private void addErrorMessages(SetupModel model)
+    {
+        List<CustomLogRecord> errorRecords = Lists.newLinkedList(Iterables.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
+        {
+            public boolean apply(CustomLogRecord record)
+            {
+                return record.getLevel().intValue() == Level.SEVERE.intValue();
+            }
+        }));
+
+        Collections.reverse(errorRecords);
+        if (errorRecords.size() > MAX_ERRORS)
+        {
+            errorRecords = errorRecords.subList(0, MAX_ERRORS);
+        }
+
+        for (CustomLogRecord record: errorRecords)
+        {
+            model.addErrorMessage(record.getMessage());
+        }
     }
 
     private File getPulseConfig()

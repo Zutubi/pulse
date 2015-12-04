@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.setup;
 
-import com.zutubi.pulse.master.bootstrap.SetupManager;
-import com.zutubi.pulse.master.bootstrap.SetupState;
+import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 /**
@@ -9,12 +8,11 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
  */
 public class SetupAppAction extends ActionSupport
 {
-    private SetupManager setupManager;
+    private WebManager webManager;
 
     public String execute() throws Exception
     {
-        SetupState state = setupManager.getCurrentState();
-        if (state == SetupState.STARTING)
+        if (webManager.isMainDeployed())
         {
             return "redirect";
         }
@@ -24,8 +22,8 @@ public class SetupAppAction extends ActionSupport
         }
     }
 
-    public void setSetupManager(SetupManager setupManager)
+    public void setWebManager(WebManager webManager)
     {
-        this.setupManager = setupManager;
+        this.webManager = webManager;
     }
 }

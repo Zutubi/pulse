@@ -445,7 +445,7 @@ public class DefaultSetupManager implements SetupManager
                     SecurityUtils.logout();
                 }
             }
-        }).run();
+        }).start();
     }
 
     private void ensureDriversRegisteredAndLoaded()
@@ -505,17 +505,10 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void requestRestoreComplete(boolean restored)
+    public void requestRestoreComplete()
     {
         try
         {
-            if (databaseConsole.isEmbedded())
-            {
-                statusMessage("Compacting embedded database.  This may take some time.");
-            }
-
-            databaseConsole.postRestoreHook(restored);
-
             linkUserTemplates();
 
             initialiseConfigurationPersistence();
@@ -877,7 +870,7 @@ public class DefaultSetupManager implements SetupManager
                     SecurityUtils.logout();
                 }
             }
-        }).run();
+        }).start();
     }
 
     private void loadContexts(List<String> contexts)
@@ -1078,7 +1071,7 @@ public class DefaultSetupManager implements SetupManager
             }
         }
 
-        requestRestoreComplete(false);
+        requestRestoreComplete();
     }
 
     @Override
@@ -1103,13 +1096,13 @@ public class DefaultSetupManager implements SetupManager
                             LOG.severe(e);
                         }
                     }
-                }).run();
+                }).start();
 
                 while (!monitor.isStarted())
                 {
                     try
                     {
-                        Thread.sleep(1000);
+                        Thread.sleep(200);
                     }
                     catch (InterruptedException e)
                     {
@@ -1136,9 +1129,9 @@ public class DefaultSetupManager implements SetupManager
                     @Override
                     public void run()
                     {
-                        requestRestoreComplete(false);
+                        requestRestoreComplete();
                     }
-                }).run();
+                }).start();
             }
         }
     }
@@ -1159,9 +1152,9 @@ public class DefaultSetupManager implements SetupManager
                     @Override
                     public void run()
                     {
-                        requestRestoreComplete(true);
+                        requestRestoreComplete();
                     }
-                }).run();
+                }).start();
             }
         }
     }

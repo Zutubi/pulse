@@ -299,12 +299,12 @@
         </action>
     </package>
 
-    <package name="startup" namespace="/startup" extends="webwork-default-package">
+    <package name="setup" namespace="/setup" extends="webwork-default-package">
         <!--
-        a simple redirect to ensure that if the startup requests '/startup/starting.action'
+        a simple redirect to ensure that if the startup requests '/setup/app.action'
         from this xwork config, it handles it gracefully.
          -->
-        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
+        <action name="app" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="redirect">/</result>
         </action>
     </package>

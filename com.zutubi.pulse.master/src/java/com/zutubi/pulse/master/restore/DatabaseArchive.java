@@ -29,7 +29,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
     static final String EXPORT_FILENAME = "export.xml";
     static final String TRACKING_FILENAME = "tables.properties";
     
-    private List<String> mappings = new LinkedList<String>();
+    private List<String> mappings = new ArrayList<>();
 
     private DataSource dataSource = null;
 
@@ -44,9 +44,9 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
 
     public String getDescription()
     {
-        return "The database restoration process takes a snapshot of the database schema and content based on " +
-                "the internal Pulse schema descriptors.  Please be aware that this process will reconstruct the " +
-                "schema in your specified database.  All existing data will be replaced.";
+        return "Restores a snapshot of the database schema and content based on internal Pulse " +
+                "schema descriptors.  This process will reconstruct the schema in your " +
+                "specified database.  All existing data will be replaced.";
     }
 
     public void backup(File base) throws ArchiveException
@@ -58,7 +58,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
                 throw new IOException("Failed to create archive output directory.");
             }
 
-            List<Resource> resources = new LinkedList<Resource>();
+            List<Resource> resources = new ArrayList<>();
             for (String mapping : mappings)
             {
                 resources.add(new ClassPathResource(mapping));
@@ -91,7 +91,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
             }
             configuration.setProperties(hibernatePropeties);
 
-            final Map<String, Long> transferedTableSizes = new HashMap<String, Long>();
+            final Map<String, Long> transferedTableSizes = new HashMap<>();
 
             TransferAPI transfer = new TransferAPI();
             transfer.addListener(new LogTableSizeTransferListener(transferedTableSizes));
@@ -99,11 +99,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
 
             writeTableSizes(transferedTableSizes, new File(base, TRACKING_FILENAME));
         }
-        catch (IOException e)
-        {
-            throw new ArchiveException(e);
-        }
-        catch (TransferException e)
+        catch (IOException | TransferException e)
         {
             throw new ArchiveException(e);
         }
@@ -160,15 +156,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
                 transfer.restore(configuration, export, dataSource);
             }
         }
-        catch (SQLException e)
-        {
-            throw new ArchiveException(e);
-        }
-        catch (IOException e)
-        {
-            throw new ArchiveException(e);
-        }
-        catch (TransferException e)
+        catch (SQLException | IOException | TransferException e)
         {
             throw new ArchiveException(e);
         }
@@ -206,7 +194,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
 
     private Map<String, Long> readTableSizes(File file) throws IOException
     {
-        Map<String, Long> tableSizes = new HashMap<String, Long>();
+        Map<String, Long> tableSizes = new HashMap<>();
 
         BufferedReader reader = null;
         try

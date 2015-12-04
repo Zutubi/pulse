@@ -6,7 +6,15 @@ if (window.Zutubi.setup === undefined)
     window.Zutubi.setup = (function($)
     {
         var app = {},
-            propertyRenderers = {};
+            propertyRenderers = {},
+            SUCCESS_MESSAGES = {
+                restore: 'The restore succeeded, please click continue to resume server startup.'
+            },
+            FAILURE_MESSAGES = {
+                restore: 'The restore has failed, please see above for details.  If you believe this to be a bug, please ' +
+                         'contact <a href="mailto:support@zutubi.com">support@zutubi.com</a>.  To help us diagnose the ' +
+                         'issue please include the above details and attach your server logs (from $PULSE_HOME/logs).'
+            };
 
         function _createNotificationWidget()
         {
@@ -75,20 +83,35 @@ if (window.Zutubi.setup === undefined)
             }, 5000);
         }
 
-        function _showWaitingMessage(message)
+        function _showWaitingMessage(message, errorMessages)
         {
+            var errorList, i;
+
             if (!message)
             {
                 message = "unknown";
             }
 
             app.mainView.html('<div id="waiting-message">' +
-                '<h1>Starting Pulse</h1>' +
+                '<h1>Please Wait</h1>' +
                 '<p><span class="fa fa-2x fa-spinner fa-spin"></span></p>' +
-                '<p>Please wait while the server initializes.</p>' +
                 '<p><b>Status</b>: ' + kendo.htmlEncode(message) + '</p>' +
                 '<p>(This view will refresh automatically.)</p>' +
             '</div>');
+
+            if (errorMessages && errorMessages.length > 0)
+            {
+                app.mainView.append('<div id="waiting-errors"><p><b>Note:</b> some errors have been detected while ' +
+                    'waiting. These errors may prevent the server from starting.  Please see below, or check the ' +
+                    'server logs (<code>$PULSE_HOME/logs</code>) for full details.</p><ul></ul></div>');
+
+                errorList = app.mainView.find("ul");
+
+                for (i = 0; i < errorMessages.length; i++)
+                {
+                    errorList.append('<li>' + kendo.htmlEncode(errorMessages[i]) + '</li>');
+                }
+            }
         }
 
         function _showInputPanel(data)
@@ -168,7 +191,9 @@ if (window.Zutubi.setup === undefined)
 
                 app.panel = new Zutubi.setup.ProgressPanel({
                     containerSelector: "#main-view",
-                    type: data.status
+                    type: data.status,
+                    successVerbose: SUCCESS_MESSAGES[data.status],
+                    failureVerbose: FAILURE_MESSAGES[data.status]
                 });
 
                 app.panel.bind("continue", jQuery.proxy(Zutubi.setup.postAndUpdate, app, data.status + "Continue", "Continuing startup..."));
@@ -247,12 +272,12 @@ if (window.Zutubi.setup === undefined)
                 }
                 else if(data.status === "waiting")
                 {
-                    _showWaitingMessage(data.statusMessage);
+                    _showWaitingMessage(data.statusMessage, data.errorMessages);
                     _pollStatus();
                 }
                 else
                 {
-                    _showWaitingMessage("Deploying main web interface...");
+                    _showWaitingMessage("Deploying main web interface...", data.errorMessages);
                     setTimeout(function()
                     {
                         window.location.reload(false);

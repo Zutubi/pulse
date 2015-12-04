@@ -71,8 +71,31 @@ h1 {
     margin: 1em 0;
 }
 
-#waiting-message b {
+#waiting-message b, #waiting-errors b {
     font-weight: bold;
+}
+
+#waiting-errors {
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+#waiting-errors p {
+    margin: 0.5em 0;
+}
+
+#waiting-errors code {
+    font-family: monospace;
+}
+
+#waiting-errors ul {
+    list-style-type: disc;
+    margin-left: 1em;
+    color: #aa082a;
+}
+
+#waiting-errors li {
+    margin: 0.3em;
 }
 
 /* Extra properties */
@@ -117,6 +140,11 @@ h1 {
     font-size: 1.1em;
 }
 
+#progress-view h2 {
+    font-size: 1.3em;
+    margin: 0.6em 0;
+}
+
 #progress-view th, #progress-view td {
     padding: 0.5em;
 }
@@ -124,6 +152,17 @@ h1 {
 #progress-view th {
     font-weight: bold;
     text-align: right;
+}
+
+#verbose-message {
+    margin: 0.5em 0;
+}
+
+#continue-wrapper {
+    margin: 0.5em 0;
+    border-top: solid 1px #eee;
+    padding-top: 0.5em;
+    text-align: center;
 }
 
 .k-task-list {

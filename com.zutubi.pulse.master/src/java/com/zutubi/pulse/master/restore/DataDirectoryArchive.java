@@ -33,10 +33,10 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
 
     public String getDescription()
     {
-        return "The configuration restoration task restores system configuration files.  These " +
-                "contain low-level configuration that is not editable via the UI.  Note that the " +
-                "database.properties file is explicitly excluded: the database of the Pulse " +
-                "installation you are restoring into is preserved.";
+        return "Restores system configuration files.  These contain low-level configuration " +
+                "that is not editable via the UI.  Note that the database.properties file is " +
+                "explicitly excluded: the database of the Pulse installation you are restoring " +
+                "into is preserved.";
     }
 
     public void backup(File archive) throws ArchiveException

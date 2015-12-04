@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.restore;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.util.monitor.FeedbackAware;
-import com.zutubi.pulse.master.util.monitor.TaskFeedback;
-import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.pulse.master.util.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -15,6 +16,8 @@ import java.util.List;
  */
 public class RestoreComponentTask implements Task, FeedbackAware
 {
+    private static final Messages I18N = Messages.getInstance(RestoreComponentTask.class);
+
     private ArchiveableComponent component;
     private File archiveBase;
     private List<String> errorMessages = new LinkedList<String>();
@@ -43,7 +46,15 @@ public class RestoreComponentTask implements Task, FeedbackAware
     public String getName()
     {
         String name = component.getName();
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+        String key = name + ".label";
+        if (I18N.isKeyDefined(key))
+        {
+            return I18N.format(key);
+        }
+        else
+        {
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        }
     }
 
     public ArchiveableComponent getComponent()

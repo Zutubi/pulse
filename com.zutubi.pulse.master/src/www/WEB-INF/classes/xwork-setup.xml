@@ -14,7 +14,7 @@
 
         <action name="404" class="com.zutubi.pulse.master.xwork.actions.FourOhFourAction">
             <result name="404" type="velocity">404.vm</result>
-            <result name="success" type="redirect">/startup/starting.action</result>
+            <result name="success" type="redirect">/setup/app.action</result>
         </action>
     </package>
 
@@ -24,61 +24,6 @@
         <action name="app" class="com.zutubi.pulse.master.xwork.actions.setup.SetupAppAction">
             <result name="success" type="velocity">app.vm</result>
             <result name="redirect" type="redirect">/</result>
-        </action>
-    </package>
-
-    <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="preview" class="com.zutubi.pulse.master.xwork.actions.upgrade.PreviewUpgradeAction">
-            <result name="success" type="velocity">preview.vm</result>
-        </action>
-
-        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.upgrade.ExecuteUpgradeAction">
-            <interceptor-ref name="executeAndWaitSideEffectStack"/>
-            <result name="wait" type="velocity">status.vm</result>
-            <result name="cancel" type="redirect">/setup/setup!input.action</result>
-            <result name="success" type="velocity">complete.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="continue" class="com.zutubi.pulse.master.xwork.actions.upgrade.PostUpgradeAction">
-            <result name="success" type="redirect">/</result>
-        </action>
-    </package>
-
-    <package name="migrate" namespace="/migrate" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="preview" class="com.zutubi.pulse.master.xwork.actions.migrate.PreviewMigrateAction">
-            <result name="input" type="velocity">preview.vm</result>
-            <result name="cancel" type="redirect">/migrate/abort.action</result>
-            <result name="success" type="redirect">/migrate/execute.action</result>
-        </action>
-
-        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.migrate.ExecuteMigrateAction">
-            <interceptor-ref name="executeAndWaitStack"/>
-            <result name="wait" type="velocity">status.vm</result>
-            <result name="cancel" type="redirect">/</result>
-            <result name="success" type="velocity">complete.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="continue" class="com.zutubi.pulse.master.xwork.actions.migrate.PostMigrateAction">
-            <result name="success" type="redirect">/</result>
-        </action>
-
-        <action name="abort" class="com.zutubi.pulse.master.xwork.actions.migrate.AbortMigrateAction">
-            <result name="success" type="redirect">/</result>
-        </action>
-
-    </package>
-
-    <package name="startup" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.setup.SystemStartingAction">
-            <result name="success" type="velocity">system-starting.vm</result>
         </action>
     </package>
 

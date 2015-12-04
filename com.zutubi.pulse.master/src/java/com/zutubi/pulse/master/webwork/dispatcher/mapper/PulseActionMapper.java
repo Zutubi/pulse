@@ -31,6 +31,7 @@ public class PulseActionMapper implements ActionMapper
     public static final String SERVER_NAMESPACE    = "/server";
     public static final String AGENTS_NAMESPACE    = "/agents";
     public static final String ADMIN_NAMESPACE     = "/admin";
+    public static final String SETUP_NAMESPACE     = "/setup";
 
     private static final String PATH_MY_BUILDS = "my";
     private static final String PATH_MY_CHANGES = "changes";
@@ -50,16 +51,6 @@ public class PulseActionMapper implements ActionMapper
         configNamespaces.add("/ajax/config");
         configNamespaces.add("/ajax/help");
         configNamespaces.add("/ajax/template");
-    }
-
-    // Setup paths are only available during the setup.
-    private static final Set<String> setupNamespaces = new HashSet<>();
-    static
-    {
-        setupNamespaces.add("migrate");
-        setupNamespaces.add("restore");
-        setupNamespaces.add("setup");
-        setupNamespaces.add("upgrade");
     }
 
     private WebManager webManager = null;
@@ -82,9 +73,9 @@ public class PulseActionMapper implements ActionMapper
         path = PathUtils.getSuffix(fullPath, 1);
 
         // Is this a request for one of the setup paths?
-        if (isSetupRequest(request) && webManager.isMainDeployed())
+        if (namespace.equals(SETUP_NAMESPACE) && webManager.isMainDeployed())
         {
-            return new ActionMapping("starting", "/startup", null, new HashMap());
+            return new ActionMapping("app", namespace, null, new HashMap());
         }
 
         ActionMapping mapping = null;
@@ -100,7 +91,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // Urls in this space currently have no parameters, just the
             // action name.
-            mapping = getDashboardMapping(getEncodedPath(request, namespace), request);
+            mapping = getDashboardMapping(getEncodedPath(request, namespace));
         }
         else if(BROWSE_NAMESPACE.equals(namespace))
         {
@@ -125,12 +116,6 @@ public class PulseActionMapper implements ActionMapper
         }
 
         return mapping;
-    }
-
-    private boolean isSetupRequest(HttpServletRequest request)
-    {
-        String[] pathElements = PathUtils.getPathElements(request.getServletPath());
-        return pathElements.length > 0 && setupNamespaces.contains(pathElements[0]);
     }
 
     private String getEncodedPath(HttpServletRequest request, String namespace)
@@ -259,7 +244,7 @@ public class PulseActionMapper implements ActionMapper
         return actionSubmit;
     }
 
-    private ActionMapping getDashboardMapping(String encodedPath, HttpServletRequest request)
+    private ActionMapping getDashboardMapping(String encodedPath)
     {
         encodedPath = normalise(encodedPath);
         if(encodedPath.startsWith(PATH_PREFERENCES))

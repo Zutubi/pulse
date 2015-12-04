@@ -2,8 +2,7 @@ package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.logging.Logger;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobRunner<T extends Task>
@@ -14,17 +13,17 @@ public class JobRunner<T extends Task>
 
     public void run(List<T> tasks)
     {
-        run(new ListJobWrapper<T>(tasks));
+        run(new ListJobWrapper<>(tasks));
     }
 
     public void run(T task)
     {
-        run(new ArrayJobWrapper<T>(task));
+        run(new ArrayJobWrapper<>(task));
     }
 
     public void run(T... tasks)
     {
-        run(new ArrayJobWrapper<T>(tasks));
+        run(new ArrayJobWrapper<>(tasks));
     }
 
     public void run(Job<T> job)
@@ -32,10 +31,9 @@ public class JobRunner<T extends Task>
         JobMonitor<T> monitor = (JobMonitor<T>) getMonitor();
 
         // register the tasks with the monitor.
-        Iterator<T> i = job.iterator();
-        while (i.hasNext())
+        for (T aJob : job)
         {
-            monitor.add(i.next());
+            monitor.add(aJob);
         }
 
         monitor.markStarted();
@@ -43,7 +41,7 @@ public class JobRunner<T extends Task>
         boolean abort = false;
         try
         {
-            List<T> tasks = new LinkedList<T>(monitor.getTasks());
+            List<T> tasks = new ArrayList<>(monitor.getTasks());
 
             for (T currentTask : tasks)
             {
@@ -76,7 +74,7 @@ public class JobRunner<T extends Task>
                         if (currentTask.hasFailed())
                         {
                             // use an exception to break out to the task failure handling.
-                            StringBuffer errors = new StringBuffer();
+                            StringBuilder errors = new StringBuilder();
                             String sep = "\n";
                             for (String error : currentTask.getErrors())
                             {
@@ -133,7 +131,7 @@ public class JobRunner<T extends Task>
             {
                 if (monitor == null)
                 {
-                    monitor = new JobMonitor<T>();
+                    monitor = new JobMonitor<>();
                 }
             }
         }

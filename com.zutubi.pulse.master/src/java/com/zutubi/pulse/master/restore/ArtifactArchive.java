@@ -30,8 +30,8 @@ public class ArtifactArchive extends AbstractArchiveableComponent implements Fee
 
     public String getDescription()
     {
-        return "The artifacts restoration consists of moving around the directories located within the " +
-                "PULSE_DATA/projects directory to match the restructured project hierarchy.";
+        return "Moves Pulse 1.2 format project directories to match the restructured Pulse 2.0 " +
+                "project hierarchy.";
     }
 
     public void backup(File archive) throws ArchiveException

@@ -23,7 +23,8 @@ public class RecordsArchive extends AbstractArchiveableComponent
 
     public String getDescription()
     {
-        return "The records restoration will replace the current Pulse system configuration with the archived configuration.";
+        return "Restores a snapshot of the configuration records (the editable project, agent " +
+                "and server configuration).";
     }
 
     public void backup(File dir) throws ArchiveException

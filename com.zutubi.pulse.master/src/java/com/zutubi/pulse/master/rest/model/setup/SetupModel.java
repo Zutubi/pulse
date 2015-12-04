@@ -3,7 +3,9 @@ package com.zutubi.pulse.master.rest.model.setup;
 import com.zutubi.pulse.master.rest.model.TransientModel;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +15,7 @@ public class SetupModel
 {
     private String status;
     private String statusMessage;
+    private List<String> errorMessages;
     private TransientModel input;
     private ProgressModel progress;
     private Map<String, Object> properties;
@@ -31,6 +34,21 @@ public class SetupModel
     public String getStatusMessage()
     {
         return statusMessage;
+    }
+
+    public List<String> getErrorMessages()
+    {
+        return errorMessages;
+    }
+
+    public void addErrorMessage(String message)
+    {
+        if (errorMessages == null)
+        {
+            errorMessages = new ArrayList<>();
+        }
+
+        errorMessages.add(message);
     }
 
     public TransientModel getInput()
