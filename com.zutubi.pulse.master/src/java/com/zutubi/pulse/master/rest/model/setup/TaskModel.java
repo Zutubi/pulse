@@ -19,33 +19,36 @@ public class TaskModel
     {
         name = task.getName();
         description = task.getDescription();
-        if (feedback.isFinished())
+        if (feedback != null)
         {
-            if (feedback.isSuccessful())
+            if (feedback.isFinished())
             {
-                status = "success";
+                if (feedback.isSuccessful())
+                {
+                    status = "success";
+                }
+                else if (feedback.isFailed())
+                {
+                    status = "failed";
+                }
+                else
+                {
+                    status = "aborted";
+                }
             }
-            else if (feedback.isFailed())
+            else if (feedback.isStarted())
             {
-                status = "failed";
+                status = "running";
             }
             else
             {
-                status = "aborted";
+                status = "pending";
             }
-        }
-        else if (feedback.isStarted())
-        {
-            status = "running";
-        }
-        else
-        {
-            status = "pending";
-        }
 
-        statusMessage = feedback.getStatusMessage();
-        percentComplete = feedback.getPercentageComplete();
-        elapsedMillis = feedback.getElapsedTime();
+            statusMessage = feedback.getStatusMessage();
+            percentComplete = feedback.getPercentageComplete();
+            elapsedMillis = feedback.getElapsedTime();
+        }
     }
 
     public String getName()

@@ -3,3 +3,4 @@
 // dependency: ./ProgressPanel.js
 // dependency: ./RestorePanel.js
 // dependency: ./TaskList.js
+// dependency: ./UpgradePanel.js

@@ -143,16 +143,6 @@ public class DefaultUpgradeManager implements UpgradeManager
         assertUpgradePrepared();
 
         Monitor<UpgradeTask> monitor = runner.getMonitor();
-
-        // CIB-1029: Refresh during upgrade causes tasks to be re-run
-        // The upgrade manager handles a one-shot process.  At no stage should executeUpgrade be allowed
-        // to proceed a second time.  Enforce this just in case the client gets it wrong.
-        if (monitor.isStarted())
-        {
-            LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
-            return;
-        }
-
         for (UpgradeTaskGroup group : groups)
         {
             group.getSource().upgradeStarted();

@@ -30,7 +30,9 @@ public interface SetupManager
 
     void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException;
 
-    void executeMigrate(MigrateDatabaseTypeConfiguration config) throws IOException;
+    void setLicense(SetupLicenseConfiguration license);
+
+    void executeMigrate(MigrateDatabaseTypeConfiguration config);
 
     void abortMigrate();
 
@@ -42,9 +44,9 @@ public interface SetupManager
 
     void postRestore();
 
-    void setLicense(SetupLicenseConfiguration license);
+    void executeUpgrade();
 
-    void requestUpgradeComplete(boolean changes);
+    void postUpgrade();
 
     UserConfiguration setAdminUser(AdminUserConfiguration admin) throws Exception;
 

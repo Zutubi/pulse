@@ -3,8 +3,10 @@ package com.zutubi.pulse.master.rest.controllers.setup;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.bootstrap.SetupState;
@@ -20,6 +22,8 @@ import com.zutubi.pulse.master.rest.model.CheckResultModel;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.TransientModel;
 import com.zutubi.pulse.master.rest.model.setup.SetupModel;
+import com.zutubi.pulse.master.rest.model.setup.TaskModel;
+import com.zutubi.pulse.master.rest.model.setup.VersionModel;
 import com.zutubi.pulse.master.restore.Archive;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.security.Principle;
@@ -29,6 +33,8 @@ import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.setup.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
+import com.zutubi.pulse.master.upgrade.UpgradeTask;
+import com.zutubi.pulse.master.upgrade.UpgradeTaskGroup;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
@@ -52,6 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -92,17 +99,8 @@ public class SetupController
                 addErrorMessages(model);
                 break;
             case DATA:
-            {
-                TransientModel input = configModelBuilder.buildTransientModel(SetupDataConfiguration.class);
-                input.getType().setSimplePropertyDefaults(Utils.getSimplePropertyValues(typeRegistry.getType(SetupDataConfiguration.class), setupManager.getDefaultData()));
-                model.setInput(input);
-
-                File pulseConfig = getPulseConfig();
-                model.addProperty("configPath", pulseConfig.getAbsolutePath());
-                model.addProperty("configExists", pulseConfig.isFile());
-
+                fillDataModel(model);
                 break;
-            }
             case DATABASE:
                 model.setInput(configModelBuilder.buildTransientModel(SetupDatabaseTypeConfiguration.class));
                 break;
@@ -110,50 +108,11 @@ public class SetupController
                 model.setInput(configModelBuilder.buildTransientModel(SetupLicenseConfiguration.class));
                 break;
             case MIGRATE:
-            {
-                MigrationManager migrationManager = SpringComponentContext.getBean("migrationManager");
-                Monitor monitor = migrationManager.getMonitor();
-                model.setProgressMonitor(monitor);
-                if (monitor == null || !monitor.isStarted())
-                {
-                    model.setInput(configModelBuilder.buildTransientModel(MigrateDatabaseTypeConfiguration.class));
-                }
-
-                DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
-                String url = databaseConfig.getUrl();
-                MigrateDatabaseTypeConfiguration configuration;
-                if (url.startsWith("jdbc:mysql"))
-                {
-                    configuration = DatabaseType.MYSQL.getDatabaseConfiguration(databaseConfig.getProperties());
-                }
-                else if (url.startsWith("jdbc:postgresql"))
-                {
-                    configuration = DatabaseType.POSTGRESQL.getDatabaseConfiguration(databaseConfig.getProperties());
-                }
-                else
-                {
-                    configuration = DatabaseType.EMBEDDED.getDatabaseConfiguration(databaseConfig.getProperties());
-                }
-
-                model.addProperty("databaseType", configuration.getType().getPrettyName());
-                model.addProperty("host", configuration.getHost());
-                model.addProperty("port", configuration.getPort());
-                model.addProperty("database", configuration.getDatabase());
-                model.addProperty("user", configuration.getUser());
-
+                fillMigrateModel(model);
                 break;
-            }
             case RESTORE:
-            {
-                RestoreManager restoreManager = SpringComponentContext.getBean("restoreManager");
-                model.setProgressMonitor(restoreManager.getMonitor());
-
-                Archive archive = restoreManager.getArchive();
-                model.addProperty("archiveCreated", archive.getCreated());
-                model.addProperty("archiveName", getArchiveName(archive));
-                model.addProperty("archiveLocation", getArchiveLocation(archive));
+                fillRestoreModel(model);
                 break;
-            }
             case ADMIN:
                 model.setInput(configModelBuilder.buildTransientModel(AdminUserConfiguration.class));
                 break;
@@ -165,8 +124,7 @@ public class SetupController
                 break;
             }
             case UPGRADE:
-                UpgradeManager upgradeManager = SpringComponentContext.getBean("upgradeContext");
-                model.setProgressMonitor(upgradeManager.getMonitor());
+                fillUpgradeModel(model);
                 break;
             case STARTING:
                 addErrorMessages(model);
@@ -174,6 +132,17 @@ public class SetupController
         }
 
         return new ResponseEntity<>(new SetupModel[]{model}, HttpStatus.OK);
+    }
+
+    private void fillDataModel(SetupModel model) throws Exception
+    {
+        TransientModel input = configModelBuilder.buildTransientModel(SetupDataConfiguration.class);
+        input.getType().setSimplePropertyDefaults(Utils.getSimplePropertyValues(typeRegistry.getType(SetupDataConfiguration.class), setupManager.getDefaultData()));
+        model.setInput(input);
+
+        File pulseConfig = getPulseConfig();
+        model.addProperty("configPath", pulseConfig.getAbsolutePath());
+        model.addProperty("configExists", pulseConfig.isFile());
     }
 
     private void addErrorMessages(SetupModel model)
@@ -211,6 +180,50 @@ public class SetupController
         }
     }
 
+    private void fillMigrateModel(SetupModel model) throws IOException
+    {
+        MigrationManager migrationManager = SpringComponentContext.getBean("migrationManager");
+        Monitor monitor = migrationManager.getMonitor();
+        model.setProgressMonitor(monitor);
+        if (monitor == null || !monitor.isStarted())
+        {
+            model.setInput(configModelBuilder.buildTransientModel(MigrateDatabaseTypeConfiguration.class));
+        }
+
+        DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
+        String url = databaseConfig.getUrl();
+        MigrateDatabaseTypeConfiguration configuration;
+        if (url.startsWith("jdbc:mysql"))
+        {
+            configuration = DatabaseType.MYSQL.getDatabaseConfiguration(databaseConfig.getProperties());
+        }
+        else if (url.startsWith("jdbc:postgresql"))
+        {
+            configuration = DatabaseType.POSTGRESQL.getDatabaseConfiguration(databaseConfig.getProperties());
+        }
+        else
+        {
+            configuration = DatabaseType.EMBEDDED.getDatabaseConfiguration(databaseConfig.getProperties());
+        }
+
+        model.addProperty("databaseType", configuration.getType().getPrettyName());
+        model.addProperty("host", configuration.getHost());
+        model.addProperty("port", configuration.getPort());
+        model.addProperty("database", configuration.getDatabase());
+        model.addProperty("user", configuration.getUser());
+    }
+
+    private void fillRestoreModel(SetupModel model)
+    {
+        RestoreManager restoreManager = SpringComponentContext.getBean("restoreManager");
+        model.setProgressMonitor(restoreManager.getMonitor());
+
+        Archive archive = restoreManager.getArchive();
+        model.addProperty("archiveCreated", archive.getCreated());
+        model.addProperty("archiveName", getArchiveName(archive));
+        model.addProperty("archiveLocation", getArchiveLocation(archive));
+    }
+
     public String getArchiveName(Archive archive)
     {
         if (archive.getOriginal() != null)
@@ -241,6 +254,27 @@ public class SetupController
         }
 
         return "n/a";
+    }
+
+    private void fillUpgradeModel(SetupModel model)
+    {
+        UpgradeManager upgradeManager = SpringComponentContext.getBean("upgradeManager");
+        model.setProgressMonitor(upgradeManager.getMonitor());
+        List<UpgradeTaskGroup> taskGroups = upgradeManager.previewUpgrade();
+        List<TaskModel> taskModels = new ArrayList<>();
+        for (UpgradeTaskGroup group: taskGroups)
+        {
+            for (UpgradeTask task: group.getTasks())
+            {
+                taskModels.add(new TaskModel(task, null));
+            }
+        }
+
+        model.addProperty("tasks", taskModels);
+
+        Data existingData = configurationManager.getData();
+        model.addProperty("existingVersion", new VersionModel(existingData.getVersion()));
+        model.addProperty("newVersion", new VersionModel(Version.getVersion()));
     }
 
     @RequestMapping(value = "/data", method = RequestMethod.POST)
@@ -329,6 +363,19 @@ public class SetupController
     public ResponseEntity<SetupModel[]> postMigrateContinue() throws Exception
     {
         setupManager.postMigrate();
+        return get();
+    }
+    @RequestMapping(value = "/upgrade", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postUpgrade() throws Exception
+    {
+        setupManager.executeUpgrade();
+        return get();
+    }
+
+    @RequestMapping(value = "/upgradeContinue", method = RequestMethod.POST)
+    public ResponseEntity<SetupModel[]> postUpgradeContinue() throws Exception
+    {
+        setupManager.postUpgrade();
         return get();
     }
 

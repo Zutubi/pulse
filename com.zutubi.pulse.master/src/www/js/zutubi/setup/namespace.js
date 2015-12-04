@@ -230,6 +230,14 @@ if (window.Zutubi.setup === undefined)
             });
         }
 
+        function _showUpgradePanel(data)
+        {
+            app.panel = new Zutubi.setup.UpgradePanel({
+                containerSelector: "#main-view",
+                properties: data.properties
+            });
+        }
+
         function _showProgressPanel(data)
         {
             var list, taskList;
@@ -321,6 +329,10 @@ if (window.Zutubi.setup === undefined)
                 else if (data.status === "restore")
                 {
                     _showRestorePanel(data);
+                }
+                else if (data.status === "upgrade")
+                {
+                    _showUpgradePanel(data);
                 }
                 else if (data.input)
                 {

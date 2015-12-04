@@ -53,7 +53,7 @@
                 for (i = 0; i < data.length; i++)
                 {
                     task = data[i];
-                    task.iconCls = ICON_CLS[task.status];
+                    task.iconCls = task.status ? ICON_CLS[task.status] : "fa-dot-circle-o";
                     this.list.append(this.taskTemplate(task));
                 }
             }

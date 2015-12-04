@@ -638,6 +638,7 @@ public class DefaultSetupManager implements SetupManager
             if (isUpgradeRequired())
             {
                 statusMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
+                upgradeManager.prepareUpgrade();
                 state = SetupState.UPGRADE;
                 showPrompt();
                 return;
@@ -697,6 +698,52 @@ public class DefaultSetupManager implements SetupManager
 
         LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");
         logConfigurationManager.applyConfig();
+    }
+
+    @Override
+    public void executeUpgrade()
+    {
+        if (state == SetupState.UPGRADE)
+        {
+            Monitor monitor = upgradeManager.getMonitor();
+            if (monitor == null || !monitor.isStarted())
+            {
+                threadFactory.newThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        upgradeManager.executeUpgrade();
+                    }
+                }).start();
+
+                while (monitor == null || !monitor.isStarted())
+                {
+                    try
+                    {
+                        Thread.sleep(200);
+                        monitor = upgradeManager.getMonitor();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // Ignore.
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void postUpgrade()
+    {
+        if (state == SetupState.UPGRADE)
+        {
+            Monitor monitor = upgradeManager.getMonitor();
+            if (monitor != null && monitor.isSuccessful())
+            {
+                requestUpgradeComplete(true);
+            }
+        }
     }
 
     public void requestUpgradeComplete(final boolean changes)
