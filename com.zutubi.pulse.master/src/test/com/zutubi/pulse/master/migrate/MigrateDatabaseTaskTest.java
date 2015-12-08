@@ -99,7 +99,7 @@ public class MigrateDatabaseTaskTest extends PulseTestCase
     private DataSource createDataSource(Properties jdbcProperties)
     {
         DatabaseConfig config = new DatabaseConfig(jdbcProperties);
-        return config.createDataSource();
+        return config.createDataSource(true);
     }
 
 

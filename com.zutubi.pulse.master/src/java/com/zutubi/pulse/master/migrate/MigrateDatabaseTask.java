@@ -63,10 +63,10 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
         try
         {
             DatabaseConfig sourceDatabaseConfig = new DatabaseConfig(sourceJdbcProperties);
-            DataSource source = sourceDatabaseConfig.createDataSource();
+            DataSource source = sourceDatabaseConfig.createDataSource(true);
 
             DatabaseConfig targetDatabaseConfig = new DatabaseConfig(targetJdbcProperties);
-            DataSource target = targetDatabaseConfig.createDataSource();
+            DataSource target = targetDatabaseConfig.createDataSource(true);
 
             MutableConfiguration sourceConfiguration = hibernateConfiguration.copy();
             sourceConfiguration.buildMappings();

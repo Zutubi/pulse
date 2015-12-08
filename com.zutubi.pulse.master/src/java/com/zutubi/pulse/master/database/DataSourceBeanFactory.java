@@ -24,7 +24,7 @@ public class DataSourceBeanFactory implements FactoryBean
             {
                 if (dataSource == null)
                 {
-                    dataSource = databaseConfig.createDataSource();
+                    dataSource = databaseConfig.createDataSource(false);
 
                     // handle some custom processing for embedded hsql databases.
                     if (isHsqldb())
@@ -61,7 +61,7 @@ public class DataSourceBeanFactory implements FactoryBean
             HSQLDBUtils.shutdown(dataSource);
             dataSource.close();
             HSQLDBUtils.updateMaxSize(databaseConfig.getUrl());
-            dataSource = databaseConfig.createDataSource();
+            dataSource = databaseConfig.createDataSource(false);
         }
     }
 

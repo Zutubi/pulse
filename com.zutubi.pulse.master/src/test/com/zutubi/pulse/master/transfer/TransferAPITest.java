@@ -163,6 +163,6 @@ public class TransferAPITest extends ZutubiTestCase
     private DataSource createDataSource(Properties jdbcProperties)
     {
         DatabaseConfig config = new DatabaseConfig(jdbcProperties);
-        return config.createDataSource();
+        return config.createDataSource(true);
     }
 }

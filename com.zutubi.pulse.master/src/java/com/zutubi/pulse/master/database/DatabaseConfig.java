@@ -252,11 +252,23 @@ public class DatabaseConfig
         this.userPaths = userPaths;
     }
 
-    public BasicDataSource createDataSource()
+    /**
+     * Creates a data source configured by our settings.
+     *
+     * @param specifyDriverClass true if we should specify the driver class name, false otherwise.
+     *                           This should be false if the driver is loaded dynamically and
+     *                           registered with the DriverManager.  It should only be true when
+     *                           the driver class needs loading directly by the data source.
+     * @return the configured data source
+     */
+    public BasicDataSource createDataSource(boolean specifyDriverClass)
     {
         BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setDriverClassName(getDriverClassName());
+        if (specifyDriverClass)
+        {
+            dataSource.setDriverClassName(getDriverClassName());
+        }
         dataSource.setUrl(getUrl());
         dataSource.setUsername(getUsername());
         dataSource.setPassword(getPassword());
