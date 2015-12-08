@@ -222,24 +222,3 @@ h1 {
 #upgrade-versions th {
     font-weight: bold;
 }
-
-/* Footer bar */
-
-#footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 20px;
-    font-size: 12px;
-    color: #aaa;
-    text-align: center;
-    line-height: 20px;
-    border-top: solid 1px #eee;
-}
-
-#footer a {
-    text-decoration: none;
-    font-weight: bold;
-    color: #aaa;
-}

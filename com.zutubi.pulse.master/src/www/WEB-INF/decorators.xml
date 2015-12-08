@@ -31,12 +31,4 @@
         <pattern>/login*</pattern>
         <pattern>/signup*</pattern>
     </decorator>
-
-    <decorator name="basic" page="basic.vm">
-        <pattern>/startup/*</pattern>
-        <pattern>/shutdown/*</pattern>
-    </decorator>
-
-    <decorator name="printable" page="printable.vm"/>
-    
 </decorators>

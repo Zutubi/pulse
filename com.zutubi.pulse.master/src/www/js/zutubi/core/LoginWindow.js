@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: ./LoginForm.js
 
 (function($)
 {
@@ -17,38 +18,16 @@
 
             Observable.fn.init.call(that);
 
-            that.view = new kendo.View(
-                '<div id="login" style="display: none">' +
-                    '<div id="login-error"></div>' +
-                    '<form id="login-form">' +
-                        '<table class="k-form">' +
-                            '<tr>' +
-                                '<th><label for="username">login:</label></th>' +
-                                '<td><input class="k-textbox" type="text" name="username" required/></td>' +
-                            '</tr>' +
-                            '<tr>' +
-                                '<th><label for="password">password:</label></th>' +
-                                '<td><input class="k-textbox" type="password" name="password"/></td>' +
-                            '</tr>' +
-                            '<tr>' +
-                                '<th><label for="rememberMe">remember me:</label></th>' +
-                                '<td><input type="checkbox" name="rememberMe" value="true"/></td>' +
-                            '</tr>' +
-                            '<tr>' +
-                                '<th>&nbsp;</th>' +
-                                '<td><input class="k-button" type="submit" name="login" value="login"/></td>' +
-                            '</tr>' +
-                        '</table>' +
-                    '</form>' +
-                '</div>'
-            , {wrap: false});
+            that.container = $('<div id="login-container" style="display:none"></div>');
+            $("body").append(that.container);
 
-            that.element = that.view.render("body");
+            that.form = new Zutubi.core.LoginForm({
+                containerSelector: "#login-container"
+            });
 
-            $("#login-form").on("submit", function(e)
+            that.form.bind("submit", function(e)
             {
-                e.preventDefault();
-                that._loginUser();
+                that._loginUser(e.data);
             });
         },
 
@@ -58,8 +37,7 @@
 
             that.completed = false;
 
-            $("#login-form").kendoValidator();
-            that.loginWindow = $("#login").kendoWindow({
+            that.loginWindow = that.container.kendoWindow({
                 width: 400,
                 modal: true,
                 title: "Login",
@@ -80,11 +58,9 @@
             that.loginWindow.open();
         },
 
-        _loginUser: function()
+        _loginUser: function(data)
         {
-            var that = this,
-                form = $("#login-form"),
-                data = {};
+            var that = this;
 
             if (that.errorWidget)
             {
@@ -95,8 +71,6 @@
 
                 that.errorWidget.destroy();
             }
-
-            form.serializeArray().map(function(x) { data[x.name] = x.value; });
 
             jQuery.ajax({
                 type: "POST",

@@ -1,0 +1,39 @@
+#outer-container {
+    width: 400px;
+    margin: 4em auto;
+}
+
+#login-logo {
+    margin: 0 auto;
+    display: block;
+}
+
+#action-errors {
+    color: #b22;
+    width: 200px;
+    margin: 1em auto;
+}
+
+#action-errors {
+    list-style-type: disc;
+    padding-left: 1em;
+}
+
+#action-errors li
+{
+    margin: 0.5em 0;
+}
+
+#login-container {
+    width: 300px;
+    margin: 1em 0;
+}
+
+.k-form th {
+    vertical-align: middle;
+    padding-top: 0.33em;
+}
+
+input[type="checkbox"] {
+    height: 2em;
+}

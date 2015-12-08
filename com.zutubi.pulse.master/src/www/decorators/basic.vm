@@ -1,53 +1,31 @@
-## Page properties are specified using <content tag="selectedTab">navigate</content>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
 <head>
-<title>:: pulse :: #if ($title) $title #end</title>
-<link rel="shortcut icon" href="$base/favicon.ico"/>
-<link rel="icon" type="image/png" href="$base/favicon.png"/>
-<link rel="stylesheet" type="text/css" href="$base/css/ext-all.css?#version()"/>
-<link rel="stylesheet" type="text/css" href="$base/css/xtheme-pagan.css?#version()"/>
-<link rel="stylesheet" type="text/css" href="$base/css/main.css?#version()" media="screen"/>
-<link rel="stylesheet" type="text/css" href="$base/css/form.css?#version()" media="screen"/>
-<link rel="stylesheet" type="text/css" href="$base/css/statusbar.css?#version()" media="screen"/>
-#javascript()
-    #if($page.getProperty("page.header.javascript"))
-    $page.getProperty("page.header.javascript")
-    #end
-    ext/package.js
-    ext/StatusBar.js
-    main.js
-    zutubi.js
-#end
-<script type="text/javascript">
-    Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
-    Ext.MessageBox.buttonText.yes = 'yes';
-    Ext.MessageBox.buttonText.no = 'no';
-    Ext.MessageBox.buttonText.ok = 'ok';
-    Ext.MessageBox.buttonText.cancel = 'cancel';
-    window.baseUrl = '$base';
+    <link href="${base}/css/reset.css?#version()" rel="stylesheet"/>
 
-    Ext.onReady(function() { Ext.QuickTips.init(); });
-</script>
-<style type="text/css">
-    #center
-    {
-        margin: 0;
-        text-align: center;
-    }
-</style>
-		$head
+    <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
+
+    <script>
+        window.baseUrl = "${base}";
+    </script>
+
+    #javascript()
+    zutubi/setup/package.js
+#end
+
+    $head
+
 </head>
 <body>
-    <div class="content" id="nested-layout">
-        <table width="100%">
-            <tr>
-                <td align="center" style="padding: 12px;">$body</td>
-            </tr>
-        </table>
-    </div>
-    <div id="south" style="border-top: none">
-        <strong>:: pulse ($version_number #$build_number) ::</strong> copyright &copy; 2005-2015 zutubi pty ltd
-    </div>
+
+    $body
+
+<div id="footer">
+    <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+    <b>::</b> copyright &copy; 2005-2015 <a href="http://zutubi.com/">zutubi pty ltd</a>
+</div>
 </body>
 </html>

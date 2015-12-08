@@ -1,20 +1,33 @@
 package com.zutubi.pulse.master.xwork.actions;
 
-import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
-import com.zutubi.pulse.master.tove.webwork.TransientAction;
-
 /**
  * This login action is to provide mapping support between how Acegi expects the
  * data and how webwork likes to present it.
  */
-public class LoginAction extends TransientAction<LoginConfiguration>
+public class LoginAction extends ActionSupport
 {
     private boolean authenticationError = false;
+    private String username;
+    private boolean rememberMe;
 
-    protected LoginAction()
+    public String getUsername()
     {
-        super("transient/login", false);
+        return username;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
+
+    public boolean isRememberMe()
+    {
+        return rememberMe;
+    }
+
+    public void setRememberMe(boolean rememberMe)
+    {
+        this.rememberMe = rememberMe;
     }
 
     public void setError(boolean error)
@@ -22,21 +35,20 @@ public class LoginAction extends TransientAction<LoginConfiguration>
         this.authenticationError = error;
     }
 
-    protected LoginConfiguration initialise() throws Exception
+    @Override
+    public String doInput() throws Exception
     {
-        LoginConfiguration result = new LoginConfiguration();
         if (authenticationError)
         {
-            String[] param = (String[]) ActionContext.getContext().getParameters().get("username");
-            String username = param == null || param.length == 0 ? "" : param[0];
-            result.setUsername(username);
             addActionError(getText("login.badcredentials"));
         }
 
-        return result;
+
+        return INPUT;
     }
 
-    protected String complete(LoginConfiguration instance) throws Exception
+    @Override
+    public String execute() throws Exception
     {
         return SUCCESS;
     }

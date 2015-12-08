@@ -1,27 +1,48 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>login</title>
+    <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/login.css?#version()" rel="stylesheet"/>
+
+    <title>:: pulse :: login</title>
 </head>
-
 <body>
-    <img id="login-logo" style="margin-top: 30px; margin-bottom: 20px;" alt="pulse logo" src="$base/images/pulse-pagan-smallmedium.jpg"/>
+<div id="outer-container">
+    <img id="login-logo" alt="pulse logo" src="$base/images/pulse-pagan-smallmedium.jpg"/>
 
-    <div class="config-panel" style="width: 400px">
-        <h3 class="config-header">login</h3>
-        <div class="config-container">
-            #pform("path=$path" "action=login")
-        </div>
-    </div>
+    #if($actionErrors && $actionErrors.size() > 0)
+        #set($actionErrorDetected = true)
 
-    <script type="text/javascript">
-        mainForm.on('render', function(form) { form.findById('zfid.username').focus(true); });
-    </script>
-    
-    #if ($config.anonymousSignupEnabled)
-    <p>
-        Not a member? <a id="signup" href="signup!input.action">Signup</a> for an account.
-    </p>
+    <ul id="action-errors" class="error">
+        #foreach($error in $actionErrors)
+            <li class="error">$!webwork.htmlEncode($error)</li>
+        #end
+    </ul>
     #end
 
+    <div id="login-container">
+    </div>
+
+    #if ($config.anonymousSignupEnabled)
+    <div id="signup-link">
+        Not a member? <a id="signup" href="signup!input.action">Signup</a> for an account.
+    </div>
+    #end
+</div>
+
+<script>
+    window.loginForm = new Zutubi.core.LoginForm({
+        containerSelector: "#login-container",
+    #if($username)
+        username: "#jss($username)",
+    #end
+    #if($rememberMe)
+        rememberMe: $rememberMe,
+    #end
+        action: "${base}/login"
+    });
+
+    window.loginForm.focus();
+</script>
 </body>
 </html>
