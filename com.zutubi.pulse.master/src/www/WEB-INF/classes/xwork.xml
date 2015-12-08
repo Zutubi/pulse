@@ -18,10 +18,9 @@
             <result name="success" type="velocity">login.vm</result>
         </action>
 
-        <action name="signup" class="com.zutubi.pulse.master.xwork.actions.admin.user.SignupUserAction">
-            <result name="cancel" type="redirect">/</result>
+        <action name="signup" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="input" type="velocity">signup.vm</result>
-            <result name="success" type="redirect">/</result>
+            <result name="success" type="redirect">signup.vm</result>
         </action>
 
         <action name="dismissWelcome" class="com.zutubi.pulse.master.xwork.actions.DismissWelcomeAction">

@@ -1,11 +1,24 @@
 package com.zutubi.pulse.master.rest.controllers.main;
 
+import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.rest.Utils;
+import com.zutubi.pulse.master.rest.errors.ValidationException;
+import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.security.CustomRememberMeServices;
 import com.zutubi.pulse.master.security.SecurityUtils;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,6 +46,12 @@ public class AuthController
     private AuthenticationManager authenticationManager;
     @Autowired
     private CustomRememberMeServices rememberMeServices;
+    @Autowired
+    private TypeRegistry typeRegistry;
+    @Autowired
+    private ConfigurationTemplateManager configurationTemplateManager;
+    @Autowired
+    private UserManager userManager;
 
     @RequestMapping(value = "/session", method = RequestMethod.GET)
     public ResponseEntity<Session> getSession(HttpServletRequest request)
@@ -45,20 +64,7 @@ public class AuthController
     {
         try
         {
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
-            authRequest.setDetails(new WebAuthenticationDetails(request));
-            Authentication authResult = authenticationManager.authenticate(authRequest);
-
-            SecurityContextHolder.getContext().setAuthentication(authResult);
-            if (credentials.rememberMe)
-            {
-                // Communicate the user requested rememberMe to our CustomRememberMeServices.
-                request.setAttribute(rememberMeServices.getParameter(), true);
-            }
-
-            rememberMeServices.loginSuccess(request, response, authResult);
-            LOG.debug("RESTish login success for '" + credentials.username + "'");
-
+            loginWithCredentials(credentials, request, response);
             return getSessionResponse(request);
         }
         catch (AuthenticationException failed)
@@ -70,6 +76,60 @@ public class AuthController
 
             throw failed;
         }
+    }
+
+    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    public ResponseEntity<Session> postSession(@RequestBody CompositeModel body, HttpServletRequest request, HttpServletResponse response) throws TypeException
+    {
+        if (!configurationTemplateManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class).isAnonymousSignupEnabled())
+        {
+            throw new AccessDeniedException("Anonymous signup is not enabled");
+        }
+
+        CompositeType type = typeRegistry.getType(SignupUserConfiguration.class);
+        Record record = Utils.convertProperties(type, null, body.getProperties());
+
+        SignupUserConfiguration instance = configurationTemplateManager.validate(null, null, record, true, true);
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance);
+        }
+
+        UserConfiguration user = new UserConfiguration(instance.getLogin(), instance.getName());
+        user = userManager.insert(user);
+        setPassword(user, instance.getPassword());
+
+        loginWithCredentials(new Credentials(instance.getLogin(), instance.getPassword()), request, response);
+
+        return getSessionResponse(request);
+    }
+
+    private void setPassword(final UserConfiguration user, final String password)
+    {
+        SecurityUtils.runAsSystem(new Runnable()
+        {
+            public void run()
+            {
+                userManager.setPassword(user, password);
+            }
+        });
+    }
+
+    private void loginWithCredentials(@RequestBody Credentials credentials, HttpServletRequest request, HttpServletResponse response)
+    {
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword());
+        authRequest.setDetails(new WebAuthenticationDetails(request));
+        Authentication authResult = authenticationManager.authenticate(authRequest);
+
+        SecurityContextHolder.getContext().setAuthentication(authResult);
+        if (credentials.rememberMe)
+        {
+            // Communicate the user requested rememberMe to our CustomRememberMeServices.
+            request.setAttribute(rememberMeServices.getParameter(), true);
+        }
+
+        rememberMeServices.loginSuccess(request, response, authResult);
+        LOG.debug("RESTish login success for '" + credentials.username + "'");
     }
 
     private ResponseEntity<Session> getSessionResponse(HttpServletRequest request)
@@ -85,6 +145,12 @@ public class AuthController
 
         public Credentials()
         {
+        }
+
+        public Credentials(String username, String password)
+        {
+            this.username = username;
+            this.password = password;
         }
 
         public String getUsername()

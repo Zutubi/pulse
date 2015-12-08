@@ -12,10 +12,11 @@
         window.baseUrl = "${base}";
     </script>
 
-    #javascript()
-    zutubi/setup/package.js
+#javascript()
+    zutubi/config/package.js
 #end
 
+    <title>:: pulse :: #if($title) $title #end</title>
     $head
 
 </head>

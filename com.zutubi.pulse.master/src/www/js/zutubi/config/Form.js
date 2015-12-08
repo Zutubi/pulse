@@ -48,6 +48,7 @@
 
         events: [
             CREATED,
+
             BUTTON_CLICKED,
             ENTER_PRESSED
         ],
@@ -140,10 +141,13 @@
             }
             else
             {
+                fieldOptions.label = fieldOptions.label || fieldOptions.name;
+                fieldOptions.type = fieldOptions.type || "text";
+
                 rowElement = $(this.fieldTemplate(fieldOptions));
                 fieldElement = rowElement.appendTo(this.tableBodyElement).find(SELECTOR_FIELD_WRAPPER);
 
-                if (fieldOptions.label === "name" || (this.options.markRequired && fieldOptions.required))
+                if (fieldOptions.name === "name" || (this.options.markRequired && fieldOptions.required))
                 {
                     rowElement.find("label").addClass("k-required");
                 }
@@ -185,7 +189,8 @@
             parentElement.append(this.buttonTemplate({name: name, value: name, id: id}));
             element = parentElement.find("button").last();
             button = element.kendoZaButton({
-                click: jQuery.proxy(that._buttonClicked, that, name)
+                click: jQuery.proxy(that._buttonClicked, that, name),
+                value: name
             }).data("kendoZaButton");
 
             that.submits.push(button);
@@ -225,7 +230,7 @@
                 {
                     if (this.submits.length > 0)
                     {
-                        this._buttonClicked(this.options.defaultSubmit || this.submits[0].structure.value);
+                        this._buttonClicked(this.options.defaultSubmit || this.submits[0].options.value);
                     }
                     else
                     {
@@ -237,7 +242,7 @@
 
         _enterSubmits: function(wrapperEl)
         {
-            return ["zatextfield", "zacheckbox", "zacontrollingcheckbox"].indexOf(wrapperEl.attr("data-role")) >= 0;
+            return ["zatextfield", "zapasswordfield", "zacheckbox", "zacontrollingcheckbox"].indexOf(wrapperEl.attr("data-role")) >= 0;
         },
 
         _updateButtons: function()

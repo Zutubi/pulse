@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 
@@ -13,7 +12,7 @@ public class LoginForm extends SeleniumForm
 
     public String getFormName()
     {
-        return LoginConfiguration.class.getName();
+        return "login";
     }
 
     public String[] getFieldNames()

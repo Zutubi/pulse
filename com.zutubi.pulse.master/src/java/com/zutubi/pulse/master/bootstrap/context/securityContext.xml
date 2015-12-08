@@ -257,6 +257,8 @@ based upon the Spring Security system.
         <property name="securityMetadataSource">
             <security:filter-security-metadata-source request-matcher="ant" lowercase-comparisons="true" use-expressions="false">
                 <security:intercept-url pattern="/api/auth/session" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/api/auth/signup" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+                <security:intercept-url pattern="/api/config/**" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/signup*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/logout.action" access="IS_AUTHENTICATED_ANONYMOUSLY" />

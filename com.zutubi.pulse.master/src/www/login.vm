@@ -4,7 +4,7 @@
     <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/login.css?#version()" rel="stylesheet"/>
 
-    <title>:: pulse :: login</title>
+    <title>login</title>
 </head>
 <body>
 <div id="outer-container">
@@ -13,9 +13,9 @@
     #if($actionErrors && $actionErrors.size() > 0)
         #set($actionErrorDetected = true)
 
-    <ul id="action-errors" class="error">
+    <ul id="action-errors">
         #foreach($error in $actionErrors)
-            <li class="error">$!webwork.htmlEncode($error)</li>
+            <li>$!webwork.htmlEncode($error)</li>
         #end
     </ul>
     #end

@@ -1,10 +1,86 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/login.css?#version()" rel="stylesheet"/>
+
     <title>signup</title>
 </head>
-
 <body>
-    <h1 id="signup">:: signup ::</h1>
-    #pform("path=$path" "action=signup.action")
+<div id="outer-container">
+    <img id="login-logo" alt="pulse logo" src="$base/images/pulse-pagan-smallmedium.jpg"/>
+
+    <ul id="action-errors" style="display:none">
+    </ul>
+
+    <div id="login-container">
+        <div id="signup-form"></div>
+    </div>
+</div>
+
+<script>
+    Zutubi.core.ajax({
+        type: "GET",
+        url: "/api/config/transient/signup",
+        maskAll: true,
+        suppressLogin: true,
+        success: function (data)
+        {
+            var composite = data[0];
+
+            window.signupForm = $("#login-container").kendoZaForm({
+                structure: composite.type.form,
+                submits: ["sign up", "cancel"]
+            }).data("kendoZaForm");
+
+            window.signupForm.bind("buttonClicked", function(e)
+            {
+                if (e.value === "cancel")
+                {
+                    window.location = window.baseUrl + "/login!input.action";
+                }
+                else
+                {
+                    $("#action-errors").empty();
+                    $("#action-errors").hide();
+
+                    Zutubi.core.ajax({
+                        type: "POST",
+                        url: "/api/auth/signup",
+                        data: {
+                            kind: "composite",
+                            properties: window.signupForm.getValues()
+                        },
+                        maskAll: true,
+                        suppressLogin: true,
+                        success: function (data)
+                        {
+                            window.location = window.baseUrl + "/";
+                        },
+                        error: function (jqXHR)
+                        {
+                            var details = Zutubi.config.getValidationErrors(jqXHR);
+                            if (details)
+                            {
+                                window.signupForm.showValidationErrors(details.validationErrors);
+                            }
+                            else
+                            {
+                                $("#action-errors").append('<li>Could not sign up: ' + kendo.htmlEncode(Zutubi.core.ajaxError(jqXHR)) + '</li>');
+                                $("#action-errors").show();
+                            }
+                        }
+                    });
+                }
+            });
+        },
+        error: function (jqXHR)
+        {
+            $("#action-errors").append('<li>Could not load form: ' + kendo.htmlEncode(Zutubi.core.ajaxError(jqXHR)) + '</li>');
+            $("#action-errors").show();
+        }
+    });
+
+</script>
 </body>
 </html>

@@ -494,26 +494,16 @@
 
         _handleError: function(jqXHR, stepIndex)
         {
-            var details;
+            var details = Zutubi.config.getValidationErrors(jqXHR);
 
-            if (jqXHR.status === 422)
+            if (details)
             {
-                try
-                {
-                    details = JSON.parse(jqXHR.responseText);
-                    if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                    {
-                        this.showValidationErrors(details, stepIndex);
-                        return;
-                    }
-                }
-                catch(e)
-                {
-                    // Do nothing.
-                }
+                this.showValidationErrors(details, stepIndex);
             }
-
-            Zutubi.admin.reportError("Error stepping forward: " + Zutubi.core.ajaxError(jqXHR));
+            else
+            {
+                Zutubi.admin.reportError("Error stepping forward: " + Zutubi.core.ajaxError(jqXHR));
+            }
         },
 
         _findNestedComposite: function(parent, key)

@@ -159,26 +159,16 @@
                     },
                     error: function(jqXHR)
                     {
-                        var details;
+                        var details = Zutubi.config.getValidationErrors(jqXHR);
 
-                        if (jqXHR.status === 422)
+                        if (details)
                         {
-                            try
-                            {
-                                details = JSON.parse(jqXHR.responseText);
-                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                                {
-                                    that.form.showValidationErrors(details.validationErrors);
-                                    return;
-                                }
-                            }
-                            catch (e)
-                            {
-                                // Do nothing.
-                            }
+                            that.form.showValidationErrors(details.validationErrors);
                         }
-
-                        Zutubi.admin.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
+                        else
+                        {
+                            Zutubi.admin.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
+                        }
                     }
                 });
             }

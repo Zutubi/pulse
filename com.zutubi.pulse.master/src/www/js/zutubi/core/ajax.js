@@ -97,7 +97,7 @@
                         kendo.ui.progress($("body"), false);
                     }
 
-                    if (loginRequired(jqXHR))
+                    if (!options.suppressLogin && loginRequired(jqXHR))
                     {
                         loginThenRetryAjax(resolvedOptions);
                     }

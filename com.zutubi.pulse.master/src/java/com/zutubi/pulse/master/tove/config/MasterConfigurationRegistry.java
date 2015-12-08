@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
-import com.zutubi.pulse.master.tove.config.misc.LoginConfiguration;
 import com.zutubi.pulse.master.tove.config.misc.TransientConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -108,7 +107,6 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             transientConfig = registerConfigurationType(TransientConfiguration.class);
             configurationPersistenceManager.register(TRANSIENT_SCOPE, transientConfig, false);
 
-            registerTransientConfiguration("login", LoginConfiguration.class);
             registerTransientConfiguration("signup", SignupUserConfiguration.class);
             registerTransientConfiguration("projectTypeSelection", ProjectTypeSelectionConfiguration.class);
 

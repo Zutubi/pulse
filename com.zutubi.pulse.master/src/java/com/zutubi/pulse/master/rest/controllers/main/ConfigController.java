@@ -60,7 +60,7 @@ public class ConfigController
 
         String parentPath = PathUtils.getParentPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
-        Record record = configurationTemplateManager.getRecord(configPath);
+        Record record = configurationTemplateManager.isPersistent(configPath) ? configurationTemplateManager.getRecord(configPath) : null;
 
         ConfigModel model = configModelBuilder.buildModel(filters, configPath, type, parentType, record, depth);
 

@@ -117,6 +117,29 @@ if (window.Zutubi.config === undefined)
                 }
             },
 
+            getValidationErrors: function(jqXHR)
+            {
+                var details;
+
+                if (jqXHR.status === 422)
+                {
+                    try
+                    {
+                        details = JSON.parse(jqXHR.responseText);
+                        if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                        {
+                            return details;
+                        }
+                    }
+                    catch (e)
+                    {
+                        // Do nothing.
+                    }
+                }
+
+                return null;
+            },
+
             checkConfig: function(path, type, form, checkForm, errorCb)
             {
                 var properties = form.getValues(),
@@ -143,33 +166,23 @@ if (window.Zutubi.config === undefined)
                     },
                     error: function (jqXHR)
                     {
-                        var details;
+                        var details = Zutubi.config.getValidationErrors(jqXHR);
 
-                        if (jqXHR.status === 422)
+                        if (details)
                         {
-                            try
+                            if (details.key === "main")
                             {
-                                details = JSON.parse(jqXHR.responseText);
-                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                                {
-                                    if (details.key === "main")
-                                    {
-                                        form.showValidationErrors(details.validationErrors);
-                                    }
-                                    else
-                                    {
-                                        checkForm.showValidationErrors(details.validationErrors);
-                                    }
-                                    return;
-                                }
+                                form.showValidationErrors(details.validationErrors);
                             }
-                            catch(e)
+                            else
                             {
-                                // Do nothing.
+                                checkForm.showValidationErrors(details.validationErrors);
                             }
                         }
-
-                        errorCb("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
+                        else
+                        {
+                            errorCb("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
+                        }
                     }
                 });
             }

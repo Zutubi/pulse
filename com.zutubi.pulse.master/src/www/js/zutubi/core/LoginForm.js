@@ -58,7 +58,6 @@
                 $('input[name="rememberMe"]').prop("checked", true);
             }
 
-            that.loginForm.kendoValidator();
             if (options.action)
             {
                 that.loginForm[0].action = options.action;

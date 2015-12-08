@@ -37,3 +37,8 @@
 input[type="checkbox"] {
     height: 2em;
 }
+
+#signup-link {
+    width: 300px;
+    margin: 3em auto;
+}

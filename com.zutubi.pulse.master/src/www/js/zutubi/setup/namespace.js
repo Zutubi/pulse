@@ -137,27 +137,17 @@ if (window.Zutubi.setup === undefined)
                 },
                 error: function(jqXHR)
                 {
-                    var details;
+                    var details = Zutubi.config.getValidationErrors(jqXHR);
 
                     kendo.ui.progress(app.mainView, false);
-                    if (jqXHR.status === 422)
+                    if (details)
                     {
-                        try
-                        {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                            {
-                                app.panel.showValidationErrors(details.validationErrors);
-                                return;
-                            }
-                        }
-                        catch (e)
-                        {
-                            // Do nothing.
-                        }
+                        app.panel.showValidationErrors(details.validationErrors);
                     }
-
-                    Zutubi.setup.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
+                    else
+                    {
+                        Zutubi.setup.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
+                    }
                 }
             })
         }
