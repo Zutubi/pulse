@@ -330,7 +330,7 @@
         longestMatchingSubpath: function(path)
         {
             var info = this._infoForConfigPath(this._absoluteToConfigPath(path)),
-                collapsed = Zutubi.config.baseName(info.path) === info.item.nestedName;
+                collapsed = info.path && Zutubi.config.baseName(info.path) === info.item.nestedName;
             return collapsed ? Zutubi.config.parentPath(info.path) : info.path;
         },
 

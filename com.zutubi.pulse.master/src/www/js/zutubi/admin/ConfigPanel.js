@@ -446,8 +446,17 @@
                         url: "/api/config/" + Zutubi.config.encodePath(path),
                         success: function (delta)
                         {
-                            that.applyDelta(delta);
-                            that._openPath(that.configTree.longestMatchingSubpath(path));
+                            var rootPath = that.getRootPath();
+
+                            if (delta.deletedPaths && delta.deletedPaths.indexOf(rootPath) >= 0)
+                            {
+                                Zutubi.admin.openConfigPath(Zutubi.config.parentPath(rootPath));
+                            }
+                            else
+                            {
+                                that.applyDelta(delta);
+                                that._openPath(that.configTree.longestMatchingSubpath(path));
+                            }
                         },
                         error: function (jqXHR)
                         {

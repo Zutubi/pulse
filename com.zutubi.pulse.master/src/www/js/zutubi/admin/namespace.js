@@ -99,8 +99,15 @@ if (window.Zutubi.admin === undefined)
             router.route("/config/projects(/)*path", function(path)
             {
                 var normalisedPath = Zutubi.config.normalisedPath(path);
-                app.navbar.selectScope("projects", normalisedPath);
-                _showConfig("projects/" + normalisedPath, true);
+                if (normalisedPath)
+                {
+                    app.navbar.selectScope("projects", normalisedPath);
+                    _showConfig("projects/" + normalisedPath, true);
+                }
+                else
+                {
+                    app.router.replace("/hierarchy/projects");
+                }
             });
 
             router.route("/hierarchy/agents(/)(:name)(/)", function(name)
@@ -112,10 +119,14 @@ if (window.Zutubi.admin === undefined)
             router.route("/config/agents(/)*path", function(path)
             {
                 var normalisedPath = Zutubi.config.normalisedPath(path);
-                app.navbar.selectScope("agents", normalisedPath);
-                if (path)
+                if (normalisedPath)
                 {
+                    app.navbar.selectScope("agents", normalisedPath);
                     _showConfig("agents/" + normalisedPath, true);
+                }
+                else
+                {
+                    app.router.replace("/hierarchy/agents");
                 }
             });
 
