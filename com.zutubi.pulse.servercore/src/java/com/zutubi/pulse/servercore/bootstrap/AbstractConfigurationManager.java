@@ -3,8 +3,11 @@ package com.zutubi.pulse.servercore.bootstrap;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.PropertiesConfig;
+import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,6 +17,8 @@ import java.util.Map;
  */
 public abstract class AbstractConfigurationManager implements ConfigurationManager
 {
+    private static final Logger LOG = Logger.getLogger(AbstractConfigurationManager.class);
+
     private static final String PROPERTY_DISK_SPACE_PATH = "pulse.disk.space.path";
 
     private SystemPaths systemPaths = null;
@@ -78,6 +83,30 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
         result.put(CORE_PROPERTY_PULSE_WEBAPP_PORT, Integer.toString(systemConfig.getServerPort()));
         result.put(CORE_PROPERTY_PULSE_CONTEXT_PATH, systemConfig.getContextPath());
         return result;
+    }
+
+    @Override
+    public void loadSystemProperties()
+    {
+        File propFile = new File(getUserPaths().getUserConfigRoot(), "system.properties");
+        if (propFile.exists())
+        {
+            FileInputStream is = null;
+            try
+            {
+                is = new FileInputStream(propFile);
+                System.getProperties().load(is);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
+        }
+
     }
 
     private File getHomeDir(String home, String property)

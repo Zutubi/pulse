@@ -53,7 +53,10 @@ import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -293,34 +296,12 @@ public class DefaultSetupManager implements SetupManager
 
             eventManager.publish(new DataDirectoryLocatedEvent(this));
 
-            loadSystemProperties();
+            configurationManager.loadSystemProperties();
             handleDbSetup();
         }
         catch (Exception e)
         {
             setupCallback.finaliseSetup(e);
-        }
-    }
-
-    private void loadSystemProperties()
-    {
-        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
-        if (propFile.exists())
-        {
-            FileInputStream is = null;
-            try
-            {
-                is = new FileInputStream(propFile);
-                System.getProperties().load(is);
-            }
-            catch (IOException e)
-            {
-                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
-            }
-            finally
-            {
-                IOUtils.close(is);
-            }
         }
     }
 

@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * 
- *
+ * Extended configuration only present on the Pulse master (not agents).  The main additions are
+ * the database and artifact repositories.
  */
 public interface MasterConfigurationManager extends ConfigurationManager, DataResolver
 {
-    public static final String CONFIG_DIR = ".pulse2";
+    String CONFIG_DIR = ".pulse2";
     
     MasterUserPaths getUserPaths();
 

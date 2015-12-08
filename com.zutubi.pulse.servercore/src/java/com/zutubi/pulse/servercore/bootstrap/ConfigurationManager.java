@@ -6,16 +6,19 @@ import java.io.File;
 import java.util.Map;
 
 /**
+ * Provides access to core configuration information: paths and properties needed to boot the Pulse
+ * data subsystem and web interface.  Higher-level configuration may be found within the data
+ * subsystem.
  */
 public interface ConfigurationManager
 {
-    static final String CORE_PROPERTY_PULSE_HOME_DIR = "pulse.home.dir";
-    static final String CORE_PROPERTY_USER_HOME_DIR = "user.home.dir";
-    static final String CORE_PROPERTY_PULSE_DATA_DIR = "pulse.data.dir";
-    static final String CORE_PROPERTY_PULSE_CONFIG_FILE = "pulse.config.file";
-    static final String CORE_PROPERTY_PULSE_BIND_ADDRESS = "pulse.bind.address";
-    static final String CORE_PROPERTY_PULSE_WEBAPP_PORT = "pulse.webapp.port";
-    static final String CORE_PROPERTY_PULSE_CONTEXT_PATH = "pulse.context.path";
+    String CORE_PROPERTY_PULSE_HOME_DIR = "pulse.home.dir";
+    String CORE_PROPERTY_USER_HOME_DIR = "user.home.dir";
+    String CORE_PROPERTY_PULSE_DATA_DIR = "pulse.data.dir";
+    String CORE_PROPERTY_PULSE_CONFIG_FILE = "pulse.config.file";
+    String CORE_PROPERTY_PULSE_BIND_ADDRESS = "pulse.bind.address";
+    String CORE_PROPERTY_PULSE_WEBAPP_PORT = "pulse.webapp.port";
+    String CORE_PROPERTY_PULSE_CONTEXT_PATH = "pulse.context.path";
 
     EnvConfig getEnvConfig();
     SystemConfiguration getSystemConfig();
@@ -39,4 +42,9 @@ public interface ConfigurationManager
      * @return core properties describing the configuration of this instance
      */
     Map<String, String> getCoreProperties();
+
+    /**
+     * Loads system properties from a system.properties file in the user config area.
+     */
+    void loadSystemProperties();
 }
