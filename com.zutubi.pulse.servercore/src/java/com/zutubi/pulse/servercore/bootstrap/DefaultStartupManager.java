@@ -13,21 +13,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
-/**
- * <class-comment/>
- */
 public class DefaultStartupManager implements StartupManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultStartupManager.class);
 
-    /**
-     * The systems configuration manager.
-     */
     private ConfigurationManager configurationManager;
-
-    /**
-     * The systems object factory.
-     */
     private ObjectFactory objectFactory;
 
     /**
@@ -35,54 +25,14 @@ public class DefaultStartupManager implements StartupManager
      */
     private static final long NOT_STARTED = -1;
 
-    /**
-     * The startup managers startup time.
-     */
     private long startTime = NOT_STARTED;
 
-    /**
-     * A boolean value indicating whether or not the startup manager is currently in the
-     * process of startup.
-     */
     private boolean starting = false;
 
     private List<String> startupTasks = Collections.emptyList();
     private List<String> postStartupTasks = Collections.emptyList();
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager instance
-     */
-    public void setConfigurationManager(ConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
 
-    /**
-     * Required resource.
-     *
-     * @param objectFactory instance
-     */
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
-    public void setStartupTasks(List<String> startupTasks)
-    {
-        this.startupTasks = startupTasks;
-    }
-
-    public void setPostStartupTasks(List<String> postStartupTasks)
-    {
-        this.postStartupTasks = postStartupTasks;
-    }
-
-    /**
-     * Entry point to starting the system.
-     *
-     */
     public void init() throws StartupException
     {
         if (isSystemStarted())
@@ -228,5 +178,25 @@ public class DefaultStartupManager implements StartupManager
     public long getStartTime()
     {
         return startTime;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
+    public void setStartupTasks(List<String> startupTasks)
+    {
+        this.startupTasks = startupTasks;
+    }
+
+    public void setPostStartupTasks(List<String> postStartupTasks)
+    {
+        this.postStartupTasks = postStartupTasks;
     }
 }
