@@ -51,49 +51,6 @@ function toHtmlName(s)
     return s.replace(/[^\w-:.]/g, '.');
 }
 
-// Function to toggle the enable state of a control based on the state of a
-// checkbox.
-function setEnableState(id, checkboxId, inverse)
-{
-    var element, disabled;
-
-    element = Ext.getDom(id);
-    disabled = !Ext.getDom(checkboxId).checked;
-
-    if (inverse)
-    {
-        disabled = !disabled;
-    }
-
-    element.disabled = disabled;
-}
-
-// Sets the enabled state of all controls in a form (excepting the checkbox
-// itself and submits (buttons)) based on the state of a checkbox.
-function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
-{
-    var disabled, form, fields, i, field;
-
-    disabled = !Ext.getDom(checkboxId).checked;
-
-    if(inverse)
-    {
-        disabled = !disabled;
-    }
-
-    form = Ext.getDom(formId);
-    fields = form.elements;
-
-    for(i = 0; i < fields.length; i++)
-    {
-        field = fields[i];
-        if(field.id !== checkboxId && (includeSubmit || (field.type && field.type !== "submit")))
-        {
-            fields[i].disabled = disabled;
-        }
-    }
-}
-
 // Function for opening a resource browse window used on several forms.
 //   - resourceId: ID of textbox to receive the resource name
 //   - versionId: ID of textbox to receive the resource version
@@ -223,23 +180,6 @@ function onSelectFailure(element, response)
     }
 }
 
-function onConfigSelect(sm, node)
-{
-    if(treesInitialised && node)
-    {
-        detailPanel.load({
-            url: configTree.loader.dataUrl + '/' + encodeURIPath(configTree.getNodeConfigPath(node)),
-            scripts: true,
-            callback: function(element, success, response) {
-                if(!success)
-                {
-                    onSelectFailure(element, response);
-                }
-            }
-        });
-    }
-}
-
 function getAjaxCallbacks(maskedElement)
 {
     return {
@@ -308,22 +248,6 @@ function runAjaxRequest(urlOrConfig)
     Ext.Ajax.request(config);
 }
 
-function selectPath(path)
-{
-    configTree.getSelectionModel().clearSelections();
-    configTree.selectConfigPath(path);
-}
-
-function editPath(path)
-{
-    detailPanel.load({url: window.baseUrl + '/ajax/config/' + encodeURIPath(path), scripts:true});
-}
-
-function addToPath(path, template)
-{
-    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
-}
-
 function actionPath(path, action, fromParent, onDescendants, argument)
 {
     var url;
@@ -342,11 +266,6 @@ function actionPath(path, action, fromParent, onDescendants, argument)
         url += '&argument=' + encodeURIComponent(argument);
     }
     runAjaxRequest(url);
-}
-
-function deletePath(path, direct)
-{
-    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?delete=confirm' + (direct ? 'direct' : ''));
 }
 
 function showHelp(path, type)
@@ -373,93 +292,6 @@ function showFieldHelp(field)
     {
         helpPanel.synchronise(field);
     }
-}
-
-function revertField(fieldId)
-{
-    var field;
-
-    field = Ext.getCmp(fieldId);
-    if (field)
-    {
-        field.setValue(field.overriddenValue);
-        field.focus(true);
-        field.form.updateButtons();
-    }
-}
-
-function navigateToDefinition(fieldId)
-{
-    var field;
-
-    field = Ext.getCmp(fieldId);
-    if (field)
-    {
-        // This callback-after-delay is hackish, but the chain of things that
-        // we would otherwise need to wait for is long and complicated.  If the
-        // delay is not enough things still work, just without the convenience
-        // of highlighting the field.
-        navigateToOwner(field.inheritedFrom, field.form.path, function() {
-            window.setTimeout(function() {
-                var field;
-
-                field = Ext.getCmp(fieldId);
-                if (field)
-                {
-                    field.focus(true);
-                }
-            }, 500);
-        });
-    }
-}
-
-function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, overriddenOwner, overriddenValue)
-{
-    var menuId;
-    
-    if (required)
-    {
-        form.markRequired(field.getId(), 'field is required');
-    }
-
-    if (noOverride)
-    {
-        field.getEl().addClass('field-no-override');
-    }
-
-    if (inheritedFrom)
-    {
-        field.inheritedFrom = inheritedFrom;
-        menuId = form.annotateFieldWithMenu(field.getId(), 'inherited', 'value inherited from ' + inheritedFrom);
-        Zutubi.MenuManager.registerMenu(menuId, function() {
-            return [{
-                image: 'arrow_45.gif',
-                title: 'navigate to definition',
-                onclick: "navigateToDefinition('" + field.getId() + "'); Zutubi.MenuManager.toggleMenu(Ext.get('" + menuId + "-link')); return false"
-            }];
-        }, 'inherited');
-    }
-
-    if (overriddenOwner)
-    {
-        field.overriddenValue = overriddenValue;
-        menuId = form.annotateFieldWithMenu(field.getId(), 'overridden', 'overrides value defined by ' + overriddenOwner + ' (click for actions)');
-        Zutubi.MenuManager.registerMenu(menuId, function() {
-            return [{
-                image: 'arrow_undo.gif',
-                title: 'revert to inherited value',
-                onclick: "revertField('" + field.getId() + "'); Zutubi.MenuManager.toggleMenu(Ext.get('" + menuId + "-link')); return false"
-            }];
-        }, 'overridden');
-    }
-}
-
-function addFieldHelp(form, field, message)
-{
-    var helpEl;
-
-    helpEl = form.annotateField(field.getId(), 'help', window.baseUrl + '/images/help.gif', message);
-    helpEl.on('click', function() { showFieldHelp(field.getName()); });
 }
 
 function handleDialogResponse(options, success, response)
