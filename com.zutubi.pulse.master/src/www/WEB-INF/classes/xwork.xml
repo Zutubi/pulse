@@ -605,22 +605,9 @@
             <result name="error" type="flexjson">configurationErrors</result>
         </global-results>
 
-        <action name="dependentOptions" class="com.zutubi.pulse.master.tove.webwork.DependentOptionsAction">
-            <interceptor-ref name="ajaxConfigStack"/>
-            <result name="success" type="flexjson">options</result>
-        </action>
-
         <action name="help" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <result name="success" type="velocity">help.vm</result>
-        </action>
-
-        <action name="wizard" class="com.zutubi.pulse.master.tove.wizard.webwork.AjaxEnabledConfigurationWizardAction">
-            <interceptor-ref name="ajaxConfigWizardStack"/>
-            <result name="step" type="flexjson">configurationPanel</result>
-            <result name="input" type="flexjson">configurationErrors</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
         <action name="save" class="com.zutubi.pulse.master.tove.webwork.SaveAction">
@@ -638,21 +625,6 @@
             <result name="rename" type="flexjson">configurationPanel</result>
         </action>
 
-        <action name="restore" class="com.zutubi.pulse.master.tove.webwork.RestoreAction">
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-        </action>
-
-        <action name="up" class="com.zutubi.pulse.master.tove.webwork.OrderAction">
-            <param name="moveUp">true</param>
-            <result name="success" type="flexjson">configurationResponse</result>
-        </action>
-
-        <action name="down" class="com.zutubi.pulse.master.tove.webwork.OrderAction">
-            <param name="moveUp">false</param>
-            <result name="success" type="flexjson">configurationResponse</result>
-        </action>
-
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
@@ -661,12 +633,6 @@
                 <param name="deep">true</param>
                 <param name="location">result</param>
             </result>
-        </action>
-
-        <action name="check" class="com.zutubi.pulse.master.tove.webwork.CheckAction">
-            <interceptor-ref name="ajaxConfigStack"/>
-            <result name="input" type="flexjson">configurationErrors</result>
-            <result name="success" type="flexjson">checkResponse</result>
         </action>
 
         <action name="generic" class="com.zutubi.pulse.master.tove.webwork.GenericAction">
@@ -680,12 +646,6 @@
             </result>
         </action>
         
-        <action name="clone" class="com.zutubi.pulse.master.tove.webwork.CloneAction">
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="input" type="flexjson">newPanel</result>
-        </action>
-
         <action name="smartclone" class="com.zutubi.pulse.master.tove.webwork.CloneAction">
             <param name="smart">true</param>
             <result name="cancel" type="flexjson">configurationResponse</result>
@@ -703,24 +663,6 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
-        </action>
-
-        <action name="pullUp" class="com.zutubi.pulse.master.tove.webwork.PullUpAction">
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="input" type="flexjson">newPanel</result>
-        </action>
-
-        <action name="pushDown" class="com.zutubi.pulse.master.tove.webwork.PushDownAction">
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="input" type="flexjson">newPanel</result>
-        </action>
-
-        <action name="options" class="com.zutubi.pulse.master.tove.webwork.OptionsAction">
-            <interceptor-ref name="ajaxConfigStack"/>
-            <result name="success" type="flexjson">options</result>
-            <result name="error" type="velocity">error.vm</result>
         </action>
 
         <action name="trigger" class="com.zutubi.pulse.master.tove.webwork.TriggerAction">
@@ -771,23 +713,6 @@
             <result name="input" type="flexjson">newPanel</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
-        </action>
-    </package>
-
-    <package name="templateAjax" namespace="/ajax/template" extends="default">
-        <default-interceptor-ref name="ajaxStack"/>
-
-        <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
-            <param name="basePath">templates</param>
-            <result name="success" type="flexjson">listing</result>
-            <result name="error" type="flexjson">
-                <param name="deep">true</param>
-                <param name="location">result</param>
-            </result>
-        </action>
-
-        <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayTemplateAction">
-            <result name="success" type="velocity">template.vm</result>
         </action>
     </package>
 

@@ -35,7 +35,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +55,6 @@ import java.util.Map;
 @RequestMapping("/action")
 public class ConfigActionsController
 {
-    private static final Logger LOG = Logger.getLogger(ConfigActionsController.class);
-
     @Autowired
     private ConfigurationTemplateManager configurationTemplateManager;
     @Autowired

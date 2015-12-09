@@ -1187,63 +1187,6 @@
     <img alt="delete" src="$base/images/delete.gif"/> <a href="#" id="uninstall:$plugin.id" onclick="pluginsTree.pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
 #end
 
-#macro(checkForm $path $type $formName $namespace)
-    <div id="check.frame" class="frame">
-        #i18nexists("key=test.heading" "context=$type.symbolicName")<h3 class="config-header">#i18n("key=test.heading" "context=$type.symbolicName")</h3>#end
-        #i18nexists("key=test.description" "context=$type.symbolicName")<p class="config-description">#i18n("key=test.description" "context=$type.symbolicName")</p>#end
-        <p class="config-check-result" id="check.result" style="display: none">
-        </p>
-        <div class="config-container">
-            #checkform("path=$path" "symbolicName=$type.symbolicName" "mainFormName=$formName" "checkFormName=checkform" "namespace=$namespace")
-        </div>
-        <script type="text/javascript">
-            ## Used for Selenium testing
-            checkComplete = false;
-            checkOK = true;
-
-            var frameEl = Ext.get('nested-layout');
-            var checkEl = Ext.get('check.result');
-            checkEl.enableDisplayMode();
-
-            checkform.on('beforeaction', function(form, action)
-            {
-                checkComplete = false;
-                frameEl.mask('Checking configuration...');
-                return true;
-            });
-
-            checkform.on('actioncomplete', function(form, action)
-            {
-                frameEl.unmask();
-                checkEl.setVisible(true, true);
-                checkEl.update(action.result.panel, true);
-                checkOK = action.result.checkSucceeded;
-                checkComplete = true;
-            });
-
-            checkform.on('actionfailed', function(form, action)
-            {
-                frameEl.unmask();
-
-                var message;
-                if(action.failureType == Ext.form.Action.SERVER_INVALID)
-                {
-                    message = 'unable to check configuration due to validation errors';
-                }
-                else
-                {
-                    message = 'unable to contact Pulse to run check';
-                }
-
-                checkEl.setVisible(true, true);
-                checkEl.update('<img src="$base/images/exclamation.gif" alt="error"/> <span class="config-check-failure">' + message + '</span>', true);
-                checkOK = false;
-                checkComplete = true;
-            });
-        </script>
-    </div>
-#end
-
 #macro(standardFormEvents $formName)
     <script type="text/javascript">
         ${formName}.on('actioncomplete', function(form, action)
