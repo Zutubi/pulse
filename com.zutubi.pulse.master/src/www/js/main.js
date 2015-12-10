@@ -376,28 +376,50 @@ function clearResponsibility(projectId)
     });
 }
 
-function triggerBuild(projectId, triggerHandle)
+function triggerBuild(projectName, triggerName, prompt)
 {
-    showStatus('Triggering build...', 'working');
-    runAjaxRequest({
-        url: window.baseUrl + '/ajax/manualTrigger.action',
-        params: {
-            projectId: projectId,
-            triggerHandle: triggerHandle
-        },
-        callback: function(options, success, response) {
-            var result;
-            if (success)
-            {
-                result = Ext.util.JSON.decode(response.responseText);
-                showStatus(result.detail, result.success ? 'success' : 'failure');
-            }
-            else
-            {
-                showStatus('Cannot contact server', 'failure');
-            }
+    var actionWindow;
+
+    function handleResult(data)
+    {
+        if (data.success)
+        {
+            Zutubi.core.reportSuccess(data.message);
         }
-    });
+        else
+        {
+            Zutubi.core.reportError(data.message);
+        }
+    }
+
+    if (prompt)
+    {
+        actionWindow = new Zutubi.config.ActionWindow({
+            path: "projects/" + Zutubi.config.encodePath(projectName),
+            action: {
+                action: 'trigger',
+                variant: triggerName,
+                label: triggerName
+            },
+            executed: handleResult
+        });
+
+        actionWindow.show();
+    }
+    else
+    {
+        showStatus('Triggering build...', 'working');
+        Zutubi.core.ajax({
+            type: "POST",
+            url: "/api/action/single/trigger:" + Zutubi.config.encodePath(triggerName + "/projects/" + projectName),
+            success: handleResult,
+            error: function (jqXHR)
+            {
+                Zutubi.core.reportError("Could not trigger build: " + Zutubi.core.ajaxError(jqXHR));
+            }
+        });
+
+    }
 }
 
 function deleteComment(agentId, buildId, commentId)

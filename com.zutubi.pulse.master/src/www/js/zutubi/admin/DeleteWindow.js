@@ -4,7 +4,7 @@
 
 (function($)
 {
-    var WorkflowWindow = Zutubi.admin.WorkflowWindow;
+    var WorkflowWindow = Zutubi.config.WorkflowWindow;
 
     Zutubi.admin.DeleteWindow = WorkflowWindow.extend({
         init: function (options)

@@ -1,7 +1,6 @@
 // dependency: ./namespace.js
 // dependency: zutubi/core/package.js
 // dependency: zutubi/config/package.js
-// dependency: ./ActionWindow.js
 // dependency: ./ConfigTree.js
 // dependency: ./ContextPanel.js
 // dependency: ./CollectionPanel.js
@@ -352,7 +351,7 @@
             var that = this,
                 actionWindow;
 
-            actionWindow = new Zutubi.admin.ActionWindow({
+            actionWindow = new Zutubi.config.ActionWindow({
                 path: path,
                 action: action,
                 executed: jQuery.proxy(that._handleActionResult, that, path)

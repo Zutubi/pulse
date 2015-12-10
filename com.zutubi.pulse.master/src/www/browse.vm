@@ -3,7 +3,8 @@
 <content tag="selectedTab">projects</content>
 <content tag="header.javascript">
     ext/StatusBar.js
-    projects.js    
+    zutubi/config/package.js
+    projects.js
 </content>
 <html>
 <head>

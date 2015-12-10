@@ -17,7 +17,7 @@ Zutubi.MenuManager = (function() {
     
     function appendMenuItem(el, menuId, item)
     {
-        var child;
+        var child, childEl;
 
         if (!item.title)
         {
@@ -40,11 +40,17 @@ Zutubi.MenuManager = (function() {
         {
             child.href = window.baseUrl + '/' + item.url;
         }
-        if (item.onclick !== undefined)
+        if (typeof item.onclick === "string")
         {
             child.onclick = item.onclick;
         }
-        el.createChild({tag: 'li', children: [child]});
+
+        childEl = el.createChild({tag: 'li', children: [child]});
+
+        if (typeof item.onclick === "function")
+        {
+            childEl.dom.onclick = item.onclick;
+        }
     }
 
     function renderMenu(id)

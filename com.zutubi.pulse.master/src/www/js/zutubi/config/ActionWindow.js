@@ -1,16 +1,15 @@
 // dependency: ./namespace.js
-// dependency: zutubi/config/package.js
 // dependency: ./WorkflowWindow.js
 
 (function($)
 {
-    var WorkflowWindow = Zutubi.admin.WorkflowWindow,
+    var WorkflowWindow = Zutubi.config.WorkflowWindow,
         CLONE = "clone",
         CLONE_KEY = "cloneKey",
         CLONE_KEY_PREFIX = "cloneKey_",
         DEFAULT_ACTIONS = [CLONE, "pullUp", "pushDown"];
 
-    Zutubi.admin.ActionWindow = WorkflowWindow.extend({
+    Zutubi.config.ActionWindow = WorkflowWindow.extend({
         init: function (options)
         {
             var that = this,

@@ -1,5 +1,4 @@
 // dependency: zutubi/config/package.js
-// dependency: ./ActionWindow.js
 // dependency: ./AgentOverviewPanel.js
 // dependency: ./CollectionPanel.js
 // dependency: ./CompositePanel.js
@@ -18,4 +17,3 @@
 // dependency: ./TypeSelectPanel.js
 // dependency: ./Wizard.js
 // dependency: ./WizardWindow.js
-// dependency: ./WorkflowWindow.js

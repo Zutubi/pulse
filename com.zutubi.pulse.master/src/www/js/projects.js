@@ -161,7 +161,7 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     getMenuItems: function(menuType, menuArg, id) {
-        var items, item, encodedName, i, trigger;
+        var items, encodedName, i, trigger;
 
         if (menuType === 'actions')
         {
@@ -199,21 +199,18 @@ Zutubi.ConcreteProject.prototype = {
                 for (i = 0; i < this.data.triggers.length; i++)
                 {
                     trigger = this.data.triggers[i];
-                    item = {
-                        id: trigger.name,
-                        image: 'lightning.gif'
-                    };
 
-                    if (trigger.prompt)
-                    {
-                        item.url = 'manualTrigger!input.action?projectName=' + encodedName + '&triggerHandle=' + trigger.handle;
-                    }
-                    else
-                    {
-                        item.onclick = 'Zutubi.FloatManager.showHideFloat(\'menus\', \'' + id + '\'); triggerBuild(' + this.data.projectId + ', ' + trigger.handle + '); return false';
-                    }
-
-                    items.push(item);
+                    items.push({
+                        id: Ext.util.Format.htmlEncode(trigger.name),
+                        image: 'lightning.gif',
+                        onclick: (function(project, trigger) {
+                                     return function() {
+                                         Zutubi.FloatManager.showHideFloat('menus', id);
+                                         triggerBuild(project, trigger.name, trigger.prompt);
+                                         return false;
+                                     }
+                                 })(this.data.name, trigger)
+                    });
                 }
             }
 

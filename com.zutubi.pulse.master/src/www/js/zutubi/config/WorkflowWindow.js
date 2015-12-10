@@ -1,11 +1,10 @@
 // dependency: ./namespace.js
-// dependency: zutubi/config/package.js
 
 (function($)
 {
     var Observable = kendo.Observable;
 
-    Zutubi.admin.WorkflowWindow = Observable.extend({
+    Zutubi.config.WorkflowWindow = Observable.extend({
         // options: {
         //    url: URL to GET to load the information required to render window content
         //    title: window title (default: "")

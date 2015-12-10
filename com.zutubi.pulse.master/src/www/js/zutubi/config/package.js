@@ -1,4 +1,5 @@
 // dependency: zutubi/core/package.js
+// dependency: ./ActionWindow.js
 // dependency: ./Button.js
 // dependency: ./Checkbox.js
 // dependency: ./ComboBox.js
@@ -11,3 +12,4 @@
 // dependency: ./StringList.js
 // dependency: ./TextArea.js
 // dependency: ./TextField.js
+// dependency: ./WorkflowWindow.js
