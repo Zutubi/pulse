@@ -42,7 +42,7 @@
 
             that.selected = "projects";
 
-            that.outer = $('<div class="k-hierarchy-selector fill-parent"></div>');
+            that.outer = $('<div class="k-hierarchy-selector k-pane-content"></div>');
             that.element.append(that.outer);
 
             that.search = $('<input type="text" class="k-input k-textbox" placeholder="filter">');

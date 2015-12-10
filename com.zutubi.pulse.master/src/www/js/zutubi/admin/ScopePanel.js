@@ -19,24 +19,24 @@
             Observable.fn.init.call(this);
 
             that.view = new kendo.View(
-                '<div id="outer-split" style="height: 100%; width: 100%">' +
-                    '<div id="left-pane">' +
-                        '<div id="hierarchy-tree" class="pane-content">' +
+                '<div class="k-outer-split" style="height: 100%; width: 100%">' +
+                    '<div>' +
+                        '<div class="k-hierarchy-tree k-pane-content">' +
                         '</div>' +
                     '</div>' +
-                    '<div id="center-pane">' +
-                        '<div id="center-pane-content" class="pane-content">' +
+                    '<div>' +
+                        '<div class="k-center-pane-content k-pane-content">' +
                         '</div>' +
                     '</div>' +
-                    '<div id="right-pane">' +
-                        '<div id="right-pane-content" class="pane-content">' +
+                    '<div>' +
+                        '<div class="k-right-pane-content k-pane-content">' +
                         '</div>' +
                     '</div>' +
                 '</div>', {wrap: false});
 
             that.view.render($(containerSelector));
 
-            $("#outer-split").kendoSplitter({
+            that.view.element.kendoSplitter({
                 panes: [
                     { collapsible: true, size: "350px" },
                     { collapsible: false },
@@ -44,9 +44,9 @@
                 ]
             });
 
-            that.hierarchySelector = $("#hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
-            that.contentEl = $("#center-pane-content");
-            that.contextPanel = $("#right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
+            that.hierarchySelector = that.view.element.find(".k-hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.contentEl = that.view.element.find(".k-center-pane-content");
+            that.contextPanel = that.view.element.find(".k-right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
 
             that.hierarchySelector.bind("bound", function(e)
             {
@@ -119,7 +119,7 @@
             kendo.ui.progress(this.contentEl, false);
             if (error)
             {
-                $('<p class="nav-error"></p>').appendTo(this.contentEl).text(error);
+                $('<p class="k-nav-error"></p>').appendTo(this.contentEl).text(error);
             }
         },
 
@@ -153,14 +153,14 @@
             if (this.scope === "projects")
             {
                 this.contentPanel = new Zutubi.admin.ProjectOverviewPanel({
-                    containerSelector: "#center-pane-content",
+                    containerSelector: ".k-center-pane-content",
                     project: data
                 });
             }
             else
             {
                 this.contentPanel = new Zutubi.admin.AgentOverviewPanel({
-                    containerSelector: "#center-pane-content",
+                    containerSelector: ".k-center-pane-content",
                     agent: data
                 });
             }

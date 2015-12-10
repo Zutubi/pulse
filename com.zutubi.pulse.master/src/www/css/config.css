@@ -1,8 +1,8 @@
-#outer-split {
+.k-outer-split {
     border-width: 0;
 }
 
-.pane-content, .fill-parent {
+.k-pane-content {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -72,7 +72,7 @@
 
 /* Center pane */
 
-#center-pane-content h1 {
+.k-center-pane-content h1 {
     font-size: 1.5em;
     font-weight: bold;
     color: #888;
@@ -214,29 +214,29 @@
     padding: 8px 16px;
 }
 
-#type-select-content {
+.k-type-select-content {
     margin: 1em 0 ;
 }
 
-.configured-descendants p {
+.k-configured-descendants p {
     margin: 1em 0;
 }
 
-.configured-descendants ul {
+.k-configured-descendants ul {
     margin-left: 4ch;
     list-style-type: circle;
 }
 
-.configured-descendants li {
+.k-configured-descendants li {
     margin: 0.4em 0;
 }
 
-.configured-descendants a {
+.k-configured-descendants a {
     cursor: pointer;
     padding: 0.2em;
 }
 
-.configured-descendants a:hover {
+.k-configured-descendants a:hover {
     color: #fff;
     background-color: #8ebc00;
 }
@@ -261,11 +261,11 @@ table.k-form {
     font-weight: normal;
 }
 
-.k-form td.submit {
+.k-form td.k-submit {
     text-align: center;
 }
 
-.k-form td.submit button {
+.k-form td.k-submit button {
     margin: 4px;
 }
 
@@ -391,38 +391,38 @@ ul.k-form-validation-errors {
 
 /* Delete Window */
 
-table.cleanup-tasks {
+.k-cleanup-tasks {
     margin: 12px;
 }
 
-table.cleanup-tasks th, .cleanup-tasks td {
+.k-cleanup-tasks th, .k-cleanup-tasks td {
     padding: 0.4em;
     border: solid 1px #dbdbdb;
 }
 
-table.cleanup-tasks th {
+.k-cleanup-tasks th {
     font-weight: bold;
 }
 
 /* Context panel */
 
-.context-content {
+.k-context-content {
     padding: 0.4em 1em;
 }
 
-.config-links li, .config-actions li {
+.k-config-links li, .k-config-actions li {
     padding: 0.4em 0;
 }
 
-.config-links a, .config-actions a {
+.k-config-links a, .k-config-actions a {
     text-decoration: none;
     color: inherit;
 }
 
-.config-links .fa, .config-actions .fa {
+.k-config-links .fa, .k-config-actions .fa {
     width: 20px;
 }
 
-.config-actions li:hover {
+.k-config-actions li:hover {
     cursor: pointer;
 }

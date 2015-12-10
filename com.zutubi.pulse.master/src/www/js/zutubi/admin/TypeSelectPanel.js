@@ -20,21 +20,20 @@
             Observable.fn.init.call(this);
 
             that.view = new kendo.View(
-                '<div id="#: id #" class="k-type-select-panel">' +
+                '<div class="k-type-select-panel">' +
                     '<h1>#: label #</h1>' +
-                    '<div id="#: id #-content"></div>' +
+                    '<div class="k-type-select-content"></div>' +
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
                     model: {
-                        id: "type-select",
                         label: type.label
                     }
                 });
 
             that.view.render($(options.containerSelector));
 
-            that.contentElement = $("#type-select-content");
+            that.contentElement = that.view.element.find(".k-type-select-content");
             if (configured)
             {
                 that._showConfiguredDescendants(type.configuredDescendants);
@@ -93,7 +92,7 @@
                 currentList.append(lastItem);
             }
 
-            el = $('<div class="configured-descendants"></div>').appendTo(this.contentElement);
+            el = $('<div class="k-configured-descendants"></div>').appendTo(this.contentElement);
             el.append('<p>This path is already configured in ' + descendants.length + ' descendant' +
                 (descendants.length > 1 ? 's' : '') +
                 ', thus cannot be configured here:</p>');

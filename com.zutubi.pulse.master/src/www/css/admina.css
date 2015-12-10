@@ -18,28 +18,28 @@ body {
     border-bottom: solid 1px #eee;
 }
 
-.navlist {
+.k-navlist {
     height: 34px;
     padding: 0 4px;
     display: flex;
     align-items: baseline;
 }
 
-.navitem {
+.k-navitem {
     line-height: 34px;
     margin-right: 8px;
 }
 
-.navitem .k-button {
+.k-navitem .k-button {
     line-height: 30px;
     padding: 0 4px;
 }
 
-.navright {
+.k-navright {
     margin-left: auto;
 }
 
-.navitem a {
+.k-navitem a {
     text-decoration: none;
     font-weight: bold;
     color: #ffffff;
@@ -53,21 +53,21 @@ body {
     cursor: pointer;
 }
 
-.navitem .k-split-button-arrow .fa {
+.k-navitem .k-split-button-arrow .fa {
     vertical-align: middle;
 }
 
-.selector-popup, .hierarchy-popup {
+.k-selector-popup, .k-hierarchy-popup {
     margin-top: 4px;
     border-top: none;
 }
 
-.selector-popup li {
+.k-selector-popup li {
     padding: 0 12px;
     cursor: pointer;
 }
 
-.selector-popup li:hover {
+.k-selector-popup li:hover {
     color: #fff;
     background-color: #8ebc00;
 }
@@ -83,7 +83,7 @@ body {
     overflow: auto;
 }
 
-.nav-error {
+.k-nav-error {
     padding: 1em;
     color: #bb2222;
     font-weight: bold;

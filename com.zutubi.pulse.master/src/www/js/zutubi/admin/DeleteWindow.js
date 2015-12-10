@@ -34,7 +34,7 @@
                 postLabel = this.options.label === "delete" ? "deleted" : "hidden";
 
             el.html("<p>Are you sure you would like to " + this.options.label + " this item? Any descendants will also be " + postLabel + ". The following tasks are required:</p>" +
-                "<table class='cleanup-tasks'><tbody><tr><th>affected path</th><th>action</th></tr></tbody></table>"
+                "<table class='k-cleanup-tasks'><tbody><tr><th>affected path</th><th>action</th></tr></tbody></table>"
             );
 
             tbody = el.find("tbody");

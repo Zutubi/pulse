@@ -97,8 +97,8 @@
 
             if (!this.options.readOnly)
             {
-                this.tableBodyElement.append('<tr><td class="submit" colspan="2"></td></tr>');
-                submitCell = this.tableBodyElement.find(".submit");
+                this.tableBodyElement.append('<tr><td class="k-submit" colspan="2"></td></tr>');
+                submitCell = this.tableBodyElement.find(".k-submit");
                 for (i = 0; i < submits.length; i++)
                 {
                     this._addSubmit(submits[i], submitCell);

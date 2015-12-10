@@ -94,14 +94,14 @@
                 that.scopes.push("settings", "users", "groups", "plugins");
             }
 
-            that.popupEl = $("<ul class='selector-popup'></ul>");
+            that.popupEl = $("<ul class='k-selector-popup'></ul>");
             for (i = 0; i < that.scopes.length; i++)
             {
                 that.popupEl.append("<li>" + that.scopes[i] + "</li>");
             }
 
             popup = that.popupEl.kendoPopup({
-                anchor: that.element.closest(".navitem"),
+                anchor: that.element.closest(".k-navitem"),
                 origin: "top left",
                 position: "bottom left",
                 animation: {
@@ -151,7 +151,7 @@
             var that = this,
                 popup;
 
-            that.popupEl = $("<div class='hierarchy-popup'></div>");
+            that.popupEl = $("<div class='k-hierarchy-popup'></div>");
             that.selector = that.popupEl.kendoZaHierarchySelector().data("kendoZaHierarchySelector");
             that.selector.bind("nodeselect", function(e)
             {
@@ -161,7 +161,7 @@
             });
 
             popup = that.popupEl.kendoPopup({
-                anchor: that.element.closest(".navitem"),
+                anchor: that.element.closest(".k-navitem"),
                 origin: "top left",
                 position: "bottom left",
                 animation: {
@@ -208,7 +208,7 @@
 
         options: {
             name: "ZaNavbar",
-            itemTemplate: '<span class="navitem #: cls #">#= content #</span>'
+            itemTemplate: '<span class="k-navitem #: cls #">#= content #</span>'
         },
 
         events: [
@@ -223,7 +223,7 @@
 
             that.itemTemplate = kendo.template(that.options.itemTemplate);
 
-            that.list = $('<div class="navlist"></div>');
+            that.list = $('<div class="k-navlist"></div>');
             that.element.append(that.list);
 
             that.list.append(that.itemTemplate({cls: '', content: '<a href="' + window.baseUrl + '/admin/">:: pulse admin ::</a>'}));
@@ -253,7 +253,7 @@
             that.list.append(that.addButtonItem);
 
             that.list.append(that.itemTemplate({
-                cls: 'navright',
+                cls: 'k-navright',
                 content: '<a href="' + window.baseUrl + '/dashboard/"><span class="fa fa-dashboard"></span> dashboard</a>'
             }));
         },

@@ -48,6 +48,11 @@
             }
         },
 
+        _createContentElement: function ()
+        {
+            return $('<div class="k-context-content"></div>');
+        },
+
         setData: function(path, data)
         {
             var that = this,
@@ -66,7 +71,7 @@
             {
                 if (data.links && data.links.length > 0)
                 {
-                    element = $('<div class="context-content"></div>');
+                    element = this._createContentElement();
                     that._renderLinks(element, data.links);
                     panels.push({
                         text: "links",
@@ -80,7 +85,7 @@
                 {
                     that.actions.sort(Zutubi.admin.labelCompare);
 
-                    element = $('<div class="context-content"></div>');
+                    element = this._createContentElement();
                     that._renderActions(element, that.actions, "action");
                     panels.push({
                         text: "actions",
@@ -93,7 +98,7 @@
                 {
                     data.descendantActions.sort(Zutubi.admin.labelCompare);
 
-                    element = $('<div class="context-content"></div>');
+                    element = this._createContentElement();
                     that._renderActions(element, data.descendantActions, "descendant");
                     panels.push({
                         text: "descendant actions",
@@ -104,7 +109,7 @@
 
                 that.panelBar = that.contentElement.kendoPanelBar({dataSource: panels}).data("kendoPanelBar");
 
-                that.actionLists = that.contentElement.find(".config-actions");
+                that.actionLists = that.contentElement.find(".k-config-actions");
                 that.actionLists.on(CLICK, jQuery.proxy(that._actionClicked, that));
             }
             else
@@ -148,7 +153,7 @@
 
         _renderLinks: function(element, links)
         {
-            var list = $('<ul class="config-links"></ul>'),
+            var list = $('<ul class="k-config-links"></ul>'),
                 i,
                 link;
 
@@ -168,7 +173,7 @@
 
         _renderActions: function(element, actions, prefix)
         {
-            var list = $('<ul class="config-actions"></ul>'),
+            var list = $('<ul class="k-config-actions"></ul>'),
                 i,
                 action;
 

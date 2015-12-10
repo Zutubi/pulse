@@ -23,24 +23,24 @@
 
             Observable.fn.init.call(this);
 
-            that.view = new kendo.View('<div id="outer-split" style="height: 100%; width: 100%">' +
-                                           '<div id="left-pane">' +
-                                               '<div id="config-tree" class="pane-content">' +
+            that.view = new kendo.View('<div class="k-outer-split" style="height: 100%; width: 100%">' +
+                                           '<div>' +
+                                               '<div class="k-config-tree k-pane-content">' +
                                                '</div>' +
                                            '</div>' +
-                                           '<div id="center-pane">' +
-                                               '<div id="center-pane-content" class="pane-content">' +
+                                           '<div>' +
+                                               '<div class="k-center-pane-content k-pane-content">' +
                                                '</div>' +
                                            '</div>' +
-                                           '<div id="right-pane">' +
-                                               '<div id="right-pane-content" class="pane-content">' +
+                                           '<div>' +
+                                               '<div class="k-right-pane-content k-pane-content">' +
                                                '</div>' +
                                            '</div>' +
                                        '</div>', {wrap: false});
 
             that.view.render($(containerSelector));
 
-            $("#outer-split").kendoSplitter({
+            that.view.element.kendoSplitter({
                 panes: [
                     { collapsible: true, size: "350px" },
                     { collapsible: false },
@@ -48,16 +48,16 @@
                 ]
             });
 
-            that.configTree = $("#config-tree").kendoZaConfigTree().data("kendoZaConfigTree");
+            that.configTree = that.view.element.find(".k-config-tree").kendoZaConfigTree().data("kendoZaConfigTree");
             that.configTree.bind("pathselect", function(e)
             {
                 that.trigger(PATHSELECT, {path: e.path});
                 that.loadContentPanes(e.path);
             });
 
-            that.contentEl = $("#center-pane-content");
+            that.contentEl = that.view.element.find(".k-center-pane-content");
 
-            that.contextPanel = $("#right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
+            that.contextPanel = that.view.element.find(".k-right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
             that.contextPanel.bind("action", jQuery.proxy(that._doAction, that));
         },
 
@@ -160,7 +160,7 @@
             kendo.ui.progress(this.contentEl, false);
             if (error)
             {
-                $('<p class="nav-error"></p>').appendTo(this.contentEl).text(error);
+                $('<p class="k-nav-error"></p>').appendTo(this.contentEl).text(error);
             }
         },
 
@@ -227,7 +227,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.CompositePanel({
-                containerSelector: "#center-pane-content",
+                containerSelector: ".k-center-pane-content",
                 composite: data,
                 path: that.path
             });
@@ -255,7 +255,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.CollectionPanel({
-                containerSelector: "#center-pane-content",
+                containerSelector: ".k-center-pane-content",
                 collection: data,
                 path: that.path
             });
@@ -285,7 +285,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.TypeSelectPanel({
-                containerSelector: "#center-pane-content",
+                containerSelector: ".k-center-pane-content",
                 type: data,
                 path: that.path
             });
