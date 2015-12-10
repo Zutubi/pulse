@@ -166,7 +166,7 @@
                     }
                     else
                     {
-                        Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
+                        Zutubi.core.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 }
             });

@@ -93,7 +93,7 @@
                 error: function (jqXHR)
                 {
                     that.close();
-                    Zutubi.admin.reportError("Could not get wizard information: " + Zutubi.core.ajaxError(jqXHR));
+                    Zutubi.core.reportError("Could not get wizard information: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },

@@ -56,8 +56,14 @@
         <link rel="stylesheet" type="text/css" href="$base/css/form.css?#version()" media="screen"/>
         <link rel="stylesheet" type="text/css" href="$base/css/statusbar.css?#version()" media="screen"/>
         <link rel="stylesheet" type="text/css" href="$base/css/treegrid.css?#version()"/>
-        <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
-#if ($rssEnabled && $projectId && "$projectId" != "0")
+
+        <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
+        <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
+        <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
+        <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
+        <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+
+        #if ($rssEnabled && $projectId && "$projectId" != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
         #javascript()
@@ -254,6 +260,7 @@
                     var imageMap = {
                         'success': 'accept',
                         'failure': 'exclamation',
+                        'warning': 'error',
                         'working': 'inprogress'
                     };
                     message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="[' + type + ']"/> ' + message;
@@ -265,6 +272,13 @@
                 statusAreaEl.setVisible(true, true);
                 Ext.getCmp('nested-layout').doLayout();
             }
+
+            // This is a bridge from old world status reporting to newer world.
+            Zutubi.core.registerFeedbackHandler({
+                success: function(message) { showStatus(message, 'success') },
+                error: function(message) { showStatus(message, 'failure') },
+                warning: function(message) { showStatus(message, 'warning') }
+            })
         </script>
 
 		$head

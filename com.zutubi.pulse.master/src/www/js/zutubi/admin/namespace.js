@@ -282,6 +282,7 @@ if (window.Zutubi.admin === undefined)
             init: function(isAdmin, projectCreateAllowed, agentCreateAllowed)
             {
                 app.notificationWidget = _createNotificationWidget();
+                Zutubi.core.registerFeedbackHandler(app.notificationWidget);
                 app.router = _createRouter();
                 app.navbar = _createNavbar({
                     isAdmin: isAdmin,
@@ -293,21 +294,6 @@ if (window.Zutubi.admin === undefined)
             start: function()
             {
                 app.router.start();
-            },
-
-            reportSuccess: function(message)
-            {
-                app.notificationWidget.success(message);
-            },
-
-            reportError: function(message)
-            {
-                app.notificationWidget.error(message);
-            },
-
-            reportWarning: function(message)
-            {
-                app.notificationWidget.warning(message);
             },
 
             openConfigPath: function(newPath)

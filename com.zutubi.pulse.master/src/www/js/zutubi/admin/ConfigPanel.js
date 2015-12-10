@@ -378,7 +378,7 @@
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
+                    Zutubi.core.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },
@@ -387,11 +387,11 @@
         {
             if (data.success)
             {
-                Zutubi.admin.reportSuccess(data.message);
+                Zutubi.core.reportSuccess(data.message);
             }
             else
             {
-                Zutubi.admin.reportError(data.message);
+                Zutubi.core.reportError(data.message);
             }
 
             if (data.newPath)
@@ -466,7 +466,7 @@
                         },
                         error: function (jqXHR)
                         {
-                            Zutubi.admin.reportError("Could not delete configuration: " + Zutubi.core.ajaxError(jqXHR));
+                            Zutubi.core.reportError("Could not delete configuration: " + Zutubi.core.ajaxError(jqXHR));
                         }
                     });
                 }
@@ -486,7 +486,7 @@
                 success: jQuery.proxy(that._handleRestoreResult, that),
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
+                    Zutubi.core.reportError("Could not perform action: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },

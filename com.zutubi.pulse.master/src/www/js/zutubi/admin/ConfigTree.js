@@ -200,7 +200,7 @@
             });
 
             dataSource.bind('error', function(e) {
-                Zutubi.admin.reportError('Could not load configuration tree: ' + Zutubi.core.ajaxError(e.xhr));
+                Zutubi.core.reportError('Could not load configuration tree: ' + Zutubi.core.ajaxError(e.xhr));
             });
 
             kendo.ui.progress(this.element, true);

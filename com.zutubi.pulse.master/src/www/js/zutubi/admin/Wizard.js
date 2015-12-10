@@ -55,7 +55,7 @@
         }
         else
         {
-            Zutubi.admin.reportWarning("Unknown wizard step type '" + config.kind + "'");
+            Zutubi.core.reportWarning("Unknown wizard step type '" + config.kind + "'");
         }
     };
 
@@ -257,7 +257,7 @@
 
             if (stepIndex === -1)
             {
-                Zutubi.admin.reportError("Unrecognisable validation failure in wizard");
+                Zutubi.core.reportError("Unrecognisable validation failure in wizard");
             }
             else
             {
@@ -502,7 +502,7 @@
             }
             else
             {
-                Zutubi.admin.reportError("Error stepping forward: " + Zutubi.core.ajaxError(jqXHR));
+                Zutubi.core.reportError("Error stepping forward: " + Zutubi.core.ajaxError(jqXHR));
             }
         },
 
@@ -634,7 +634,7 @@
 
         _checkClicked: function()
         {
-            Zutubi.config.checkConfig(this.options.path, this.type, this.form, this.checkForm, Zutubi.admin.reportError);
+            Zutubi.config.checkConfig(this.options.path, this.type, this.form, this.checkForm);
         }
     });
 

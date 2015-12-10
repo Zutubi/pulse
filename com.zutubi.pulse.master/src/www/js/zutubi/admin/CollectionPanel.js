@@ -154,7 +154,7 @@
                 },
                 error: function (jqXHR)
                 {
-                    Zutubi.admin.reportError("Could not save order: " + Zutubi.core.ajaxError(jqXHR));
+                    Zutubi.core.reportError("Could not save order: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         }

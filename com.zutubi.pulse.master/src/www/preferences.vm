@@ -1,16 +1,11 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
-<content tag="selectedTab">preferences</content>
+<content tag="selectedTab">dashboard</content>
 <content tag="header.javascript">
     zutubi/admin/package.js
 </content>
 <html>
 <head>
-    <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
-    <link href="${base}/css/kendo/kendo.metro.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
-    <link href="${base}/css/config.css" rel="stylesheet"/>
-
     <title>#wwtext("name=preferences")</title>
 </head>
 <body>

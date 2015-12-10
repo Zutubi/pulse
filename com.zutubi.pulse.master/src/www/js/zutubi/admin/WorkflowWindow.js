@@ -92,7 +92,7 @@
                 error: function (jqXHR)
                 {
                     that.window.close();
-                    Zutubi.admin.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
+                    Zutubi.core.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
                 }
             });
         },

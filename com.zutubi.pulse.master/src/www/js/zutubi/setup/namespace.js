@@ -82,7 +82,7 @@ if (window.Zutubi.setup === undefined)
                     },
                     error: function(jqXHR)
                     {
-                        Zutubi.setup.reportError("Could not update status: " + Zutubi.core.ajaxError(jqXHR));
+                        Zutubi.core.reportError("Could not update status: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 });
 
@@ -146,7 +146,7 @@ if (window.Zutubi.setup === undefined)
                     }
                     else
                     {
-                        Zutubi.setup.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
+                        Zutubi.core.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 }
             })
@@ -283,6 +283,8 @@ if (window.Zutubi.setup === undefined)
             init: function()
             {
                 app.notificationWidget = _createNotificationWidget();
+                Zutubi.core.registerFeedbackHandler(app.notificationWidget);
+
                 app.leftColumn = $("#left-column");
                 app.rightColumn = $("#right-column");
                 app.mainView = $("#main-view");
@@ -299,7 +301,7 @@ if (window.Zutubi.setup === undefined)
                     },
                     error: function(jqXHR)
                     {
-                        Zutubi.setup.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
+                        Zutubi.core.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 });
             },
@@ -367,24 +369,9 @@ if (window.Zutubi.setup === undefined)
                     },
                     error: function(jqXHR)
                     {
-                        Zutubi.setup.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
+                        Zutubi.core.reportError("Could not load: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 });
-            },
-
-            reportSuccess: function(message)
-            {
-                app.notificationWidget.success(message);
-            },
-
-            reportError: function(message)
-            {
-                app.notificationWidget.error(message);
-            },
-
-            reportWarning: function(message)
-            {
-                app.notificationWidget.warning(message);
             }
         };
     }(jQuery));

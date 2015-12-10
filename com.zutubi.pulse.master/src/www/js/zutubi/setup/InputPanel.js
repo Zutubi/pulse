@@ -103,7 +103,7 @@
 
         _checkClicked: function()
         {
-            Zutubi.config.checkConfig(null, this.options.model.type, this.form, this.checkForm, Zutubi.setup.reportError);
+            Zutubi.config.checkConfig(null, this.options.model.type, this.form, this.checkForm);
         }
     });
 }(jQuery));

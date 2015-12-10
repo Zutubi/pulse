@@ -167,7 +167,7 @@
                         }
                         else
                         {
-                            Zutubi.admin.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
+                            Zutubi.core.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
                         }
                     }
                 });
@@ -176,7 +176,7 @@
 
         _checkClicked: function()
         {
-            Zutubi.config.checkConfig(this.options.path, this.options.composite.type, this.form, this.checkForm, Zutubi.admin.reportError);
+            Zutubi.config.checkConfig(this.options.path, this.options.composite.type, this.form, this.checkForm);
         }
     });
 }(jQuery));

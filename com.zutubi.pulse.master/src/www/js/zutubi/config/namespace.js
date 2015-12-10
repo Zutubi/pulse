@@ -140,7 +140,7 @@ if (window.Zutubi.config === undefined)
                 return null;
             },
 
-            checkConfig: function(path, type, form, checkForm, errorCb)
+            checkConfig: function(path, type, form, checkForm)
             {
                 var properties = form.getValues(),
                     checkProperties = checkForm.getValues(),
@@ -181,7 +181,7 @@ if (window.Zutubi.config === undefined)
                         }
                         else
                         {
-                            errorCb("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
+                            Zutubi.core.reportError("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
                         }
                     }
                 });
