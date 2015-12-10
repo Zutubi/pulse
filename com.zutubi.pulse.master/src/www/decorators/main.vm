@@ -255,7 +255,7 @@
 
             function showStatus(message, type)
             {
-                if(type)
+                if (type)
                 {
                     var imageMap = {
                         'success': 'accept',
@@ -263,12 +263,16 @@
                         'warning': 'error',
                         'working': 'inprogress'
                     };
-                    message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="[' + type + ']"/> ' + message;
+                    message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="[' + type + ']"/> ' + Ext.util.Format.htmlEncode(message);
+                }
+                else
+                {
+                    message = Ext.util.Format.htmlEncode(message);
                 }
 
                 var component = Ext.getCmp('status-component');
                 component.show();
-                statusMessageEl.update(message);
+                statusMessageEl.update(message) ;
                 statusAreaEl.setVisible(true, true);
                 Ext.getCmp('nested-layout').doLayout();
             }

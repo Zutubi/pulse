@@ -90,9 +90,9 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
                 '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
                     '<td class="leftmost rightmost">' +
                         '{indent}' +
-                        '<img alt="{label}" src="{iconSrc}"/> ' +
+                        '<img alt="{label:htmlEncode}" src="{iconSrc}"/> ' +
                         '<tpl if="client">' +
-                            '<a href="#" id="{linkId}" onclick="{onclick}">{label}</a>' +
+                            '<a href="#" id="{linkId}">{label:htmlEncode}</a>' +
                         '</tpl>' +
                         '<tpl if="!client">' +
                             '<a href="{url}" id="{linkId}">{label}</a>' +
@@ -160,7 +160,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     
     renderLinks: function(links, categoryName)
     {
-        var i, l, args, idPrefix, action, handler;
+        var table = this, i, l, args, idPrefix, action, handler;
 
         for (i = 0, l = links.length; i < l; i++)
         {
@@ -192,16 +192,20 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             }
             else
             {
-                args.onclick = 'Ext.getCmp(\'' + this.id + '\').doAction(\'' + action;
-                if (args.argument)
-                {
-                    args.onclick += '\', \'' + args.argument;
-                }
-                args.onclick += '\'); return false';
                 args.client = true;
             }
-            
+
             this.rowTemplate.append(this.tbodyEl, args);
+            if (typeof handler === 'function')
+            {
+                Ext.get(args.linkId).dom.onclick = (function(args) {
+                    return function()
+                    {
+                        table.doAction(args.action, args.argument);
+                        return false;
+                    }
+                })(args);
+            }
         }
     },
     

@@ -210,6 +210,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                             success: function(data)
                             {
                                 showStatus(data.message, data.success ? 'success' : 'failure');
+                                panel.load();
                             }
                         });
                     }
@@ -219,13 +220,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         });
     },
 
-    triggerBuildWithPrompt: function(triggerHandle)
+    triggerBuildWithPrompt: function(triggerName)
     {
-        window.location = window.baseUrl + '/manualTrigger!input.action?projectId=' + this.projectId + '&triggerHandle=' + triggerHandle;
+        triggerBuild(this.data.status.name, triggerName, true, jQuery.proxy(this.load, this));
     },
 
-    triggerBuild: function(triggerHandle)
+    triggerBuild: function(triggerName)
     {
-        triggerBuild(this.projectId, triggerHandle);
+        console.dir(arguments);
+        triggerBuild(this.data.status.name, triggerName, false, jQuery.proxy(this.load, this));
     }
 });

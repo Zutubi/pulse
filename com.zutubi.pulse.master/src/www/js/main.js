@@ -376,7 +376,7 @@ function clearResponsibility(projectId)
     });
 }
 
-function triggerBuild(projectName, triggerName, prompt)
+function triggerBuild(projectName, triggerName, prompt, successCb)
 {
     var actionWindow;
 
@@ -385,6 +385,10 @@ function triggerBuild(projectName, triggerName, prompt)
         if (data.success)
         {
             Zutubi.core.reportSuccess(data.message);
+            if (successCb)
+            {
+                successCb();
+            }
         }
         else
         {

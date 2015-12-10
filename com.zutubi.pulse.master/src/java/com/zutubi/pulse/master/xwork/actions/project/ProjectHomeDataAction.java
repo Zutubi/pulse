@@ -259,7 +259,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         for (ManualTriggerConfiguration trigger: triggers)
         {
             String action = trigger.isPrompt() ? "triggerWithPrompt" : "trigger";
-            ActionLink actionLink = new ActionLink(action, trigger.getName(), ToveUtils.getActionIconName(ACTION_TRIGGER, contentRoot), Long.toString(trigger.getHandle()));
+            ActionLink actionLink = new ActionLink(action, trigger.getName(), ToveUtils.getActionIconName(ACTION_TRIGGER, contentRoot), trigger.getName());
             model.addAction(actionLink);
         }
     }
