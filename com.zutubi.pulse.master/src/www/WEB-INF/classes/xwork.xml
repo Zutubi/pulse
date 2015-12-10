@@ -615,17 +615,6 @@
             </result>
         </action>
 
-        <action name="generic" class="com.zutubi.pulse.master.tove.webwork.GenericAction">
-            <result name="input" type="flexjson">newPanel</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="chain" type="chain">
-                <param name="namespace">/ajax/action</param>
-                <param name="actionName">${customAction}</param>
-                <param name="method">input</param>
-            </result>
-        </action>
-        
         <action name="smartclone" class="com.zutubi.pulse.master.tove.webwork.CloneAction">
             <param name="smart">true</param>
             <result name="cancel" type="flexjson">configurationResponse</result>
@@ -643,17 +632,6 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
-        </action>
-
-        <action name="trigger" class="com.zutubi.pulse.master.tove.webwork.TriggerAction">
-            <result name="input" type="flexjson">newPanel</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="chain" type="chain">
-                <param name="namespace">/ajax/action</param>
-                <param name="actionName">${customAction}</param>
-                <param name="method">input</param>
-            </result>
         </action>
     </package>
 

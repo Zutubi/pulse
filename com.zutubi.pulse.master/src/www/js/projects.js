@@ -148,18 +148,6 @@ Zutubi.ConcreteProject.prototype = {
         return 'browse/projects/' + encodeURIComponent(this.data.name) + '/' + tab + '/';
     },
 
-    generateHandler: function(action, projectId, projectName, domId) {
-        var functionName;
-
-        functionName = 'gen_' + action + projectId;
-        window[functionName] = function() {
-            actionPath('projects/' + projectName, action, false, false);
-            Zutubi.FloatManager.showHideFloat('menus', domId);
-        };
-    
-        return functionName + '(); return false;';
-    },
-
     getMenuItems: function(menuType, menuArg, id) {
         var items, encodedName, i, trigger;
 

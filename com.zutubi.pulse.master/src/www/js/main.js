@@ -248,26 +248,6 @@ function runAjaxRequest(urlOrConfig)
     Ext.Ajax.request(config);
 }
 
-function actionPath(path, action, fromParent, onDescendants, argument)
-{
-    var url;
-
-    url = window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?' + action + '=input';
-    if (fromParent)
-    {
-        url += '&newPath=' + encodeURIPath(getParentPath(path));
-    }
-    if (onDescendants)
-    {
-        url += '&descendants=true';
-    }
-    if (argument)
-    {
-        url += '&argument=' + encodeURIComponent(argument);
-    }
-    runAjaxRequest(url);
-}
-
 function showHelp(path, type)
 {
     var helpPanel;

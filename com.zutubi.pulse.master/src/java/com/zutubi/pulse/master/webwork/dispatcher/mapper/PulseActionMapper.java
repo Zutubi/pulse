@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
-import com.opensymphony.xwork.ActionProxyFactory;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.agents.AgentsActionResolver;
@@ -14,13 +13,14 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.browse.BrowseActionReso
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
@@ -42,16 +42,6 @@ public class PulseActionMapper implements ActionMapper
     private ActionResolver browseActionResolver = new BrowseActionResolver();
     private ActionResolver serverActionResolver = new ServerActionResolver();
     private ActionResolver agentsActionResolver = new AgentsActionResolver();
-
-    // Pure config namespaces only, no hybrids here!
-    private static final Set<String> configNamespaces = new HashSet<>();
-    static
-    {
-        configNamespaces.add("/setupconfig");
-        configNamespaces.add("/ajax/config");
-        configNamespaces.add("/ajax/help");
-        configNamespaces.add("/ajax/template");
-    }
 
     private WebManager webManager = null;
 
@@ -79,11 +69,7 @@ public class PulseActionMapper implements ActionMapper
         }
 
         ActionMapping mapping = null;
-        if (configNamespaces.contains(namespace))
-        {
-            mapping = getConfigMapping(namespace, path, request.getQueryString());
-        }
-        else if("/".equals(namespace))
+        if("/".equals(namespace))
         {
             mapping = new ActionMapping("default", namespace, null, new HashMap());
         }
@@ -150,98 +136,6 @@ public class PulseActionMapper implements ActionMapper
         {
             throw new PulseRuntimeException(e);
         }
-    }
-
-    private ActionMapping getConfigMapping(String namespace, String path, String query)
-    {
-        return getConfigMapping(namespace, path, query, null);
-    }
-    
-    private ActionMapping getConfigMapping(String namespace, String path, String query, Map<String, String> params)
-    {
-        ActionMapping mapping = null;
-        if (path != null)
-        {
-            if(params == null)
-            {
-                params = new HashMap<>();
-            }
-
-            if (query != null)
-            {
-                // Strip parameter which is automatically added by Ext in some
-                // cases.
-                query = stripRandomParam(query);
-                query = collectExtraParameters(query, params);
-            }
-            
-            String[] actionSubmit = getActionSubmit(query, "display");
-            String requestedAction = actionSubmit[0];
-            params.put("submitField", actionSubmit[1]);
-            params.put("actionName", requestedAction);
-            params.put("path", path);
-            try
-            {
-                ActionProxyFactory.getFactory().createActionProxy(namespace, requestedAction, params);
-                mapping = new ActionMapping(requestedAction, namespace, null, params);
-            }
-            catch (Exception e)
-            {
-                // noop, action not mapped, go to generic action handling
-                mapping = new ActionMapping("generic", namespace, null, params);
-            }
-        }
-
-        return mapping;
-    }
-
-    private String stripRandomParam(String query)
-    {
-        return query.replaceAll("&?_dc=[0-9]+", "");
-    }
-
-    private String collectExtraParameters(String query, Map<String, String> params)
-    {
-        String[] queryElements = query.split("&");
-        if (queryElements.length > 1)
-        {
-            query = queryElements[0];
-            for (int i = 1; i < queryElements.length; i++)
-            {
-                String element = queryElements[i];
-                int index = element.indexOf('=');
-                if (index > 0)
-                {
-                    params.put(element.substring(0, index), element.substring(index + 1));
-                }
-            }
-        }
-        return query;
-    }
-
-    private String[] getActionSubmit(String query, String defaultAction)
-    {
-        String[] actionSubmit = new String[]{defaultAction, ""};
-        if (StringUtils.stringSet(query))
-        {
-            int index = query.indexOf('=');
-            if (index > 0)
-            {
-                actionSubmit[0] = query.substring(0, index);
-                actionSubmit[1] = query.substring(index + 1);
-
-                index = actionSubmit[1].indexOf('&');
-                if(index >= 0)
-                {
-                    actionSubmit[1] = actionSubmit[1].substring(0, index);
-                }
-            }
-            else
-            {
-                actionSubmit[0] = query;
-            }
-        }
-        return actionSubmit;
     }
 
     private ActionMapping getDashboardMapping(String encodedPath)
