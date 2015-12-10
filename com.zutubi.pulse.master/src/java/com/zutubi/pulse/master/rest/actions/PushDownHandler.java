@@ -22,7 +22,7 @@ public class PushDownHandler implements ActionHandler
     private ConfigurationRefactoringManager configurationRefactoringManager;
 
     @Override
-    public ActionModel getModel(String path)
+    public ActionModel getModel(String path, String variant)
     {
         if (!configurationRefactoringManager.canPushDown(path))
         {
@@ -37,7 +37,7 @@ public class PushDownHandler implements ActionHandler
     }
 
     @Override
-    public ActionResult doAction(String path, Map<String, Object> input)
+    public ActionResult doAction(String path, String variant, Map<String, Object> input)
     {
         Object childKeysValue = input.get(FIELD_CHILD_KEYS);
         if (childKeysValue == null || !(childKeysValue instanceof List) || ((List) childKeysValue).size() == 0)

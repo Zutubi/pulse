@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.rest.controllers.main;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.FormModelBuilder;
@@ -25,6 +28,7 @@ import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
@@ -286,7 +290,7 @@ public class ConfigActionsController
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
 
         ActionHandler handler = objectFactory.buildBean(handlerClass);
-        return new ResponseEntity<>(handler.getModel(configPath), HttpStatus.OK);
+        return new ResponseEntity<>(handler.getModel(configPath, null), HttpStatus.OK);
     }
 
     private ResponseEntity<ActionResultModel> postWithHandler(HttpServletRequest request, @RequestBody CompositeModel body, Class<? extends ActionHandler> handlerClass) throws TypeException
@@ -297,7 +301,7 @@ public class ConfigActionsController
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
 
         ActionHandler handler = objectFactory.buildBean(handlerClass);
-        ActionResult actionResult = handler.doAction(configPath, body.getProperties());
+        ActionResult actionResult = handler.doAction(configPath, null, body.getProperties());
 
         String newPath = null;
         CompositeModel model = null;
@@ -319,25 +323,33 @@ public class ConfigActionsController
     public ResponseEntity<ActionModel> getSingle(HttpServletRequest request) throws Exception
     {
         ActionContext context = createContext(request, true);
+        ActionModel model;
 
-        // Common actions including delete are not supported here.  So we don't need any of the
-        // extra logic such as s/delete/hide which can complicate creating action models in
-        // general.
-        Messages messages = Messages.getInstance(context.type.getClazz());
-        String label = messages.format(context.actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
-        ActionModel model = new ActionModel(context.actionName, label, null, actionManager.hasArgument(context.actionName, context.type));
-
-        if (context.action.hasArgument())
+        if (context.handler == null)
         {
-            CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
-            model.setForm(formModelBuilder.createForm(argumentType));
+            // Common actions including delete are not supported here.  So we don't need any of the
+            // extra logic such as s/delete/hide which can complicate creating action models in
+            // general.
+            Messages messages = Messages.getInstance(context.type.getClazz());
+            String label = messages.format(context.actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
+            model = new ActionModel(context.actionName, label, null, actionManager.hasArgument(context.actionName, context.type));
 
-            Configuration defaults = actionManager.prepare(context.actionName, context.instance);
-            if (defaults != null)
+            if (context.action.hasArgument())
             {
-                MutableRecord record = argumentType.unstantiate(defaults, null);
-                model.setFormDefaults(configModelBuilder.getProperties(null, argumentType, record));
+                CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
+                model.setForm(formModelBuilder.createForm(argumentType));
+
+                Configuration defaults = actionManager.prepare(context.actionName, context.instance);
+                if (defaults != null)
+                {
+                    MutableRecord record = argumentType.unstantiate(defaults, null);
+                    model.setFormDefaults(configModelBuilder.getProperties(null, argumentType, record));
+                }
             }
+        }
+        else
+        {
+            model = context.handler.getModel(context.path, context.variant);
         }
 
         return new ResponseEntity<>(model, HttpStatus.OK);
@@ -348,46 +360,56 @@ public class ConfigActionsController
     {
         ActionContext context = createContext(request, true);
 
-        Configuration argument = null;
-        if (context.action.hasArgument() && body != null)
+        ActionResult result = null;
+        if (context.handler == null)
         {
-            if (body instanceof CompositeModel)
+            Configuration argument = null;
+            if (context.action.hasArgument() && body != null)
             {
-                CompositeModel compositeBody = (CompositeModel) body;
-                CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
-                CompositeType bodyType;
-
-                if (compositeBody.getType() != null && compositeBody.getType().getSymbolicName() != null)
+                if (body instanceof CompositeModel)
                 {
-                    bodyType = typeRegistry.getType(compositeBody.getType().getSymbolicName());
-                }
-                else
-                {
-                    bodyType = argumentType;
-                }
+                    CompositeModel compositeBody = (CompositeModel) body;
+                    CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
+                    CompositeType bodyType;
 
-                if (argumentType.isAssignableFrom(bodyType))
-                {
-                    MutableRecord record = Utils.convertProperties(bodyType, null, compositeBody.getProperties());
-
-                    argument = configurationTemplateManager.validate(null, null, record, true, false);
-                    if (!argument.isValid())
+                    if (compositeBody.getType() != null && compositeBody.getType().getSymbolicName() != null)
                     {
-                        throw new ValidationException(argument);
+                        bodyType = typeRegistry.getType(compositeBody.getType().getSymbolicName());
+                    }
+                    else
+                    {
+                        bodyType = argumentType;
+                    }
+
+                    if (argumentType.isAssignableFrom(bodyType))
+                    {
+                        MutableRecord record = Utils.convertProperties(bodyType, null, compositeBody.getProperties());
+
+                        argument = configurationTemplateManager.validate(null, null, record, true, false);
+                        if (!argument.isValid())
+                        {
+                            throw new ValidationException(argument);
+                        }
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Action argument has unexpected type '" + bodyType + "' (expected '" + argumentType + "')");
                     }
                 }
                 else
                 {
-                    throw new IllegalArgumentException("Action argument has unexpected type '" + bodyType + "' (expected '" + argumentType + "')");
+                    throw new IllegalArgumentException("Action argument must be a composite (got '" + body.getClass().getSimpleName() + "')");
                 }
             }
-            else
-            {
-                throw new IllegalArgumentException("Action argument must be a composite (got '" + body.getClass().getSimpleName() + "')");
-            }
+
+            result = actionManager.execute(context.actionName, context.instance, argument);
+        }
+        else
+        {
+            Map<String, Object> input = body != null && body instanceof CompositeModel ? ((CompositeModel) body).getProperties() : null;
+            result = context.handler.doAction(context.path, context.variant, input);
         }
 
-        ActionResult result = actionManager.execute(context.actionName, context.instance, argument);
         return new ResponseEntity<>(new ActionResultModel(result, null, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
@@ -416,9 +438,9 @@ public class ConfigActionsController
         return new ResponseEntity<>(new ActionResultModel(failureCount == 0, message, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
-    private ActionContext createContext(HttpServletRequest request, boolean single)
+    private ActionContext createContext(HttpServletRequest request, boolean single) throws Exception
     {
-        ActionContext context = new ActionContext();
+        final ActionContext context = new ActionContext();
         String configPath = Utils.getConfigPath(request);
         if (configPath.length() == 0)
         {
@@ -428,6 +450,13 @@ public class ConfigActionsController
         String[] elements = PathUtils.getPathElements(configPath);
         context.actionName = PathUtils.getPath(0, 1, elements);
         context.path = PathUtils.getPath(1, elements);
+
+        int splitIndex = context.actionName.indexOf(":");
+        if (splitIndex > 0 && splitIndex < context.actionName.length() - 1)
+        {
+            context.variant = context.actionName.substring(splitIndex + 1);
+            context.actionName = context.actionName.substring(0, splitIndex);
+        }
 
         configurationSecurityManager.ensurePermission(context.path, AccessManager.ACTION_VIEW);
 
@@ -441,10 +470,44 @@ public class ConfigActionsController
 
             context.type = typeRegistry.getType(context.instance.getClass());
             ConfigurationActions configurationActions = actionManager.getConfigurationActions(context.type);
-            context.action = configurationActions.getAction(context.actionName);
-            if (context.action == null)
+            if (StringUtils.stringSet(context.variant))
             {
-                throw new IllegalArgumentException("Action '" + context.actionName + "' not valid for instance at path '" + context.path + "'");
+                List<ActionVariant> variants = configurationActions.getVariants(context.actionName, context.instance);
+                final Optional<ActionVariant> variant = Iterables.tryFind(variants, new Predicate<ActionVariant>()
+                {
+                    @Override
+                    public boolean apply(ActionVariant input)
+                    {
+                        return input.getName().equals(context.variant);
+                    }
+                });
+
+                if (!variant.isPresent())
+                {
+                    throw new IllegalArgumentException("Invalid variant '" + context.variant + "' for action '" + context.actionName + "' on path '" + context.path + "'");
+                }
+            }
+            else
+            {
+                context.action = configurationActions.getAction(context.actionName);
+                if (context.action == null)
+                {
+                    throw new IllegalArgumentException("Action '" + context.actionName + "' not valid for instance at path '" + context.path + "'");
+                }
+            }
+
+            // FIXME kendo in future move this into the normal actions class??  Or alongside the config class, or in a
+            // class specified in the ActionVariant.  We just need to move models down (as we do for wizards).
+            String handlerName = ActionHandler.class.getPackage().getName() + "." + context.type.getClazz().getSimpleName() + StringUtils.capitalise(context.actionName) + "Handler";
+            try
+            {
+                Class<?> candidateClass = Class.forName(handlerName);
+                Class<? extends ActionHandler> handlerClass = candidateClass.asSubclass(ActionHandler.class);
+                context.handler = objectFactory.buildBean(handlerClass);
+            }
+            catch (ClassNotFoundException | ClassCastException e)
+            {
+                // Expected, no custom handler
             }
         }
 
@@ -454,9 +517,13 @@ public class ConfigActionsController
     private static class ActionContext
     {
         String actionName;
+        String variant;
         String path;
         Configuration instance;
         CompositeType type;
+        // Only present for single, non-custom-handler actions
         ConfigurationAction action;
+        // Only present for single custom-handler actions.
+        ActionHandler handler;
     }
 }

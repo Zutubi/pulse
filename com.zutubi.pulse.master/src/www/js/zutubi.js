@@ -8,7 +8,6 @@
 // dependency: zutubi/layout/package.js
 // dependency: zutubi/table/package.js
 // dependency: zutubi/toolbar/package.js
-// dependency: zutubi/tree/package.js
 
 function getBuildMenuItem(buildLink, itemId, image)
 {
@@ -748,122 +747,6 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         });
     }
 }); }
-
-/**
- * Displays all plugins in a tree, handling selection and actions performed on
- * them.
- *
- * @cfg detailPanel panel to load plugin details into
- */
-Zutubi.PluginsTree = function(config)
-{
-    Zutubi.PluginsTree.superclass.constructor.call(this, config);
-};
-
-Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
-{
-    layout: 'fit',
-    border: false,
-    animate: false,
-    autoScroll: true,
-    bodyStyle: 'padding: 10px',
-
-    initComponent: function()
-    {
-        var config;
-        
-        config = {
-            loader: new Zutubi.fs.FSTreeLoader({
-                baseUrl: window.baseUrl
-            }),
-
-            root: new Ext.tree.AsyncTreeNode({
-                id: 'plugins',
-                baseName: 'plugins',
-                text: 'plugins',
-                iconCls: 'plugins-icon'
-            })
-        };
-
-        Ext.apply(this, config);
-        Ext.apply(this.initialConfig, config);
-
-        this.getSelectionModel().on('selectionchange', this.onPluginSelect);
-
-        Zutubi.PluginsTree.superclass.initComponent.apply(this, arguments);
-    },
-
-    selectPlugin: function(id)
-    {
-        this.getSelectionModel().select(this.getRootNode().findChild('baseName', id));
-    },
-
-    pluginAction: function(id, action)
-    {
-        var model, selectedNode, selectedId, pluginsTree;
-
-        model = this.getSelectionModel();
-        selectedNode = model.getSelectedNode();
-        selectedId = '';
-        if (selectedNode && selectedNode.parentNode)
-        {
-            selectedId = selectedNode.attributes.baseName;
-        }
-
-        pluginsTree = this;
-        runAjaxRequest({
-            url: window.baseUrl + '/ajax/admin/' + action + 'Plugin.action?id=' + id,
-
-            success: function()
-            {
-                pluginsTree.getRootNode().reload(function() {
-                    model.clearSelections();
-                    if (selectedId)
-                    {
-                        pluginsTree.selectPlugin(selectedId);
-                    }
-                    else
-                    {
-                        model.select(pluginsTree.getRootNode());
-                    }
-                });
-            },
-
-            failure: function()
-            {
-                showStatus('Unable to perform plugin action.', 'failure');
-            }
-        });
-    },
-
-    onPluginSelect: function(model, node)
-    {
-        var url;
-        
-        if (model.tree.detailPanel && node)
-        {
-            if(node.parentNode)
-            {
-                url = window.baseUrl + '/ajax/admin/viewPlugin.action?id=' + node.attributes.baseName;
-            }
-            else
-            {
-                url = window.baseUrl + '/ajax/admin/allPlugins.action';
-            }
-
-            model.tree.detailPanel.load({
-                url: url,
-                scripts: true,
-                callback: function(element, success) {
-                    if(!success)
-                    {
-                        showStatus('Could not get plugin details.', 'failure');
-                    }
-                }
-            });
-        }
-    }
-});
 
 /**
  * Generates the pulse header bar, which includes the bread crumbs, user details

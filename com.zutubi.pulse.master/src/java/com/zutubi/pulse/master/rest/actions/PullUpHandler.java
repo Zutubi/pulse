@@ -19,7 +19,7 @@ public class PullUpHandler implements ActionHandler
     private ConfigurationRefactoringManager configurationRefactoringManager;
 
     @Override
-    public ActionModel getModel(String path)
+    public ActionModel getModel(String path, String variant)
     {
         if (!configurationRefactoringManager.canPullUp(path))
         {
@@ -60,7 +60,7 @@ public class PullUpHandler implements ActionHandler
     }
 
     @Override
-    public ActionResult doAction(String path, Map<String, Object> input)
+    public ActionResult doAction(String path, String variant, Map<String, Object> input)
     {
         String ancestorKey = validate(path, input);
         configurationRefactoringManager.pullUp(path, ancestorKey);

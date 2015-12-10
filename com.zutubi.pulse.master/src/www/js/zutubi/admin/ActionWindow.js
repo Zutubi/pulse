@@ -25,9 +25,13 @@
             else
             {
                 actionPart = "single/" + options.action.action;
+                if (options.action.variant)
+                {
+                    actionPart += ":" + options.action.variant;
+                }
             }
 
-            that.url = "/api/action/" + actionPart + "/" + Zutubi.config.encodePath(options.path);
+            that.url = "/api/action/" + Zutubi.config.encodePath(actionPart + "/" + options.path);
 
             WorkflowWindow.fn.init.call(that, {
                 url: that.url,
@@ -44,6 +48,10 @@
             var that = this,
                 wrapper = $("<div></div>");
 
+            // It's important to add this element to the DOM before rendering a form in it, as it
+            // needs a width for downstream calculations to work.
+            el.append(wrapper);
+
             that.action = data;
 
             that.form = wrapper.kendoZaForm({
@@ -55,7 +63,6 @@
             }).data("kendoZaForm");
 
             that.form.bind("enterPressed", jQuery.proxy(that.complete, that));
-            el.append(wrapper);
         },
 
         _translateProperties: function()

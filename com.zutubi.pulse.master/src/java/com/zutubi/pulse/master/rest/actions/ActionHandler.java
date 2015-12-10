@@ -12,6 +12,6 @@ import java.util.Map;
  */
 public interface ActionHandler
 {
-    ActionModel getModel(String path);
-    ActionResult doAction(String path, Map<String, Object> input);
+    ActionModel getModel(String path, String variant);
+    ActionResult doAction(String path, String variant, Map<String, Object> input);
 }

@@ -335,7 +335,7 @@
             }
             else if (e.descendant)
             {
-                this._executeAction(e.path, action, true);
+                this._executeAction(e.path, e.action, true);
             }
             else if (action.inputRequired)
             {
@@ -363,12 +363,18 @@
 
         _executeAction: function(path, action, descendant)
         {
-            var that = this;
+            var that = this,
+                actionPart = action.action;
+
+            if (action.variant)
+            {
+                actionPart += ":" + action.variant;
+            }
 
             Zutubi.core.ajax({
                 type: "POST",
                 maskAll: true,
-                url: "/api/action/" + (descendant ? "descendant" : "single") + "/" + action.action + "/" + Zutubi.config.encodePath(path),
+                url: "/api/action/" + (descendant ? "descendant" : "single") + "/" + Zutubi.config.encodePath(actionPart + "/" + path),
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {

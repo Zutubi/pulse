@@ -33,9 +33,15 @@
         _adjustWidth: function()
         {
             var widgetEl = this.element.closest(".k-widget"),
+                parentWidth = widgetEl.parent().width(),
                 width;
 
-            width = Math.min(widgetEl.parent().width(), this.list.width() + 40);
+            if (parentWidth !== 0)
+            {
+                // Parent is probably not yet in the DOM, so we can't cap our width.
+                width = Math.min(parentWidth, this.list.width() + 40);
+            }
+
             this.list.width(width - 1);
             widgetEl.width(width);
         },

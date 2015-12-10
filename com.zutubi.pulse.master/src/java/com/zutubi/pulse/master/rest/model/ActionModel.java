@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Models an action that can be invoked on a configuration.  Note there may be multiple actions
- * with the same 'action', but they will have different 'argument' values for variants.
+ * with the same 'action', but they will have different 'variant's.
  *
  * FIXME kendo should replace ActionLink
  */
