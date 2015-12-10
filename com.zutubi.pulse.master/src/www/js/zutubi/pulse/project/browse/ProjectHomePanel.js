@@ -192,47 +192,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         Ext.getCmp(this.id + '-main').getLayout().checkRows();
         Ext.getCmp(this.id + '-right').getLayout().checkRows();
     },
-    
-    handleAjaxResponse: function(options, success, response)
-    {
-        var result,
-            message,
-            messageType;
 
-        if (success)
-        {
-            result = Ext.util.JSON.decode(response.responseText);
-            if (result.success)
-            {
-                if (result.status)
-                {
-                    message = result.status.message;
-                    messageType = result.status.type;
-                }
-                else if (result.detail)
-                {
-                    message = result.detail;
-                    messageType = 'success';
-                }
-
-                if (message)
-                {
-                    showStatus(message, messageType);
-                }
-
-                this.load();
-            }
-            else
-            {
-                showStatus(Ext.util.Format.htmlEncode(result.status.message || result.detail), 'failure');
-            }
-        }
-        else
-        {
-            showStatus('Cannot contact server', 'failure');
-        }
-    },
-    
     markForClean: function()
     {
         var panel = this;
@@ -244,10 +204,13 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                     if (btn === 'yes')
                     {
                         showStatus('Cleaning up build directories...', 'working');
-                        runAjaxRequest({
-                            url: window.baseUrl + '/ajax/config/projects/' + encodeURIComponent(panel.data.status.name) + '?clean=clean',
-                            callback: panel.handleAjaxResponse,
-                            scope: panel
+                        Zutubi.core.ajax({
+                            type: "POST",
+                            url: '/api/action/single/clean/projects/' + encodeURIComponent(panel.data.status.name),
+                            success: function(data)
+                            {
+                                showStatus(data.message, data.success ? 'success' : 'failure');
+                            }
                         });
                     }
             },

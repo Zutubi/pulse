@@ -101,9 +101,13 @@
                     {
                         loginThenRetryAjax(resolvedOptions);
                     }
-                    else
+                    else if (options.error)
                     {
                         options.error.apply(this, arguments);
+                    }
+                    else
+                    {
+                        Zutubi.core.reportError("Error: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 }
             });

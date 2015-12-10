@@ -2,6 +2,7 @@
 #authorisationTags($principle)
 #projectTags($project)
 <content tag="header.javascript">
+    zutubi/config/package.js
     zutubi/pulse/project/browse/ProjectHomePanel.js
 </content>
 <html>
