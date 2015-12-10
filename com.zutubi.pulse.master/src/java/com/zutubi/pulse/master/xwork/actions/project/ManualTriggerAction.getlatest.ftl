@@ -1,3 +1,4 @@
+ <#--FIXME kendo-->
 ${form.name}.items.last().on('getlatest', function(field)
 {
     var statusEl = Ext.get('latest.revision.status');

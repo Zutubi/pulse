@@ -176,19 +176,6 @@
             <result name="success" type="velocity">/view-changelist.vm</result>
         </action>
 
-        <action name="manualTrigger!input" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction" method="doInput">
-            <interceptor-ref name="completeSideEffectStack"/>
-            <result name="input" type="velocity">/manual-trigger.vm</result>
-            <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
-        </action>
-
-        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
-            <interceptor-ref name="completeSideEffectStack"/>
-            <result name="input" type="velocity">/manual-trigger.vm</result>
-            <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
-            <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
-        </action>
-
         <action name="viewArtifact" class="com.zutubi.pulse.master.xwork.actions.project.ViewDecoratedArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-artifact.vm</result>
@@ -526,13 +513,6 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
-        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
-            <interceptor-ref name="ajaxSideEffectStack"/>
-            <param name="ajax">true</param>
-            <result name="input" type="flexjson">result</result>
-            <result name="success" type="flexjson">result</result>
-        </action>
-
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
@@ -704,15 +684,6 @@
 
         <action name="manualTrigger" class="com.zutubi.pulse.master.tove.webwork.help.ManualTriggerHelpAction">
             <result name="success" type="velocity">type.vm</result>
-        </action>
-    </package>
-
-    <package name="actionAjax" namespace="/ajax/action" extends="configAjax">
-        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
-            <param name="ajax">true</param>
-            <result name="input" type="flexjson">newPanel</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
         </action>
     </package>
 
