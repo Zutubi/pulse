@@ -1,17 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.*;
 
 public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 {

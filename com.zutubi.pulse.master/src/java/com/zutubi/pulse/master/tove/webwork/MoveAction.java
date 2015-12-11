@@ -5,7 +5,6 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -76,7 +75,7 @@ public class MoveAction extends ToveFormActionSupport
         field.setLabel(I18N.format(FIELD_NEW_TEMPLATE_PARENT_KEY + ".label"));
         List<String> templates = configurationRefactoringManager.getMoveTemplates(path);
         Collections.sort(templates, new Sort.StringComparator());
-        field.addParameter(OptionFieldDescriptor.PARAMETER_LIST, templates);
+        field.addParameter("list", templates);
         field.setValue(newTemplateParentKey);
         form.add(field);
     }

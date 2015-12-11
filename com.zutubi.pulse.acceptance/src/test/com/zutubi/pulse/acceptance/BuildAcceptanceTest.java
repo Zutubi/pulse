@@ -41,6 +41,7 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
@@ -86,9 +87,9 @@ import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -571,7 +572,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertEquals(asPair("property1", "value1"), detailsPage.getCustomField(0));
         assertTrue(detailsPage.isDependenciesTablePresent());
         
-        detailsPage.clickStageAndWait(ProjectConfigurationWizard.DEFAULT_STAGE);
+        detailsPage.clickStageAndWait(DEFAULT_STAGE);
         assertFalse(detailsPage.isBuildBasicsPresent());
         assertTrue(detailsPage.isStageBasicsPresent());
         assertEquals(asPair("status", "failure"), detailsPage.getStageBasicsRow(0));
@@ -582,7 +583,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(detailsPage.isCustomFieldsTablePresent());
         assertEquals(asPair("stageproperty1", "value1"), detailsPage.getCustomField(0));
 
-        detailsPage.clickCommandAndWait(ProjectConfigurationWizard.DEFAULT_STAGE, ProjectConfigurationWizard.DEFAULT_COMMAND);
+        detailsPage.clickCommandAndWait(DEFAULT_STAGE, ProjectConfigurationWizard.DEFAULT_COMMAND);
         assertFalse(detailsPage.isBuildBasicsPresent());
         assertFalse(detailsPage.isStageBasicsPresent());
         assertTrue(detailsPage.isCommandBasicsPresent());
@@ -1550,7 +1551,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.FAILURE, build);
-        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.FAILURE, DEFAULT_STAGE, build.get("stages"));
         assertStageState(ResultState.CANCELLED, "another-stage", build.get("stages"));
     }
 
@@ -1568,7 +1569,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.SUCCESS, build);
 
-        assertStageState(ResultState.SUCCESS, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.SUCCESS, DEFAULT_STAGE, build.get("stages"));
         assertStageState(ResultState.SUCCESS, "another-stage", build.get("stages"));
     }
 
@@ -1588,7 +1589,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.FAILURE, build);
-        assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
+        assertStageState(ResultState.FAILURE, DEFAULT_STAGE, build.get("stages"));
         assertStageState(ResultState.CANCELLED, "another-stage", build.get("stages"));
     }
 

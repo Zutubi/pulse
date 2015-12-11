@@ -2,13 +2,9 @@ package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.rest.model.forms.OptionFieldModel;
-import com.zutubi.pulse.master.tove.model.Descriptor;
-import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.annotation.Annotation;
@@ -29,56 +25,6 @@ public class OptionAnnotationHandler extends FieldAnnotationHandler
     {
         return true;
     }
-
-    // FIXME kendo old version
-    public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
-    {
-        super.process(annotatedType, annotation, descriptor);
-
-        OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
-        if (!field.isLazy())
-        {
-            OptionProvider optionProvider = OptionProviderFactory.build(annotatedType, field.getProperty().getType(), annotation, objectFactory);
-            Configuration instance = null;
-            String baseName = field.getBaseName();
-            if(baseName != null && configurationProvider != null)
-            {
-                instance = configurationProvider.get(PathUtils.getPath(field.getParentPath(), baseName), Configuration.class);
-            }
-
-            process(field, optionProvider, instance);
-        }
-    }
-
-    protected void process(OptionFieldDescriptor field, OptionProvider optionProvider, Object instance)
-    {
-        String parentPath = field.getParentPath();
-        TypeProperty fieldTypeProperty = field.getProperty();
-
-        FormContext context = instance == null ? new FormContext(parentPath) : new FormContext((Configuration) instance);
-        List optionList = optionProvider.getOptions(fieldTypeProperty, context);
-        field.setList(optionList);
-
-        Object emptyOption = optionProvider.getEmptyOption(fieldTypeProperty, context);
-        if (emptyOption != null)
-        {
-            field.setEmptyOption(emptyOption);
-        }
-
-        String key = optionProvider.getOptionValue();
-        if (key != null)
-        {
-            field.setListKey(key);
-        }
-
-        String value = optionProvider.getOptionText();
-        if (value != null)
-        {
-            field.setListValue(value);
-        }
-    }
-
-
 
     public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception
     {

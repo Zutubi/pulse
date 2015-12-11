@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
-import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -27,9 +26,6 @@ public interface AnnotationHandler
      * @return true iff this handler requires context to process a field
      */
     boolean requiresContext(Annotation annotation);
-
-    // FIXME kendo old version, to be removed.
-    void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception;
 
     void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field, FormContext context) throws Exception;
 }

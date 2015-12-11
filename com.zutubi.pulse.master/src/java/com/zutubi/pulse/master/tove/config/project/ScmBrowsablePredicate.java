@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -32,12 +31,6 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     private ScmManager scmManager;
     private ProjectManager projectManager;
     private ConfigurationTemplateManager configurationTemplateManager;
-
-    @Override
-    public boolean satisfied(FieldDescriptor field, FieldAction annotation)
-    {
-        return false;
-    }
 
     @Override
     public boolean satisfied(FieldModel field, FieldAction annotation, FormContext context)

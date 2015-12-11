@@ -50,7 +50,6 @@
     <bean id="stateDisplayRenderer" class="com.zutubi.pulse.master.tove.webwork.StateDisplayRenderer"/>
     <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager"/>
 
-    <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" init-method="init"/>
     <bean id="configModelBuilder" class="com.zutubi.pulse.master.rest.ConfigModelBuilder"/>
     <bean id="formModelBuilder" class="com.zutubi.pulse.master.rest.FormModelBuilder"/>
     <bean id="tableModelBuilder" class="com.zutubi.pulse.master.rest.TableModelBuilder"/>

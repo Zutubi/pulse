@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
-import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.bean.BeanException;
@@ -20,19 +19,6 @@ public class FieldAnnotationHandler implements AnnotationHandler
     public boolean requiresContext(Annotation annotation)
     {
         return false;
-    }
-
-    public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
-    {
-        // Collect all of the annotations fields in a map and add them to the descriptor.
-        Map<String, Object> map = AnnotationUtils.collectPropertiesFromAnnotation(annotation);
-        for(Map.Entry<String, Object> entry: map.entrySet())
-        {
-            if(!entry.getKey().equals("type"))
-            {
-                descriptor.addParameter(entry.getKey(), entry.getValue());
-            }
-        }
     }
 
     @Override

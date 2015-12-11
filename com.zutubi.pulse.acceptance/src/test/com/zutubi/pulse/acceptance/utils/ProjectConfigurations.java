@@ -8,11 +8,12 @@ import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
 import java.io.File;
+
+import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.*;
 
 /**
  * The project configurations instance provides the acceptance tests with a set of

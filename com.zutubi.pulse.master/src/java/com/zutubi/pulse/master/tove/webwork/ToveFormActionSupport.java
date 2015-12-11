@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.SubmitFieldDescriptor;
 import com.zutubi.tove.annotations.FieldType;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -163,7 +162,7 @@ public abstract class ToveFormActionSupport extends ToveActionSupport
         field.setValue(value);
         if (isDefault)
         {
-            field.addParameter(SubmitFieldDescriptor.PARAM_DEFAULT, true);
+            field.addParameter("default", true);
         }
 
         form.add(field);

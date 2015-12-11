@@ -41,7 +41,6 @@
 
             <interceptor name="prepare" class="com.zutubi.pulse.master.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.zutubi.pulse.master.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="prototypeWizard" class="com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.master.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="noCache" class="com.zutubi.pulse.master.xwork.interceptor.NoCacheInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.master.xwork.interceptor.ErrorHandlingInterceptor"/>
@@ -187,34 +186,6 @@
                 <interceptor-ref name="completeReadOnlyStack"/>
                 <interceptor-ref name="ajax"/>
                 <interceptor-ref name="errorHanding"/>
-            </interceptor-stack>
-
-            <interceptor-stack name="configWizardStack">
-                <interceptor-ref name="hibernateSession"/>
-                <interceptor-ref name="prepare"/>
-                <interceptor-ref name="servlet-config"/>
-                <interceptor-ref name="chain"/>
-                <interceptor-ref name="model-driven"/>
-                <interceptor-ref name="fileUpload"/>
-                <interceptor-ref name="static-params"/>
-                <interceptor-ref name="params"/> <!-- needs to be here twice. First time, wizardAction is populated. Second time, the updates to the stack provided by the prototypeWizard Interceptor -->
-                <interceptor-ref name="prototypeWizard"/>
-                <interceptor-ref name="params"/>
-                <interceptor-ref name="cancel"/>
-                <interceptor-ref name="conversionError"/>
-                <interceptor-ref name="validation">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
-                <interceptor-ref name="workflow">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
-                <interceptor-ref name="errorHanding"/>
-            </interceptor-stack>
-
-            <interceptor-stack name="ajaxConfigWizardStack">
-                <interceptor-ref name="ajax"/>
-                <interceptor-ref name="configWizardStack"/>
-                <interceptor-ref name="configErrorHandling"/>
             </interceptor-stack>
         </interceptors>
 

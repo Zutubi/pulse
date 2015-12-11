@@ -20,7 +20,6 @@ public class RootFileObject extends StaticMappingFileObject
     public static final String NODE_PROJECT_CONFIGS = PREFIX_CONFIG + "projects";
     public static final String NODE_REFERENCE       = "reference";
     public static final String NODE_TEMPLATES       = "templates";
-    public static final String NODE_WIZARDS         = "wizards";
 
     static
     {
@@ -33,7 +32,6 @@ public class RootFileObject extends StaticMappingFileObject
         nodesDefinitions.put(NODE_PROJECT_CONFIGS, ProjectConfigsFileObject.class);
         nodesDefinitions.put(NODE_REFERENCE, ReferenceRootFileObject.class);
         nodesDefinitions.put(NODE_TEMPLATES, TemplateScopesFileObject.class);
-        nodesDefinitions.put(NODE_WIZARDS, WizardsFileObject.class);
     }
 
     public RootFileObject(final FileName name, final AbstractFileSystem fs)

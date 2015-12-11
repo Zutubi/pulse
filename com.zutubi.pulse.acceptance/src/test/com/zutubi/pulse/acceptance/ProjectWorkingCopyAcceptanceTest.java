@@ -16,10 +16,10 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.DEFAULT_RECIPE;
+import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 
 /**
  * Tests for the working copy functionality.

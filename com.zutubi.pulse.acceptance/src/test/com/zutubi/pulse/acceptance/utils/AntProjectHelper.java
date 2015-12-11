@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
+import com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 
 public class AntProjectHelper extends ProjectConfigurationHelper
 {

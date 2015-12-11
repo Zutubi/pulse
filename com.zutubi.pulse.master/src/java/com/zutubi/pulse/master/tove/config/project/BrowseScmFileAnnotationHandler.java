@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.model.Descriptor;
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.StringUtils;
@@ -23,17 +21,6 @@ public class BrowseScmFileAnnotationHandler implements AnnotationHandler
     public boolean requiresContext(Annotation annotation)
     {
         return false;
-    }
-
-    @Override
-    public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
-    {
-        FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
-        BrowseScmFileAction action = (BrowseScmFileAction) annotation;
-        if (StringUtils.stringSet(action.baseDirField()))
-        {
-            fieldDescriptor.addParameter(PARAMETER_BASE_DIR, action.baseDirField());
-        }
     }
 
     @Override

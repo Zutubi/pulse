@@ -4,7 +4,6 @@ import com.google.common.base.Function;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
-import com.zutubi.pulse.master.tove.model.ControllingCheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
 import com.zutubi.tove.annotations.FieldType;
@@ -240,7 +239,7 @@ public class CloneAction extends ToveFormActionSupport
                 String nameField = KEY_FIELD_PREFIX + key;
 
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
-                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_CHECKED_FIELDS, getDependentFields(nameField, node));
+                field.addParameter("checkedFields", getDependentFields(nameField, node));
                 field.setLabel(I18N.format("cloneDescendant.label", key));
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {

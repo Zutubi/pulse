@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
-import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -16,12 +15,6 @@ public class WizardIgnoreAnnotationHandler implements AnnotationHandler
     public boolean requiresContext(Annotation annotation)
     {
         return false;
-    }
-
-    @Override
-    public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
-    {
-        // FIXME kendo remove this old version
     }
 
     @Override

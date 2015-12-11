@@ -6,7 +6,6 @@ import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.NewLabelConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.tove.model.SubmitFieldDescriptor;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.type.CompositeType;
@@ -168,7 +167,7 @@ public class SaveLabelAction extends SaveAction
         field.setValue(value);
         if (isDefault)
         {
-            field.addParameter(SubmitFieldDescriptor.PARAM_DEFAULT, true);
+            field.addParameter("default", true);
         }
 
         form.add(field);
