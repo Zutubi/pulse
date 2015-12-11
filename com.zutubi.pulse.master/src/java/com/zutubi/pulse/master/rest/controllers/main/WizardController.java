@@ -251,7 +251,8 @@ public class WizardController
 
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ConfigurationWizard wizard = buildWizard(context.getPostableType());
-        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), templateOwnerPath, configurationTemplateManager.isConcrete(templateOwnerPath), body);
+        boolean concrete = templateOwnerPath == null || configurationTemplateManager.isConcrete(templateOwnerPath);
+        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), templateOwnerPath, concrete, body);
 
         return configurationTemplateManager.insertRecord(configPath, record);
     }
