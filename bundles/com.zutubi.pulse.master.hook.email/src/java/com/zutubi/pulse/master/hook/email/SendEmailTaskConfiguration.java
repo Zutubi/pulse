@@ -266,14 +266,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
     private void addContactEmail(UserConfiguration user, Set<String> emails)
     {
-        ContactConfiguration primaryContact = find(user.getPreferences().getContacts().values(), new Predicate<ContactConfiguration>()
-        {
-            public boolean apply(ContactConfiguration contactConfiguration)
-            {
-                return contactConfiguration.isPrimary();
-            }
-        }, null);
-
+        ContactConfiguration primaryContact = user.getPrimaryContact();
         if (primaryContact != null && primaryContact instanceof EmailContactConfiguration)
         {
             emails.add(((EmailContactConfiguration) primaryContact).getAddress());

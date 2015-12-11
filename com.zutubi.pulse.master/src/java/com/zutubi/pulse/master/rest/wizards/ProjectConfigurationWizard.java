@@ -39,16 +39,18 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class ProjectConfigurationWizard implements ConfigurationWizard
 {
+    private  static final String KEY_SCM = "scm";
+    private static final String KEY_TYPE = "type";
+
     private WizardModelBuilder wizardModelBuilder;
-    private TypeRegistry typeRegistry;
 
     @Override
     public WizardModel buildModel(CompositeType type, FormContext context) throws TypeException
     {
         WizardModel model = new WizardModel();
         model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
-        model.appendStep(wizardModelBuilder.buildStepForType("scm", typeRegistry.getType(ScmConfiguration.class), context));
-        model.appendStep(wizardModelBuilder.buildStepForType("type", typeRegistry.getType(TypeConfiguration.class), context));
+        model.appendStep(wizardModelBuilder.buildStepForClass(KEY_SCM, ScmConfiguration.class, context));
+        model.appendStep(wizardModelBuilder.buildStepForClass(KEY_TYPE, TypeConfiguration.class, context));
         return model;
     }
 
@@ -56,8 +58,8 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
         MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateOwnerPath, concrete, models, "");
-        projectRecord.put("scm", wizardModelBuilder.buildAndValidateRecord(typeRegistry.getType(ScmConfiguration.class), parentPath, templateOwnerPath, concrete, models, "scm"));
-        projectRecord.put("type", wizardModelBuilder.buildAndValidateRecord(typeRegistry.getType(TypeConfiguration.class), parentPath, templateOwnerPath, concrete, models, "type"));
+        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(ScmConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_SCM));
+        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(TypeConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_TYPE));
         return projectRecord;
     }
 
@@ -79,11 +81,12 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     private static final String PROPERTY_SCM = "scm";
     private static final String PROPERTY_STAGES = "stages";
     private static final String PROPERTY_TRIGGERS = "triggers";
-    private static final String PROPERTY_TYPE = "type";
+    private static final String PROPERTY_TYPE = KEY_TYPE;
 
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
+    private TypeRegistry typeRegistry;
 
     private CommandExtensionManager commandExtensionManager;
     private String templateParentPath = null;

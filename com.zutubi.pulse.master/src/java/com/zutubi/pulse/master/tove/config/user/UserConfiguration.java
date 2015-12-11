@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.model.Role;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.Extendable;
@@ -9,6 +11,8 @@ import com.zutubi.validation.annotations.Required;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * Configuration for a user of Pulse, including account details and the
@@ -128,6 +132,18 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     public void setPreferences(UserPreferencesConfiguration preferences)
     {
         this.preferences = preferences;
+    }
+
+    @Transient
+    public ContactConfiguration getPrimaryContact()
+    {
+        return find(preferences.getContacts().values(), new Predicate<ContactConfiguration>()
+        {
+            public boolean apply(ContactConfiguration contactConfiguration)
+            {
+                return contactConfiguration.isPrimary();
+            }
+        }, null);
     }
 
     public Map<String, Object> getExtensions()

@@ -22,6 +22,8 @@ import java.util.Set;
  */
 public class BuildHookConfigurationWizard implements ConfigurationWizard
 {
+    private static final String KEY_TASK = "task";
+
     private WizardModelBuilder wizardModelBuilder;
     private TypeRegistry typeRegistry;
 
@@ -30,7 +32,7 @@ public class BuildHookConfigurationWizard implements ConfigurationWizard
     {
         WizardModel model = new WizardModel();
         model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
-        TypedWizardStepModel taskStep = wizardModelBuilder.buildStepForType("task", typeRegistry.getType(BuildHookTaskConfiguration.class), context);
+        TypedWizardStepModel taskStep = wizardModelBuilder.buildStepForClass(KEY_TASK, BuildHookTaskConfiguration.class, context);
         for (WizardTypeModel taskModel: taskStep.getTypes())
         {
             CompositeType taskType = typeRegistry.getType(taskModel.getType().getSymbolicName());
@@ -53,7 +55,7 @@ public class BuildHookConfigurationWizard implements ConfigurationWizard
     public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
         MutableRecord hookRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateOwnerPath, concrete, models, "");
-        hookRecord.put("task", wizardModelBuilder.buildAndValidateRecord(typeRegistry.getType(BuildHookTaskConfiguration.class), parentPath, templateOwnerPath, concrete, models, "task"));
+        hookRecord.put(KEY_TASK, wizardModelBuilder.buildAndValidateRecord(BuildHookTaskConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_TASK));
         return hookRecord;
     }
 

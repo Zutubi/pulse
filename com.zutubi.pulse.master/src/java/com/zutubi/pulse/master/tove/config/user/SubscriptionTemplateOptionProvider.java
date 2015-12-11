@@ -23,7 +23,7 @@ public class SubscriptionTemplateOptionProvider extends MapOptionProvider
 
     protected Map<String, String> getMap(TypeProperty property, FormContext context)
     {
-        Map<String, String> options = new HashMap<String, String>();
+        Map<String, String> options = new HashMap<>();
         for (TemplateInfo template : buildResultRenderer.getAvailableTemplates(false))
         {
             options.put(template.getTemplate(), template.getDisplay());

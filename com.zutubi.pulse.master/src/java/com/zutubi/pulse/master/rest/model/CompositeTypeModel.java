@@ -81,6 +81,16 @@ public class CompositeTypeModel extends TypeModel
         return simplePropertyDefaults;
     }
 
+    public void addSimplePropertyDefault(String name, Object value)
+    {
+        if (simplePropertyDefaults == null)
+        {
+            simplePropertyDefaults = new HashMap<>();
+        }
+
+        simplePropertyDefaults.put(name, value);
+    }
+
     public void setSimplePropertyDefaults(Map<String, Object> simplePropertyDefaults)
     {
         this.simplePropertyDefaults = simplePropertyDefaults;

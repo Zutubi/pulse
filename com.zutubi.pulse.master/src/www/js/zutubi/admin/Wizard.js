@@ -48,6 +48,11 @@
                 };
             });
 
+            if (config.defaultType)
+            {
+                this.selectedTypeIndex = this.indexOfType(config.defaultType);
+            }
+
             this.valuesByType = jQuery.map(config.types, function(type)
             {
                 return type.type.simplePropertyDefaults || {};
@@ -104,11 +109,21 @@
 
         indexOfTypeLabel: function(label)
         {
+            return this.indexOfTypeProperty("label", label);
+        },
+
+        indexOfType: function(symbolicName)
+        {
+            return this.indexOfTypeProperty("symbolicName", symbolicName);
+        },
+
+        indexOfTypeProperty: function(name, value)
+        {
             var index = 0;
 
             jQuery.each(this.types, function(i, type)
             {
-                if (type.label === label)
+                if (type[name] === value)
                 {
                     index = i;
                     return false;
@@ -322,13 +337,19 @@
 
             this.currentStepIndex = index;
             validTypeLabels = step.validTypeLabels(that._typesByKey());
-            if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0)
+            if (validTypeLabels.length > 0)
             {
-                step.selectedTypeIndex = step.indexOfTypeLabel(validTypeLabels[0]);
-            }
+                if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0) {
+                    step.selectedTypeIndex = step.indexOfTypeLabel(validTypeLabels[0]);
+                }
 
-            this._updateTypeSelect(validTypeLabels);
-            this._showTypeAtIndex(step.selectedTypeIndex);
+                this._updateTypeSelect(validTypeLabels);
+                this._showTypeAtIndex(step.selectedTypeIndex);
+            }
+            else
+            {
+                this._forward();
+            }
         },
 
         _updateTypeSelect: function(labels)

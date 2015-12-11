@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.pulse.master.cleanup.config.AbstractCleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
+import com.zutubi.pulse.master.rest.wizards.UserConfigurationCreator;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -189,6 +190,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             MapType userCollection = new MapType(registerConfigurationType(UserConfiguration.class), typeRegistry);
             configurationPersistenceManager.register(USERS_SCOPE, userCollection);
+            registerConfigurationType(UserConfigurationCreator.class);
 
             // contacts configuration
             registerConfigurationType(EmailContactConfiguration.class);

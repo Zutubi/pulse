@@ -36,6 +36,12 @@ public class WizardModelBuilder
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager;
 
+    public TypedWizardStepModel buildStepForClass(String key, Class<? extends Configuration> clazz, FormContext context)
+    {
+
+        return buildStepForType(key, getCompositeType(clazz), context);
+    }
+
     public TypedWizardStepModel buildStepForType(String key, CompositeType type, FormContext context)
     {
         List<CompositeType> types;
@@ -57,6 +63,11 @@ public class WizardModelBuilder
             step.addType(new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context), messages.format(labelKey)));
         }
         return step;
+    }
+
+    public MutableRecord buildRecord(String templateOwnerPath, Class<? extends Configuration> clazz, String key, CompositeModel model) throws TypeException
+    {
+        return buildRecord(templateOwnerPath, getCompositeType(clazz), key, model);
     }
 
     public MutableRecord buildRecord(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException
@@ -109,6 +120,11 @@ public class WizardModelBuilder
         return Utils.convertProperties(actualType, templateOwnerPath, model.getProperties());
     }
 
+    public MutableRecord buildAndValidateRecord(Class<? extends Configuration> clazz, String parentPath, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
+    {
+        return buildAndValidateRecord(getCompositeType(clazz), parentPath, templateOwnerPath, concrete, models, key);
+    }
+
     public MutableRecord buildAndValidateRecord(CompositeType type, String parentPath, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
     {
         MutableRecord record = buildRecord(templateOwnerPath, type, key, models.get(key));
@@ -118,6 +134,11 @@ public class WizardModelBuilder
             throw new ValidationException(instance, key);
         }
         return record;
+    }
+
+    public Configuration buildInstance(String templateOwnerPath, Class<? extends Configuration> expectedClazz, String key, CompositeModel model) throws TypeException
+    {
+        return buildInstance(templateOwnerPath, getCompositeType(expectedClazz), key, model);
     }
 
     public Configuration buildInstance(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException
@@ -148,6 +169,16 @@ public class WizardModelBuilder
 
             instance.addInstanceError(message);
         }
+    }
+
+    private CompositeType getCompositeType(Class<? extends Configuration> clazz)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Class '" + clazz + "' is not registered as a type");
+        }
+        return type;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

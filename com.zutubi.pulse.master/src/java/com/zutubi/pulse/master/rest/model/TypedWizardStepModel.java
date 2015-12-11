@@ -14,6 +14,7 @@ import java.util.List;
 public class TypedWizardStepModel extends WizardStepModel
 {
     private List<WizardTypeModel> types = new ArrayList<>();
+    private String defaultType;
 
     public TypedWizardStepModel(String key, String label)
     {
@@ -28,5 +29,15 @@ public class TypedWizardStepModel extends WizardStepModel
     public void addType(WizardTypeModel type)
     {
         types.add(type);
+    }
+
+    public String getDefaultType()
+    {
+        return defaultType;
+    }
+
+    public void setDefaultType(String defaultType)
+    {
+        this.defaultType = defaultType;
     }
 }
