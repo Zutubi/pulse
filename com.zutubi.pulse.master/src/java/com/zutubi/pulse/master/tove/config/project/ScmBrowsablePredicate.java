@@ -10,20 +10,13 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.model.FieldDescriptor;
-import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
-import com.zutubi.pulse.master.vfs.provider.pulse.RootFileObject;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.commons.vfs.FileSystemManager;
-import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.Collections;
 import java.util.Set;
@@ -36,7 +29,6 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
 {
     private static final Logger LOG = Logger.getLogger(ScmBrowsablePredicate.class);
 
-    private FileSystemManager fileSystemManager;
     private ScmManager scmManager;
     private ProjectManager projectManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -44,63 +36,52 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     @Override
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
-        return satisfied(field.getPath(), field.getBaseName());
+        return false;
     }
 
     @Override
     public boolean satisfied(FieldModel field, FieldAction annotation, FormContext context)
     {
-        // FIXME kendo
-        return false;
-//        String path = field.getPath();
-//        return satisfied(path, path == null ? null : PathUtils.getBaseName(path));
+        String closestExistingPath = context.getClosestExistingPath();
+        if (closestExistingPath == null)
+        {
+            return false;
+        }
+
+        String[] elements = PathUtils.getPathElements(closestExistingPath);
+        if (elements.length < 2)
+        {
+            return false;
+        }
+
+        String projectName = elements[1];
+        return satisfied(projectName);
     }
 
-    private boolean satisfied(String path, String baseName)
+    private boolean satisfied(String projectName)
     {
-        String projectPath;
-        if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(path)))
-        {
-            if(StringUtils.stringSet(baseName))
-            {
-                projectPath = RootFileObject.PREFIX_CONFIG + path;
-            }
-            else
-            {
-                projectPath = RootFileObject.NODE_WIZARDS + "/" + path;
-            }
-        }
-        else
-        {
-            projectPath = RootFileObject.PREFIX_CONFIG + PathUtils.getPath(0, 2, PathUtils.getPathElements(path));
-        }
-
         Set<ScmCapability> capabilities = Collections.emptySet();
         try
         {
-            AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + UriParser.encode(projectPath));
-            ProjectConfigProvider projectConfigProvider = (ProjectConfigProvider)pfo;
-            if (projectConfigProvider != null && projectConfigProvider.getProjectConfig() != null)
+            ProjectConfiguration projectConfig = projectManager.getProjectConfig(projectName, false);
+            if (projectConfig != null && projectConfig.getScm() != null)
             {
-                ProjectConfiguration projectConfig = projectConfigProvider.getProjectConfig();
                 ScmConfiguration config = projectConfig.getScm();
-                if (config != null && configurationTemplateManager.isDeeplyCompleteAndValid(config))
+                Project project = projectManager.getProject(projectConfig.getProjectId(), false);
+                if (project == null)
                 {
-                    Project project = projectManager.getProject(projectConfig.getProjectId(), true);
-                    if (project == null)
+                    // Template project.
+                    capabilities = ScmClientUtils.withScmClient(config, scmManager, new ScmClientUtils.ScmContextualAction<Set<ScmCapability>>()
                     {
-                        capabilities = ScmClientUtils.withScmClient(config, scmManager, new ScmClientUtils.ScmContextualAction<Set<ScmCapability>>()
+                        public Set<ScmCapability> process(ScmClient scmClient, ScmContext context) throws ScmException
                         {
-                            public Set<ScmCapability> process(ScmClient scmClient, ScmContext context) throws ScmException
-                            {
-                                return scmClient.getCapabilities(context);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        capabilities = ScmClientUtils.getCapabilities(projectConfig, project.getState(), scmManager);
-                    }
+                            return scmClient.getCapabilities(context);
+                        }
+                    });
+                }
+                else
+                {
+                    capabilities = ScmClientUtils.getCapabilities(projectConfig, project.getState(), scmManager);
                 }
             }
         }
@@ -110,11 +91,6 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
         }
 
         return capabilities.contains(ScmCapability.BROWSE);
-    }
-
-    public void setFileSystemManager(FileSystemManager fileSystemManager)
-    {
-        this.fileSystemManager = fileSystemManager;
     }
 
     public void setScmManager(ScmManager scmManager)
