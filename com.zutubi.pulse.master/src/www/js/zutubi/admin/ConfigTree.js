@@ -562,7 +562,7 @@
                     model = delta.models[path];
                     path = that._absoluteToConfigPath(path);
                     info = that._infoForConfigPath(path);
-                    if (info.found)
+                    if (info.found && !info.embedded)
                     {
                         // Update to a node, e.g. collection reorder. Refresh.
                         that._updateItem(path, info.item, _cloneAndTranslate(model));

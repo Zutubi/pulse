@@ -360,7 +360,7 @@ public class ConfigActionsController
     {
         ActionContext context = createContext(request, true);
 
-        ActionResult result = null;
+        ActionResult result;
         if (context.handler == null)
         {
             Configuration argument = null;

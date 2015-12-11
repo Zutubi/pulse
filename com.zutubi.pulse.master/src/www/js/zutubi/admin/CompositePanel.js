@@ -6,6 +6,7 @@
 {
     var Observable = kendo.Observable,
         CANCELLED = "cancelled",
+        APPLIED = "applied",
         SAVED = "saved",
         ns = ".kendoCompositePanel",
         CLICK = "click" + ns;
@@ -106,6 +107,7 @@
 
         events: [
             CANCELLED,
+            APPLIED,
             SAVED
         ],
 
@@ -137,7 +139,10 @@
         _submitClicked: function(e)
         {
             var that = this,
-                properties;
+                composite,
+                type,
+                properties,
+                hookFn;
 
             if (e.value === "cancel")
             {
@@ -145,29 +150,33 @@
             }
             else
             {
+                composite = that.options.composite;
+                type = composite.type;
                 properties = that.form.getValues();
-                Zutubi.config.coerceProperties(properties, that.options.composite.type.simpleProperties);
+                Zutubi.config.coerceProperties(properties, type.simpleProperties);
 
-                Zutubi.core.ajax({
-                    type: "PUT",
-                    maskAll: true,
-                    url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=1",
-                    data: {kind: "composite", properties: properties},
-                    success: function(data)
+                hookFn = Zutubi.config.saveHookForType(type.symbolicName);
+                hookFn({
+                    path: that.options.path,
+                    composite: composite,
+                    properties: properties,
+                    success: function(delta)
                     {
-                        that.trigger(SAVED, {delta: data});
+                        that.trigger(composite.keyed ? APPLIED : SAVED, {delta: delta});
                     },
-                    error: function(jqXHR)
+                    invalid: function(validationErrors)
                     {
-                        var details = Zutubi.config.getValidationErrors(jqXHR);
-
-                        if (details)
+                        that.form.showValidationErrors(validationErrors);
+                    },
+                    cancel: function()
+                    {
+                        if (composite.keyed)
                         {
-                            that.form.showValidationErrors(details.validationErrors);
+                            that.form.resetValues();
                         }
                         else
                         {
-                            Zutubi.core.reportError("Could not save configuration: " + Zutubi.core.ajaxError(jqXHR));
+                            that.trigger(CANCELLED);
                         }
                     }
                 });

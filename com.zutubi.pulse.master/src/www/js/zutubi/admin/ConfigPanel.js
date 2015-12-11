@@ -239,6 +239,12 @@
             that.contentPanel.bind("saved", function(e)
             {
                 that.applyDelta(e.delta);
+                that._openPath(Zutubi.config.parentPath(that.path));
+            });
+
+            that.contentPanel.bind("applied", function(e)
+            {
+                that.applyDelta(e.delta);
                 that._clearContent();
                 that._showComposite(e.delta.models[that.path]);
             });

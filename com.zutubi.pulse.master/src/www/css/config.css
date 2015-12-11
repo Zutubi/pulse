@@ -375,20 +375,6 @@ ul.k-form-validation-errors {
     line-height: 14px;
 }
 
-/* Workflow Window */
-
-.k-workflow-content {
-    padding: 0.4em;
-}
-
-.k-workflow-actions {
-    text-align: center;
-}
-
-.k-workflow-actions .k-button {
-    margin: 0.4em;
-}
-
 /* Delete Window */
 
 .k-cleanup-tasks {

@@ -24,8 +24,8 @@
 
             that.view = new kendo.View(
                 '<div style="display: none">' +
-                    '<div class="k-workflow-content"></div>' +
-                    '<div class="k-workflow-actions"></div>' +
+                    '<div class="k-dialog-window-content"></div>' +
+                    '<div class="k-dialog-window-actions"></div>' +
                 '</div>',
                 {wrap: false});
 
@@ -37,7 +37,6 @@
             title: "",
             continueLabel: "ok",
             buttonTemplate: '<button id="#: id #" value="#: name #"><span class="k-sprite"></span> #: name #</button>',
-            id: "workflow-window",
             width: 400
         },
 
@@ -84,7 +83,7 @@
                 success: function (data)
                 {
                     that.mask(false);
-                    that.options.render(data, that.element.find(".k-workflow-content"));
+                    that.options.render(data, that.element.find(".k-dialog-window-content"));
                     that._renderButtons();
                     that.window.center();
                 },
@@ -110,7 +109,7 @@
         _renderButtons: function()
         {
             var that = this,
-                parentElement = that.element.find(".k-workflow-actions"),
+                parentElement = that.element.find(".k-dialog-window-actions"),
                 buttonElement;
 
             buttonElement = $(that.buttonTemplate({name: that.options.continueLabel, id: that.options.id + "-continue"}));
@@ -124,10 +123,7 @@
             parentElement.append(buttonElement);
             buttonElement.kendoButton({
                 spriteCssClass: "fa fa-times-circle",
-                click: function()
-                {
-                    that.close();
-                }
+                click: jQuery.proxy(that.close, that)
             });
         }
     });

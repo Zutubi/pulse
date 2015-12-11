@@ -23,6 +23,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Spring web controller for the /config subset of the RESTish API.
@@ -43,28 +47,82 @@ public class ConfigController
     @Autowired
     private ConfigurationTemplateManager configurationTemplateManager;
     @Autowired
+    private RecordManager recordManager;
+    @Autowired
     private ConfigModelBuilder configModelBuilder;
 
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     public ResponseEntity<ConfigModel[]> get(HttpServletRequest request,
                                            @RequestParam(value = "filter", required = false) String[] filters,
+                                           @RequestParam(value = "predicate", required = false) String[] predicates,
                                            @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
 
         filters = canonicaliseFilters(filters);
 
+        List<ConfigModel> models = new ArrayList<>();
+        if (configPath.contains(PathUtils.SEPARATOR + PathUtils.WILDCARD_ANY_ELEMENT))
+        {
+            Set<String> paths = recordManager.selectAll(configPath).keySet();
+            configurationSecurityManager.filterPaths("", paths, AccessManager.ACTION_VIEW);
+            for (String path: paths)
+            {
+                ConfigModel model = getConfigModel(path, predicates, filters, depth);
+                if (model != null)
+                {
+                    models.add(model);
+                }
+            }
+        }
+        else
+        {
+            configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_VIEW);
+            ConfigModel model = getConfigModel(configPath, predicates, filters, depth);
+            if (model != null)
+            {
+                models.add(model);
+            }
+        }
+
+        return new ResponseEntity<>(models.toArray(new ConfigModel[models.size()]), HttpStatus.OK);
+    }
+
+    private ConfigModel getConfigModel(String configPath, String[] predicates, String[] filters, int depth) throws TypeException
+    {
         // We can model anything with a type, even if it is not an existing path yet.
-        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_VIEW);
         ComplexType type = Utils.getType(configPath, configurationTemplateManager);
 
         String parentPath = PathUtils.getParentPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
         Record record = configurationTemplateManager.isPersistent(configPath) ? configurationTemplateManager.getRecord(configPath) : null;
+        if (predicates != null)
+        {
+            if (record == null || !recordMatchesPredicates(record, predicates))
+            {
+                return null;
+            }
+        }
 
-        ConfigModel model = configModelBuilder.buildModel(filters, configPath, type, parentType, record, depth);
+        return configModelBuilder.buildModel(filters, configPath, type, parentType, record, depth);
+    }
 
-        return new ResponseEntity<>(new ConfigModel[]{model}, HttpStatus.OK);
+    private boolean recordMatchesPredicates(Record record, String[] predicates)
+    {
+        for (String predicate: predicates)
+        {
+            String[] parts = StringUtils.split(predicate, '=', false);
+            if (parts.length == 2)
+            {
+                Object value = record.get(parts[0]);
+                if (value == null || !value.toString().equals(parts[1]))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     // PUT <path> to update composite, or set the order of a collection.

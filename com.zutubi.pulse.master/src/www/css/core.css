@@ -10,6 +10,20 @@
     text-align: right;
 }
 
+/* Prompt Window */
+
+.k-dialog-window-content {
+    padding: 0.4em;
+}
+
+.k-dialog-window-actions {
+    text-align: center;
+}
+
+.k-dialog-window-actions .k-button {
+    margin: 0.4em;
+}
+
 /* Footer bar */
 
 #footer {

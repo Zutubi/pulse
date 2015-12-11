@@ -244,7 +244,7 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
      * @param action the action to filter by
      * @return the passed in list, which will have been modified in place
      */
-    public List<String> filterPaths(String prefix, List<String> paths, String action)
+    public <T extends Iterable<String>> T filterPaths(String prefix, T paths, String action)
     {
         Iterator<String> it = paths.iterator();
         while(it.hasNext())

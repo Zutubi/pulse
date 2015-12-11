@@ -8,7 +8,7 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
  * Labels are used for freeform categorisation.
  */
 @SymbolicName("zutubi.labelConfig")
-@Form(fieldOrder = "label", actionName = "saveLabel")
+@Form(fieldOrder = "label")
 public class LabelConfiguration extends AbstractConfiguration
 {
     private String label;

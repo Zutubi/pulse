@@ -597,14 +597,6 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="saveLabel" class="com.zutubi.pulse.master.tove.webwork.SaveLabelAction">
-            <result name="composite" type="flexjson">configurationResponse</result>
-            <result name="map" type="flexjson">configurationResponse</result>
-            <result name="input" type="flexjson">configurationErrors</result>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="rename" type="flexjson">configurationPanel</result>
-        </action>
-
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
