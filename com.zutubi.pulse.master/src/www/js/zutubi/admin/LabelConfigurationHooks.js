@@ -6,7 +6,7 @@
     {
         var message, allLabel, window;
 
-        if (labelCount == 1)
+        if (labelCount === 1)
         {
             message = "There is another label with this name, rename both labels or just this one?";
             allLabel = "rename both labels";

@@ -162,6 +162,15 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     {
         var table = this, i, l, args, idPrefix, action, handler;
 
+        function createClickHandler(args)
+        {
+            return function()
+            {
+                table.doAction(args.action, args.argument);
+                return false;
+            };
+        }
+
         for (i = 0, l = links.length; i < l; i++)
         {
             args = Ext.apply({}, links[i]);
@@ -198,13 +207,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             this.rowTemplate.append(this.tbodyEl, args);
             if (typeof handler === 'function')
             {
-                Ext.get(args.linkId).dom.onclick = (function(args) {
-                    return function()
-                    {
-                        table.doAction(args.action, args.argument);
-                        return false;
-                    }
-                })(args);
+                Ext.get(args.linkId).dom.onclick = createClickHandler(args);
             }
         }
     },

@@ -149,7 +149,7 @@ if (window.Zutubi.setup === undefined)
                         Zutubi.core.reportError("Could not continue setup: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 }
-            })
+            });
         }
 
         function _showInputPanel(data)
@@ -265,7 +265,7 @@ if (window.Zutubi.setup === undefined)
             _pollStatus();
         }
 
-        propertyRenderers["data"] = function(data)
+        propertyRenderers.data = function(data)
         {
             var div = $('<div class="temp config-file"></div>');
             div.append('<p><span class="fa fa-info-circle prop-info"></span> Using configuration file <span class="filename">' + kendo.htmlEncode(data.properties.configPath) + '</span></p>');

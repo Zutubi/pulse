@@ -227,7 +227,6 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
 
     triggerBuild: function(triggerName)
     {
-        console.dir(arguments);
         triggerBuild(this.data.status.name, triggerName, false, jQuery.proxy(this.load, this));
     }
 });

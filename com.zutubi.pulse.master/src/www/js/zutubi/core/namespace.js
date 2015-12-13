@@ -38,6 +38,6 @@ if (window.Zutubi.core === undefined)
             {
                 feedbackHandlers.warning(message);
             }
-        }
+        };
     }(jQuery));
 }

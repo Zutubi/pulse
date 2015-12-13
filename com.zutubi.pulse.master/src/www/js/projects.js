@@ -151,6 +151,15 @@ Zutubi.ConcreteProject.prototype = {
     getMenuItems: function(menuType, menuArg, id) {
         var items, encodedName, i, trigger;
 
+        function createClickHandler(project, trigger)
+        {
+            return function() {
+                Zutubi.FloatManager.showHideFloat('menus', id);
+                triggerBuild(project, trigger.name, trigger.prompt);
+                return false;
+            };
+        }
+
         if (menuType === 'actions')
         {
             encodedName = encodeURIComponent(this.data.name);
@@ -191,13 +200,7 @@ Zutubi.ConcreteProject.prototype = {
                     items.push({
                         id: Ext.util.Format.htmlEncode(trigger.name),
                         image: 'lightning.gif',
-                        onclick: (function(project, trigger) {
-                                     return function() {
-                                         Zutubi.FloatManager.showHideFloat('menus', id);
-                                         triggerBuild(project, trigger.name, trigger.prompt);
-                                         return false;
-                                     }
-                                 })(this.data.name, trigger)
+                        onclick: createClickHandler(this.data.name, trigger)
                     });
                 }
             }

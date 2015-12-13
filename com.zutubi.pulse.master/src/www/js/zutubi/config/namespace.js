@@ -243,6 +243,6 @@ if (window.Zutubi.config === undefined)
             {
                 return saveHooksByType[type] || Zutubi.config.saveConfig;
             }
-        }
+        };
     }(jQuery));
 }
