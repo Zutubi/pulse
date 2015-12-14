@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.upgrade;
 
 import com.zutubi.pulse.master.util.monitor.*;
-import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,9 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DefaultUpgradeManager implements UpgradeManager
 {
-    private static final Logger LOG = Logger.getLogger(UpgradeManager.class);
-
-    private static final AtomicBoolean upgradeExecuted = new AtomicBoolean(false);
+    private final AtomicBoolean upgradeExecuted = new AtomicBoolean(false);
 
     private List<UpgradeableComponentSource> upgradeableSources = new ArrayList<>();
 
