@@ -1,1 +1,0 @@
-<img src='${base}/images/accept.gif'/> <span class="config-check-success">configuration ok</span>
