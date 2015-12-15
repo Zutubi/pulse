@@ -37,7 +37,6 @@
     <ul style="list-style: circle; width: 720px">
         <li>Template hiearchy refactoring (e.g. smart clone, move).</li>
         <li>Template decoration of forms (showing what is inherited/overridden and from where).</li>
-        <li>Configuration state display.</li>
         <li>Field actions (e.g. browsing for files).</li>
         <li>Plugin administration.</li>
         <li>Built-in documentation.</li>

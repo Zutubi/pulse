@@ -1567,29 +1567,13 @@ public class RemoteApi
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
 
-            Hashtable<String, String> result = new Hashtable<String, String>();
-            ComplexType type = configurationTemplateManager.getType(path);
-            if (type instanceof CollectionType)
+            Map<String, Object> configState = stateDisplayManager.getConfigState(instance);
+            Hashtable<String, String> result = new Hashtable<>(configState.size());
+            for (Map.Entry<String, Object> entry: configState.entrySet())
             {
-                CompositeType itemType = (CompositeType) type.getTargetType();
-                @SuppressWarnings("unchecked")
-                Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
-                Configuration parentInstance = configurationProvider.get(PathUtils.getParentPath(path), Configuration.class);
-                List<String> fields = stateDisplayManager.getCollectionDisplayFields(itemType, items, parentInstance);
-                for (String field: fields)
-                {
-                    result.put(field, stateDisplayManager.formatCollection(field, itemType, items, parentInstance).toString());
-                }
+                result.put(entry.getKey(), entry.getValue().toString());
             }
-            else
-            {
-                List<String> fields = stateDisplayManager.getDisplayFields(instance);
-                for (String field: fields)
-                {
-                    result.put(field, stateDisplayManager.format(field, instance).toString());
-                }
-            }
-            
+
             return result;
         }
         finally

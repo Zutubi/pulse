@@ -11,8 +11,8 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class ConfigurationStateManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationStateManager.class);
 
-    private Map<Class<? extends Configuration>, ExternalStateManager<?>> managers = new HashMap<Class<? extends Configuration>, ExternalStateManager<?>>();
+    private Map<Class<? extends Configuration>, ExternalStateManager<?>> managers = new HashMap<>();
 
     private TransactionManager transactionManager;
     private TypeRegistry typeRegistry;
@@ -47,7 +47,7 @@ public class ConfigurationStateManager
 
     public List<Class<? extends Configuration>> getStatefulConfigurationTypes()
     {
-        return new LinkedList<Class<? extends Configuration>>(managers.keySet());
+        return new ArrayList<>(managers.keySet());
     }
 
     /**

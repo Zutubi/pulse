@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
@@ -64,6 +65,7 @@ public class ConfigModelBuilder
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationDocsManager configurationDocsManager;
+    private StateDisplayManager stateDisplayManager;
 
     public ConfigModel buildModel(String[] filters, String path, int depth) throws TypeException
     {
@@ -158,6 +160,19 @@ public class ConfigModelBuilder
         if (isFieldSelected(filters, "hiddenItems"))
         {
             addHiddenItems(path, type, record, model);
+        }
+
+        if (isFieldSelected(filters, "state"))
+        {
+            Configuration instance = configurationTemplateManager.getInstance(path);
+            if (instance != null)
+            {
+                Map<String, Object> configState = stateDisplayManager.getConfigState(instance);
+                if (configState.size() > 0)
+                {
+                    model.setState(new StateModel(configState, Messages.getInstance(type.getTargetType().getClazz())));
+                }
+            }
         }
 
         return model;
@@ -296,6 +311,15 @@ public class ConfigModelBuilder
         if (isFieldSelected(filters, "links"))
         {
             model.setLinks(linkManager.getLinks(instance));
+        }
+
+        if (isFieldSelected(filters, "state"))
+        {
+            Map<String, Object> configState = stateDisplayManager.getConfigState(instance);
+            if (configState.size() > 0)
+            {
+                model.setState(new StateModel(configState, Messages.getInstance(type.getClazz())));
+            }
         }
 
         return model;
@@ -747,6 +771,11 @@ public class ConfigModelBuilder
     public void setConfigurationDocsManager(ConfigurationDocsManager configurationDocsManager)
     {
         this.configurationDocsManager = configurationDocsManager;
+    }
+
+    public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
+    {
+        this.stateDisplayManager = stateDisplayManager;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>

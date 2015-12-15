@@ -5,6 +5,10 @@
     border: solid 1px #eee;
 }
 
+.k-property-table .k-title {
+    font-weight: bold;
+}
+
 .k-property-table th {
     font-weight: bold;
     text-align: right;

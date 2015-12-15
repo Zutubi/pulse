@@ -25,6 +25,8 @@
                 '<div id="#: id #" class="k-collection-panel">' +
                     '<button id="#: id #-add" class="k-collection-add"><span class="k-sprite"></span> add</button>' +
                     '<h1>#: label #</h1>' +
+                    '<div style="display:none" class="k-state-wrapper">' +
+                    '</div>' +
                     '<div id="#: id #-table"></div>' +
                     '<div id="#: id #-hidden-wrapper" class="k-collection-hidden" style="display: none">' +
                         '<h1>hidden items</h1>' +
@@ -50,6 +52,17 @@
             else
             {
                 that.addElement.hide();
+            }
+
+            if (collection.state && collection.state.fields)
+            {
+                stateWrapper = that.view.element.find(".k-state-wrapper");
+                stateWrapper.kendoZaPropertyTable({
+                    id: "composite-state",
+                    title: collection.state.label,
+                    data: collection.state.fields
+                }).data("kendoZaPropertyTable");
+                stateWrapper.show();
             }
 
             that.table = $("#collection-table").kendoZaTable({

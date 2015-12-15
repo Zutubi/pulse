@@ -26,6 +26,8 @@
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-composite-panel">' +
                     '<h1>#: label #</h1>' +
+                    '<div style="display:none" class="k-state-wrapper">' +
+                    '</div>' +
                     '<div id="#: id #-form"></div>' +
                     '<div style="display:none" id="#: id #-checkwrapper" class="k-check-wrapper">' +
                         '<h1>check configuration</h1>' +
@@ -48,6 +50,17 @@
                 });
 
             that.view.render($(options.containerSelector));
+
+            if (composite.state && composite.state.fields)
+            {
+                stateWrapper = that.view.element.find(".k-state-wrapper");
+                stateWrapper.kendoZaPropertyTable({
+                    id: "composite-state",
+                    title: composite.state.label,
+                    data: composite.state.fields
+                }).data("kendoZaPropertyTable");
+                stateWrapper.show();
+            }
 
             that.form = $("#composite-form").kendoZaForm({
                 parentPath: Zutubi.config.parentPath(options.path),

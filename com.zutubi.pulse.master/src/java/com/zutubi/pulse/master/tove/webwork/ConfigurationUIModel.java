@@ -44,7 +44,6 @@ public class ConfigurationUIModel
     private LinkManager linkManager;
     private ActionManager actionManager;
     private StateDisplayManager stateDisplayManager;
-    private StateDisplayRenderer stateDisplayRenderer;
     private SystemPaths systemPaths;
 
     private Record record;
@@ -341,20 +340,6 @@ public class ConfigurationUIModel
         Collections.sort(descendantActions, new ActionLinkComparator());
     }
 
-    public Object format(String fieldName)
-    {
-        if (type instanceof CollectionType)
-        {
-            @SuppressWarnings("unchecked")
-            Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
-            return stateDisplayRenderer.renderCollection(fieldName, (CompositeType) targetType, items, configurationProvider.get(parentPath, Configuration.class));
-        }
-        else
-        {
-            return stateDisplayRenderer.render(fieldName, instance);
-        }
-    }
-
     public boolean isConfigurationCheckAvailable()
     {
         return configurationCheckAvailable;
@@ -577,11 +562,6 @@ public class ConfigurationUIModel
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
-    }
-
-    public void setStateDisplayRenderer(StateDisplayRenderer stateDisplayRenderer)
-    {
-        this.stateDisplayRenderer = stateDisplayRenderer;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>

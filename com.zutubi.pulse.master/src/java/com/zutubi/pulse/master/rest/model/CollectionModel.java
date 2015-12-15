@@ -16,6 +16,7 @@ public class CollectionModel extends ConfigModel
     private TableModel table;
     private List<String> allowedActions;
     private List<HiddenItemModel> hiddenItems;
+    private StateModel state;
 
     public CollectionModel()
     {
@@ -74,5 +75,15 @@ public class CollectionModel extends ConfigModel
         }
 
         hiddenItems.add(model);
+    }
+
+    public StateModel getState()
+    {
+        return state;
+    }
+
+    public void setState(StateModel state)
+    {
+        this.state = state;
     }
 }

@@ -241,6 +241,66 @@
     background-color: #8ebc00;
 }
 
+/* State Display */
+
+.k-state-wrapper {
+    margin: 1em 0 1.5em 0;
+}
+
+.k-state-wrapper .k-property-table {
+    width: 100%;
+}
+
+.k-state-wrapper .k-property-table .k-title {
+    font-weight: normal;
+    background-color: #f8f8f8;
+}
+
+.k-state-wrapper .k-property-table th {
+    width: 1%;
+    white-space: nowrap;
+    font-weight: normal;
+}
+
+.k-state-wrapper .k-list-limiter {
+    max-height: 10.5em;
+    overflow: scroll;
+}
+
+.k-simple-value-list {
+    padding-left: 1em;
+    list-style-type: disc;
+}
+
+.k-simple-value-list li, .k-property-list li {
+    margin: 0.3em 0;
+}
+
+.k-property-list ul {
+    padding-left: 1.4em;
+}
+
+.k-property-list .k-expanded, .k-property-list .k-collapsed {
+    cursor: pointer;
+}
+
+.k-property-list > li:before {
+    font-family: 'FontAwesome';
+    margin-right: 0.4em;
+}
+
+.k-property-list > li.k-expanded:before {
+    content: '\f0d7';
+}
+
+.k-property-list > li.k-collapsed:before {
+    content: '\f0da';
+}
+
+.k-property-list .k-collapsed ul {
+    display: none;
+}
+
 /* Forms */
 
 table.k-form {

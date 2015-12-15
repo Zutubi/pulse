@@ -21,6 +21,7 @@ public class CompositeModel extends ConfigModel
     private List<ActionModel> actions;
     private List<ActionModel> descendantActions;
     private List<ConfigurationLink> links;
+    private StateModel state;
 
     public CompositeModel()
     {
@@ -120,5 +121,15 @@ public class CompositeModel extends ConfigModel
         {
             this.links = null;
         }
+    }
+
+    public StateModel getState()
+    {
+        return state;
+    }
+
+    public void setState(StateModel state)
+    {
+        this.state = state;
     }
 }

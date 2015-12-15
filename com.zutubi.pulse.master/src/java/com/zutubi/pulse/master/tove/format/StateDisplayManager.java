@@ -2,9 +2,13 @@ package com.zutubi.pulse.master.tove.format;
 
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.StateDisplay;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.CollectionType;
+import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -21,10 +25,47 @@ public class StateDisplayManager
 
     private static final String UNABLE_TO_FORMAT = "<unable to format>";
 
-    private Map<CompositeType, StateDisplayFields> fieldsByType = new HashMap<CompositeType, StateDisplayFields>();
+    private Map<CompositeType, StateDisplayFields> fieldsByType = new HashMap<>();
     private ObjectFactory objectFactory;
     private TypeRegistry typeRegistry;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
+    /**
+     * Gets and formats all state fields for the given instance.  The instance may be either a
+     * collection or composite, but must be persistent (i.e. have a defined path).
+     *
+     * @param instance the instance to get the state fields for
+     * @return a mapping from field name to value for all state for the instance
+     */
+    public Map<String, Object> getConfigState(Configuration instance)
+    {
+        Map<String, Object> result = new HashMap<>();
+
+        String path = instance.getConfigurationPath();
+        ComplexType type = configurationTemplateManager.getType(path);
+        if (type instanceof CollectionType)
+        {
+            CompositeType itemType = (CompositeType) type.getTargetType();
+            @SuppressWarnings("unchecked")
+            Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
+            Configuration parentInstance = configurationTemplateManager.getInstance(PathUtils.getParentPath(path), Configuration.class);
+            List<String> fields = getCollectionDisplayFields(itemType, items, parentInstance);
+            for (String field: fields)
+            {
+                result.put(field, formatCollection(field, itemType, items, parentInstance));
+            }
+        }
+        else
+        {
+            List<String> fields = getDisplayFields(instance);
+            for (String field: fields)
+            {
+                result.put(field, format(field, instance));
+            }
+        }
+
+        return result;
+    }
     /**
      * Returns the names of all state display fields to show for the given
      * instance.
@@ -189,5 +230,10 @@ public class StateDisplayManager
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

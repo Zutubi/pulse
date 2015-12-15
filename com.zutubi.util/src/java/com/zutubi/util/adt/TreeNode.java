@@ -29,10 +29,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      * @param data     data held by this node
      * @param children initial children for this node
      */
+    @SafeVarargs
     public TreeNode(T data, TreeNode<T>... children)
     {
         this.data = data;
-        this.children = new LinkedList<TreeNode<T>>(asList(children));
+        this.children = new ArrayList<>(asList(children));
         setParent(this, this.children);
     }
 
@@ -214,7 +215,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      */
     public void breadthFirstWalk(UnaryProcedure<TreeNode<T>> fn)
     {
-        Queue<TreeNode<T>> toProcess = new LinkedList<TreeNode<T>>();
+        Queue<TreeNode<T>> toProcess = new LinkedList<>();
         toProcess.offer(this);
         breadthFirstWalk(fn, toProcess);
     }

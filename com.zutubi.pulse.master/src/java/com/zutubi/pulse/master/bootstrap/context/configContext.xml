@@ -47,7 +47,6 @@
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager"/>
     <bean id="linkManager" class="com.zutubi.tove.links.LinkManager"/>
     <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager"/>
-    <bean id="stateDisplayRenderer" class="com.zutubi.pulse.master.tove.webwork.StateDisplayRenderer"/>
     <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager"/>
 
     <bean id="configModelBuilder" class="com.zutubi.pulse.master.rest.ConfigModelBuilder"/>
