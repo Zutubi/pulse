@@ -143,28 +143,29 @@ public class ConfigurationDocsManager
         boolean inTag = false;
         int fragmentStart = 0;
 
-        for(int i = 0; i < s.length(); i++)
+        for (int i = 0; i < s.length(); i++)
         {
             char c = s.charAt(i);
-            if(inTag)
+            if (inTag)
             {
-                if(c == '>')
+                if (c == '>')
                 {
                     inTag = false;
+                    fragmentStart = i + 1;
                 }
             }
             else
             {
-                if(c == '<')
+                if (c == '<')
                 {
-                    if(builder == null)
+                    if (builder == null)
                     {
                         builder = new StringBuilder(s.length());
                     }
 
-                    if(fragmentStart < i)
+                    if (fragmentStart < i)
                     {
-                        builder.append(s.substring(fragmentStart, i));
+                        appendFragment(s.substring(fragmentStart, i), builder);
                     }
 
                     inTag = true;
@@ -172,19 +173,31 @@ public class ConfigurationDocsManager
             }
         }
 
-        if(builder == null)
+        if (builder == null)
         {
             return s;
         }
         else
         {
-            if(fragmentStart < s.length())
+            if (fragmentStart < s.length())
             {
                 builder.append(s.substring(fragmentStart, s.length()));
             }
 
             return builder.toString();
         }
+    }
+
+    private void appendFragment(String fragment, StringBuilder builder)
+    {
+        if (builder.length() > 0 &&
+                !Character.isWhitespace(builder.charAt(builder.length() - 1)) &&
+                !Character.isWhitespace(fragment.charAt(0)))
+        {
+            builder.append(' ');
+        }
+
+        builder.append(fragment);
     }
 
     private void setDetails(Messages messages, Object docs, String prefix, Map<String, String> keyMap)
