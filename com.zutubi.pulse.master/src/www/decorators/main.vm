@@ -73,6 +73,7 @@
             ext/package.js
             ext/StatusBar.js
             widget/treegrid/package.js
+            zutubi/core/package.js
             main.js
             zutubi.js
         #end
