@@ -1,10 +1,7 @@
 package com.zutubi.tove.config.docs;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.zutubi.i18n.Messages;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.StringUtils;
@@ -12,13 +9,8 @@ import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.collect.Iterables.find;
-import static java.util.Arrays.asList;
 
 /**
  * A repository for documentation of configuration types.  The information is
@@ -74,7 +66,7 @@ public class ConfigurationDocsManager
     private TypeDocs generateDocs(CompositeType type)
     {
         TypeDocs typeDocs = new TypeDocs(type.getSymbolicName());
-        Messages messages = getMessages(type);
+        Messages messages = Messages.getInstance(type.getClazz());
 
         setDetails(messages, typeDocs, "", TYPE_KEY_MAP);
         ensureBrief(typeDocs);
@@ -89,25 +81,6 @@ public class ConfigurationDocsManager
         }
 
         return typeDocs;
-    }
-
-    private Messages getMessages(CompositeType type)
-    {
-        Class<? extends Configuration> clazz = type.getClazz();
-        if (ConfigurationCreator.class.isAssignableFrom(clazz))
-        {
-            ParameterizedType creatorType = (ParameterizedType) find(asList(clazz.getGenericInterfaces()), new Predicate<Type>()
-            {
-                public boolean apply(Type type)
-                {
-                    return type instanceof ParameterizedType && ((ParameterizedType)type).getRawType() == ConfigurationCreator.class;
-                }
-            }, null);
-
-            clazz = (Class<? extends Configuration>) creatorType.getActualTypeArguments()[0];
-        }
-
-        return Messages.getInstance(clazz);
     }
 
     private void findExamples(Messages messages, PropertyDocs propertyDocs, TypeProperty property)
