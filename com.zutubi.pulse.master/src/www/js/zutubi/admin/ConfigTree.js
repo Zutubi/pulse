@@ -28,8 +28,17 @@
             else if (Zutubi.admin.hasCollapsedCollection(item))
             {
                 item.collapsed = item.nested[0];
-                item.nestedName = item.collapsed.key;
-                item.nested = item.collapsed.nested;
+                if (item.collapsed.type.keyed)
+                {
+                    item.nestedName = item.collapsed.key;
+                    item.nested = item.collapsed.nested;
+                }
+                else
+                {
+                    // The collapsed collection is embedded (i.e. no names, thus no tree nodes).
+                    item.embedded = item.collapsed;
+                    delete item.nested;
+                }
             }
         }
     }

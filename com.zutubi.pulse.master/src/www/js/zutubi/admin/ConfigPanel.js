@@ -233,13 +233,13 @@
 
             that.contentPanel.bind("cancelled", function(e)
             {
-                that._openPath(Zutubi.config.parentPath(that.path));
+                that._openPath(that.configTree.longestMatchingSubpath(Zutubi.config.parentPath(that.path)));
             });
 
             that.contentPanel.bind("saved", function(e)
             {
                 that.applyDelta(e.delta);
-                that._openPath(Zutubi.config.parentPath(that.path));
+                that._openPath(that.configTree.longestMatchingSubpath(Zutubi.config.parentPath(that.path)));
             });
 
             that.contentPanel.bind("applied", function(e)
