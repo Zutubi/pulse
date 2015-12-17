@@ -3,7 +3,6 @@
 // dependency: widget/treegrid/package.js
 // dependency: zutubi/FloatManager.js
 // dependency: zutubi/MenuManager.js
-// dependency: zutubi/form/package.js
 // dependency: zutubi/fs/package.js
 // dependency: zutubi/layout/package.js
 // dependency: zutubi/table/package.js
@@ -31,7 +30,7 @@ function getBuildMenuLinks(buildLink)
 
 function getBuildMenuItems(buildModel)
 {
-    var items, onclick;
+    var items;
     items = getBuildMenuLinks(buildModel.link);
     if (buildModel.cancelPermitted)
     {
