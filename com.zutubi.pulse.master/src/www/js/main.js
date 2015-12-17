@@ -99,13 +99,6 @@ function toggleSuccessfulTestRows(tableId, successfulShowing)
     }
 }
 
-function setClass(id, className)
-{
-    var element;
-    element = Ext.getDom(id);
-    element.className = className;
-}
-
 /*===========================================================================
  * Functions used for configuration UI
  *=========================================================================*/
@@ -221,8 +214,7 @@ function getAjaxCallbacks(maskedElement)
 function runAjaxRequest(urlOrConfig)
 {
     var config,
-        pane,
-        callbacks;
+        pane;
 
     if (typeof urlOrConfig === typeof '')
     {
@@ -246,32 +238,6 @@ function runAjaxRequest(urlOrConfig)
 
     window.actionInProgress = true;
     Ext.Ajax.request(config);
-}
-
-function showHelp(path, type)
-{
-    var helpPanel;
-
-    helpPanel = Ext.getCmp('nested-east');
-    // Only show help when there is a panel for it (there is none during
-    // setup, for example).
-    if(helpPanel)
-    {
-        helpPanel.showHelp(path, type);
-    }
-}
-
-function showFieldHelp(field)
-{
-    var helpPanel;
-
-    helpPanel = Ext.getCmp('nested-east');
-    // Only show help when there is a panel for it (there is none during
-    // setup, for example).
-    if(helpPanel)
-    {
-        helpPanel.synchronise(field);
-    }
 }
 
 function handleDialogResponse(options, success, response)
@@ -415,26 +381,6 @@ function deleteComment(agentId, buildId, commentId)
                      'Deleting comment...',
                      '/ajax/deleteComment.action',
                      { agentId: agentId, buildId: buildId, commentId: commentId });
-}
-
-function toggleStateList(e)
-{
-    var target;
-
-    target = e.target || e.srcElement;
-    Ext.get(target).findParent('ul.top-level', document.body, true).toggleClass('expanded');
-}
-
-function indentImage(size)
-{
-    if (size === 0)
-    {
-        return '';
-    }
-    else
-    {
-        return '<img src="' + Ext.BLANK_IMAGE_URL + '" width="' + String(size * 10) +  '"/>';
-    }
 }
 
 function refreshPanel(id, url, callback)
