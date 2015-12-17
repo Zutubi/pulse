@@ -43,7 +43,7 @@
                     }
             });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             $("#upgrade-list-wrapper").kendoZaTaskList({
                 id: "upgrade-list",

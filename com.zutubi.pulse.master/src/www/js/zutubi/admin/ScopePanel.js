@@ -12,7 +12,7 @@
         SELECT = 'select';
 
     Zutubi.admin.ScopePanel = Observable.extend({
-        init: function (containerSelector)
+        init: function (container)
         {
             var that = this;
 
@@ -34,7 +34,7 @@
                     '</div>' +
                 '</div>', {wrap: false});
 
-            that.view.render($(containerSelector));
+            that.view.render(container);
 
             that.view.element.kendoSplitter({
                 panes: [
@@ -153,14 +153,14 @@
             if (this.scope === "projects")
             {
                 this.contentPanel = new Zutubi.admin.ProjectOverviewPanel({
-                    containerSelector: ".k-center-pane-content",
+                    container: this.contentEl,
                     project: data
                 });
             }
             else
             {
                 this.contentPanel = new Zutubi.admin.AgentOverviewPanel({
-                    containerSelector: ".k-center-pane-content",
+                    container: this.contentEl,
                     agent: data
                 });
             }

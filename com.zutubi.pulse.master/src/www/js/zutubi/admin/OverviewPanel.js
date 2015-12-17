@@ -53,7 +53,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
             that.view.element.find(".k-summary-edit").on(CLICK, jQuery.proxy(this._editClicked, this, ""));
 
             that._addSummary($("#" + options.id + "-summary"));

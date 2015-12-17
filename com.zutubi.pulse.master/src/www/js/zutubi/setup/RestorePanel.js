@@ -32,7 +32,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             $("#archive-table").kendoZaPropertyTable({
                 id: "archive-properties",

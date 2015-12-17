@@ -35,7 +35,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             that.form = $("#main-form").kendoZaForm({
                 symbolicName: model.type.symbolicName,

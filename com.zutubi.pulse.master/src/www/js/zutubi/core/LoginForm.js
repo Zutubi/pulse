@@ -7,7 +7,7 @@
 
     Zutubi.core.LoginForm = Observable.extend({
         // options:
-        //   - containerSelector: jQuery selector for container to render form in
+        //   - container: jQuery object for container to render form in
         //   - username: if specified, prefilled text for the username box
         //   - rememberMe: if specified and true, pre-checks the remember me box
         //   - action: if specified, the URL to POST the form to on submit (if not specified a
@@ -46,7 +46,7 @@
                 '</div>'
                 , { wrap: false });
 
-            that.element = that.view.render(options.containerSelector);
+            that.element = that.view.render(options.container);
 
             that.loginForm = $("#login-form");
             if (options.username)

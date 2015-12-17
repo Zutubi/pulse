@@ -155,7 +155,7 @@ if (window.Zutubi.setup === undefined)
         function _showInputPanel(data)
         {
             app.panel = new Zutubi.setup.InputPanel({
-                containerSelector: "#main-view",
+                container: app.mainView,
                 status: data.status,
                 model: data.input
             });
@@ -193,7 +193,7 @@ if (window.Zutubi.setup === undefined)
             _showRightColumn();
 
             app.panel = new Zutubi.setup.InputPanel({
-                containerSelector: "#main-view",
+                container: app.mainView,
                 status: data.status,
                 model: data.input,
                 submits: ["migrate database", "abort migrate (normal startup)"]
@@ -215,7 +215,7 @@ if (window.Zutubi.setup === undefined)
         function _showRestorePanel(data)
         {
             app.panel = new Zutubi.setup.RestorePanel({
-                containerSelector: "#main-view",
+                container: app.mainView,
                 properties: data.properties
             });
         }
@@ -223,7 +223,7 @@ if (window.Zutubi.setup === undefined)
         function _showUpgradePanel(data)
         {
             app.panel = new Zutubi.setup.UpgradePanel({
-                containerSelector: "#main-view",
+                container: app.mainView,
                 properties: data.properties
             });
         }
@@ -245,7 +245,7 @@ if (window.Zutubi.setup === undefined)
                 }
 
                 app.panel = new Zutubi.setup.ProgressPanel({
-                    containerSelector: "#main-view",
+                    container: app.mainView,
                     type: data.status,
                     successVerbose: SUCCESS_MESSAGES[data.status],
                     failureVerbose: FAILURE_MESSAGES[data.status]

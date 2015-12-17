@@ -16,7 +16,7 @@
         PATHSELECT = 'pathselect';
 
     Zutubi.admin.ConfigPanel = Observable.extend({
-        init: function (containerSelector)
+        init: function (container)
         {
             var that = this;
 
@@ -37,7 +37,7 @@
                                            '</div>' +
                                        '</div>', {wrap: false});
 
-            that.view.render($(containerSelector));
+            that.view.render(container);
 
             that.view.element.kendoSplitter({
                 panes: [
@@ -226,7 +226,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.CompositePanel({
-                containerSelector: ".k-center-pane-content",
+                container: that.contentEl,
                 composite: data,
                 path: that.path
             });
@@ -260,7 +260,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.CollectionPanel({
-                containerSelector: ".k-center-pane-content",
+                container: that.contentEl,
                 collection: data,
                 path: that.path
             });
@@ -290,7 +290,7 @@
             var that = this;
 
             that.contentPanel = new Zutubi.admin.TypeSelectPanel({
-                containerSelector: ".k-center-pane-content",
+                container: that.contentEl,
                 type: data,
                 path: that.path
             });

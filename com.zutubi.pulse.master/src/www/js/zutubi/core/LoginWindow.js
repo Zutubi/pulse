@@ -22,7 +22,7 @@
             $("body").append(that.container);
 
             that.form = new Zutubi.core.LoginForm({
-                containerSelector: "#login-container"
+                container: $("#login-container")
             });
 
             that.form.bind("submit", function(e)

@@ -41,7 +41,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             that.addElement = $("#collection-add");
             if (createAllowed)

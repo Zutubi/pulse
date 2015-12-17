@@ -35,7 +35,7 @@
                         '<div id="#: id #-checkform">' +
                         '</div>' +
                     '</div>' +
-                    '<div style="display:none" id="#: id #-collapsed-collection" class="k-collapsed-collection-wrapper">' +
+                    '<div style="display:none" class="k-collapsed-collection-wrapper">' +
                     '</div>' +
                     '<div style="display:none" id="#: id #-upwrapper" class="k-up-wrapper">' +
                         '<a><span class="fa fa-chevron-left"/> return to list</a>' +
@@ -49,7 +49,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             if (composite.state && composite.state.fields)
             {
@@ -98,10 +98,11 @@
 
             if (Zutubi.admin.hasCollapsedCollection(composite))
             {
-                $("#composite-collapsed-collection").show();
+                el = that.view.element.find(".k-collapsed-collection-wrapper");
+                el.show();
 
                 that.collapsedCollectionPanel = new Zutubi.admin.CollectionPanel({
-                    containerSelector: "#composite-collapsed-collection",
+                    container: el,
                     collection: composite.nested[0],
                     path: that.options.path + "/" + composite.nested[0].key
                 });

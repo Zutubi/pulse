@@ -41,7 +41,7 @@
             that.element = that.view.render("body");
             that.contentEl = that.element.find(".k-wizard-content");
             that.docPanel = new Zutubi.admin.DocPanel({
-                containerSelector: ".k-help-wrapper"
+                container: that.element.find(".k-help-wrapper")
             });
         },
 

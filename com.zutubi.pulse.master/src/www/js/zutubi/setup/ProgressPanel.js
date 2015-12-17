@@ -36,7 +36,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
             that.overallTable = $("#progress-overall");
             that.taskWrapper = $("#task-wrapper");
             that.taskTable = $("#progress-task");

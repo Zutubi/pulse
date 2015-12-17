@@ -28,7 +28,7 @@
                     model: that.options
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
             that.introduction = that.view.element.find(".k-doc-intro");
             that.fieldsTable = that.view.element.find(".k-doc-fields");
             that.fieldsTableTitle = that.fieldsTable.find(".k-doc-fields-title");

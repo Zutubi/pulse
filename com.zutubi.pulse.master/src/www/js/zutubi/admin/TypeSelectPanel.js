@@ -31,7 +31,7 @@
                     }
                 });
 
-            that.view.render($(options.containerSelector));
+            that.view.render(options.container);
 
             that.contentElement = that.view.element.find(".k-type-select-content");
             if (configured)

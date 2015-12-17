@@ -32,7 +32,7 @@
 
 <script>
     window.loginForm = new Zutubi.core.LoginForm({
-        containerSelector: "#login-container",
+        container: $("#login-container"),
     #if($username)
         username: "#jss($username)",
     #end
