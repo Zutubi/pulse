@@ -415,6 +415,14 @@ ul.k-form-validation-errors {
     font-style: italic;
 }
 
+div.k-wizard-window {
+    padding: 0;
+}
+
+.k-wizard-content {
+    padding: 0.5em;
+}
+
 /* Drag and drop in collection tables */
 
 .k-hint {

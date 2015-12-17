@@ -12,7 +12,6 @@
 
     <script>
         window.baseUrl = "${base}";
-        adminPath = "/${path}/";
     </script>
 
     #javascript()

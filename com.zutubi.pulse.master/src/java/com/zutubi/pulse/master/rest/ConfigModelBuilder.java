@@ -475,7 +475,7 @@ public class ConfigModelBuilder
             typeModel.addSubType(buildCompositeTypeModel(extension, context));
         }
 
-        typeModel.setDocs(new DocModel(configurationDocsManager.getDocs(type)));
+        typeModel.setDocs(configurationDocsManager.getDocs(type));
 
         return typeModel;
     }

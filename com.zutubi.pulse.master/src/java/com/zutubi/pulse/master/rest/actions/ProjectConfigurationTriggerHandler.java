@@ -30,6 +30,8 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfigu
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.docs.PropertyDocs;
+import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
@@ -46,10 +48,15 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 public class ProjectConfigurationTriggerHandler implements ActionHandler
 {
     private static final String FIELD_VERSION = "version";
+    private static final String LABEL_VERSION = "version";
     private static final String FIELD_MATURITY = "maturity";
+    private static final String LABEL_MATURITY = "maturity";
     private static final String FIELD_REBUILD = "rebuild";
+    private static final String LABEL_REBUILD = "trigger with dependencies";
     private static final String FIELD_REVISION = "revision";
+    private static final String LABEL_REVISION = "revision";
     private static final String FIELD_PRIORITY = "priority";
+    private static final String LABEL_PRIORITY = "priority";
 
     private static final String FIELD_PREFIX_PROJECT = "project_";
     private static final String FIELD_PREFIX_TRIGGER = "project_";
@@ -70,46 +77,54 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
         {
             FormModel form = new FormModel();
             Map<String, Object> formDefaults = new HashMap<>();
+            TypeDocs typeDocs = new TypeDocs();
+            typeDocs.setBrief("The following properties can be configured for the build.");
 
-            form.addField(new TextFieldModel(FIELD_VERSION, "version"));
+            form.addField(new TextFieldModel(FIELD_VERSION, LABEL_VERSION));
             formDefaults.put(FIELD_VERSION, project.getDependencies().getVersion());
+            typeDocs.addProperty(new PropertyDocs(FIELD_VERSION, LABEL_VERSION, "The build version number, e.g. 1.0.4."));
 
-            form.addField(new DropdownFieldModel(FIELD_MATURITY, "maturity", IvyStatus.getStatuses()));
+            form.addField(new DropdownFieldModel(FIELD_MATURITY, LABEL_MATURITY, IvyStatus.getStatuses()));
             formDefaults.put(FIELD_MATURITY, project.getDependencies().getStatus());
+            typeDocs.addProperty(new PropertyDocs(FIELD_MATURITY, LABEL_MATURITY, "The build maturity status, indicating how stable it is."));
 
             if (hasDependencyOfBuildableStatus(project))
             {
-                form.addField(new CheckboxFieldModel(FIELD_REBUILD, "trigger with dependencies"));
+                form.addField(new CheckboxFieldModel(FIELD_REBUILD, LABEL_REBUILD));
                 formDefaults.put(FIELD_REBUILD, trigger.isRebuildUpstreamDependencies());
+                typeDocs.addProperty(new PropertyDocs(FIELD_REBUILD, LABEL_REBUILD, "If checked, all upstream dependencies will be rebuilt first."));
             }
 
             form.addField(new TextFieldModel(FIELD_REVISION, "revision"));
+            typeDocs.addProperty(new PropertyDocs(FIELD_REVISION, LABEL_REVISION, "The build revision, leave blank to build the latest revision at build activation time."));
 
             form.addField(new TextFieldModel(FIELD_PRIORITY, "priority"));
             formDefaults.put(FIELD_PRIORITY, "0");
+            typeDocs.addProperty(new PropertyDocs(FIELD_PRIORITY, LABEL_PRIORITY, "If set to non-zero, the priority of the build (higher priority builds go first)."));
 
             Map<String, ResourcePropertyConfiguration> triggerProperties = trigger.getProperties();
             for (ResourcePropertyConfiguration property: project.getProperties().values())
             {
                 if (!triggerProperties.containsKey(property.getName()))
                 {
-                    addPropertyField(form, formDefaults, property, FIELD_PREFIX_PROJECT);
+                    addPropertyField(form, formDefaults, typeDocs, property, FIELD_PREFIX_PROJECT);
                 }
             }
 
             for (ResourcePropertyConfiguration property : triggerProperties.values())
             {
-                addPropertyField(form, formDefaults, property, FIELD_PREFIX_TRIGGER);
+                addPropertyField(form, formDefaults, typeDocs, property, FIELD_PREFIX_TRIGGER);
             }
 
             model.setForm(form);
             model.setFormDefaults(formDefaults);
+            model.setDocs(typeDocs);
         }
 
         return model;
     }
 
-    private void addPropertyField(FormModel form, Map<String, Object> formDefaults, ResourcePropertyConfiguration property, String prefix)
+    private void addPropertyField(FormModel form, Map<String, Object> formDefaults, TypeDocs typeDocs, ResourcePropertyConfiguration property, String prefix)
     {
         String fieldName = prefix + property.getName();
         TextFieldModel field = new TextFieldModel(fieldName, property.getName());
@@ -117,6 +132,7 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
         field.addParameter("help", property.getDescription());
         form.addField(field);
         formDefaults.put(fieldName, property.getValue());
+        typeDocs.addProperty(new PropertyDocs(fieldName, property.getName(), property.getDescription()));
     }
 
     private boolean hasDependencyOfBuildableStatus(ProjectConfiguration project)

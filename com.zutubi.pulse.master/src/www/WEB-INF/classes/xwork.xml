@@ -585,11 +585,6 @@
             <result name="error" type="flexjson">configurationErrors</result>
         </global-results>
 
-        <action name="help" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
-            <interceptor-ref name="ajaxConfigStack"/>
-            <result name="success" type="velocity">help.vm</result>
-        </action>
-
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
@@ -617,18 +612,6 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
-        </action>
-    </package>
-
-    <package name="helpAjax" namespace="/ajax/help" extends="configAjax">
-        <default-interceptor-ref name="ajaxConfigStack"/>
-        
-        <action name="type" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
-            <result name="success" type="velocity">type.vm</result>
-        </action>
-
-        <action name="manualTrigger" class="com.zutubi.pulse.master.tove.webwork.help.ManualTriggerHelpAction">
-            <result name="success" type="velocity">type.vm</result>
         </action>
     </package>
 

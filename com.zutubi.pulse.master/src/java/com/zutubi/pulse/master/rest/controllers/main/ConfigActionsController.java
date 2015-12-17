@@ -32,6 +32,7 @@ import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
+import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -67,6 +68,8 @@ public class ConfigActionsController
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
     private ConfigurationReferenceManager configurationReferenceManager;
+    @Autowired
+    private ConfigurationDocsManager configurationDocsManager;
     @Autowired
     private ConfigModelBuilder configModelBuilder;
     @Autowired
@@ -338,6 +341,7 @@ public class ConfigActionsController
             {
                 CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
                 model.setForm(formModelBuilder.createForm(argumentType));
+                model.setDocs(configurationDocsManager.getDocs(argumentType));
 
                 Configuration defaults = actionManager.prepare(context.actionName, context.instance);
                 if (defaults != null)

@@ -1,6 +1,6 @@
 package com.zutubi.tove.config.docs;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,26 +11,26 @@ import java.util.List;
 public class PropertyDocs implements Docs
 {
     private String name;
-    private String type;
     private String label;
     private String brief;
     private String verbose;
-    private List<Example> examples = new LinkedList<Example>();
+    private List<Example> examples;
 
-    public PropertyDocs(String name, String type)
+    public PropertyDocs(String name)
     {
         this.name = name;
-        this.type = type;
+    }
+
+    public PropertyDocs(String name, String label, String brief)
+    {
+        this.name = name;
+        this.label = label;
+        this.brief = brief;
     }
 
     public String getName()
     {
         return name;
-    }
-
-    public String getType()
-    {
-        return type;
     }
 
     public String getLabel()
@@ -70,6 +70,11 @@ public class PropertyDocs implements Docs
 
     public void addExample(Example example)
     {
+        if (examples == null)
+        {
+            examples = new ArrayList<>();
+        }
+
         examples.add(example);
     }
 }

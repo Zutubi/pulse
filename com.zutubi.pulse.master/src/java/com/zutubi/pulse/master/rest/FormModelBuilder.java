@@ -151,18 +151,16 @@ public class FormModelBuilder
     {
         List<Validator> validators =  getValidators(type);
 
-        for (TypeProperty property : type.getProperties(SimpleType.class))
+        for (String propertyName: type.getSimplePropertyNames())
         {
-            FieldModel fd = createField(property, messages);
-            addFieldParameters(type, property, fd, validators);
-            form.addField(fd);
-        }
-
-        for (TypeProperty property : type.getProperties(CollectionType.class))
-        {
-            CollectionType propertyType = (CollectionType) property.getType();
-            Type targetType = propertyType.getCollectionType();
-            if (targetType instanceof SimpleType)
+            TypeProperty property = type.getProperty(propertyName);
+            if (property.getType() instanceof SimpleType)
+            {
+                FieldModel fd = createField(property, messages);
+                addFieldParameters(type, property, fd, validators);
+                form.addField(fd);
+            }
+            else
             {
                 String fieldType = FieldType.ITEM_PICKER;
                 com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);

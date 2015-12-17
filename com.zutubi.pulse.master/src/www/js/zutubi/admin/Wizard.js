@@ -9,6 +9,8 @@
         NEXT = "next",
         CANCEL = "cancel",
         FINISH = "finish",
+        RENDERED = "rendered",
+        TYPE_UPDATED = "typeUpdated",
         POSTING = "posting",
         POSTED = "posted",
         FINISHED = "finished",
@@ -43,6 +45,7 @@
                     symbolicName: type.type.symbolicName,
                     form: type.type.form,
                     checkType: type.type.checkType,
+                    docs: type.type.docs,
                     simpleProperties: type.type.simpleProperties,
                     filter: type.filter
                 };
@@ -165,6 +168,8 @@
         },
 
         events: [
+            RENDERED,
+            TYPE_UPDATED,
             POSTING,
             POSTED,
             FINISHED
@@ -278,6 +283,7 @@
             {
                 that._showStepAtIndex(stepIndex);
                 that.form.showValidationErrors(details.validationErrors);
+                this.trigger(RENDERED);
             }
         },
 
@@ -452,6 +458,9 @@
             }
 
             that.type = type;
+            this.trigger(RENDERED);
+            console.dir(type);
+            this.trigger(TYPE_UPDATED, {type: type});
         },
 
         _ignoredFieldNames: function(formStructure)
@@ -655,7 +664,8 @@
 
         _checkClicked: function()
         {
-            Zutubi.config.checkConfig(this.options.path, this.type, this.form, this.checkForm);
+            var cb = jQuery.proxy(this.trigger, this, RENDERED);
+            Zutubi.config.checkConfig(this.options.path, this.type, this.form, this.checkForm, cb, cb);
         }
     });
 

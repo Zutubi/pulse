@@ -5,6 +5,7 @@
 // dependency: ./ConfigPanel.js
 // dependency: ./ConfigTree.js
 // dependency: ./ContextPanel.js
+// dependency: ./DocPanel.js
 // dependency: ./DeleteWindow.js
 // dependency: ./HierarchySelector.js
 // dependency: ./HierarchyTree.js

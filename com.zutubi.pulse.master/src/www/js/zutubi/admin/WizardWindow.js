@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
+// dependency: ./DocPanel.js
 // dependency: ./Wizard.js
 
 (function($)
@@ -25,19 +26,30 @@
             Observable.fn.init.call(that);
 
             that.view = new kendo.View(
-                '<div style="display: none">' +
-                    '<div class="k-wizard-content"></div>' +
+                '<div class="k-wizard-window">' +
+                    '<div class="k-outer-split" style="width: 100%">' +
+                        '<div>' +
+                            '<div class="k-wizard-content"></div>' +
+                        '</div>' +
+                        '<div>' +
+                            '<div class="k-help-wrapper"></div>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>',
                 {wrap: false});
 
             that.element = that.view.render("body");
+            that.contentEl = that.element.find(".k-wizard-content");
+            that.docPanel = new Zutubi.admin.DocPanel({
+                containerSelector: ".k-help-wrapper"
+            });
         },
 
         options: {
             label: "config",
             markRequired: true,
             id: "wizard-window",
-            width: 720
+            width: 800
         },
 
         mask: function(mask)
@@ -49,18 +61,20 @@
         {
             var that = this,
                 windowWidth = $(window).width(),
-                width = Math.min(that.options.width, windowWidth - 2 * PADDING);
+                width = Math.min(that.options.width, windowWidth - 2 * PADDING),
+                maxHeight = $(window).height() - 3 * PADDING;
 
             that.completed = false;
 
             that.window = $(that.element).kendoWindow({
                 width: width,
-                maxHeight: $(window).height() - 3 * PADDING,
+                maxHeight: maxHeight,
                 position: {
                     top: PADDING,
                     left: (windowWidth - width) / 2
                 },
                 modal: true,
+                resizable: false,
                 title: "add new " + that.options.label,
                 close: function()
                 {
@@ -71,6 +85,17 @@
                             that.options.cancel();
                         }
                     }
+                },
+                activate: function()
+                {
+                    that.maxSplitterHeight = maxHeight - that.element.find(".k-window-titlebar").outerHeight();
+                    that.splitter = that.element.find(".k-outer-split").kendoSplitter({
+                        panes: [
+                            { collapsible: false },
+                            { collapsible: true, size: "250px", collapsed: true }
+                        ]
+                    });
+                    that._updateSplitter();
                 },
                 deactivate: function()
                 {
@@ -89,6 +114,7 @@
                 {
                     that.mask(false);
                     that._renderWizard(data);
+                    that._updateSplitter();
                 },
                 error: function (jqXHR)
                 {
@@ -106,24 +132,22 @@
         _renderWizard: function(data)
         {
             var that = this,
-                contentEl = that.element.find(".k-wizard-content"),
                 wizardEl = $("<div></div>");
 
-            contentEl.append(wizardEl);
+            that.contentEl.append(wizardEl);
             that.wizard = wizardEl.kendoZaWizard({
                 structure: data,
                 path: that.options.path,
                 markRequired: that.options.markRequired
             }).data("kendoZaWizard");
 
-            that.wizard.bind("posting", function()
-            {
-                that.mask(true);
-            });
+            that.wizard.bind("rendered", jQuery.proxy(that._updateSplitter, that));
+            that.wizard.bind("posting", jQuery.proxy(that.mask, that, true));
+            that.wizard.bind("posted", jQuery.proxy(that.mask, that, false));
 
-            that.wizard.bind("posted", function()
+            that.wizard.bind("typeUpdated", function(e)
             {
-                that.mask(false);
+                that._updateDocs(e.type.docs);
             });
 
             that.wizard.bind("finished", function(e)
@@ -140,6 +164,18 @@
                     that.options.cancel();
                 }
             });
+        },
+
+        _updateDocs: function(docs)
+        {
+            this.docPanel.setDocs(docs);
+        },
+
+        _updateSplitter: function()
+        {
+            var wizardHeight = this.contentEl.outerHeight();
+            this.element.find(".k-outer-split").height(Math.min(wizardHeight, this.maxSplitterHeight));
+            this.splitter.resize();
         }
     });
 }(jQuery));

@@ -2,6 +2,7 @@ package com.zutubi.tove.config.docs;
 
 import com.google.common.collect.ImmutableMap;
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.StringUtils;
@@ -9,8 +10,7 @@ import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A repository for documentation of configuration types.  The information is
@@ -65,19 +65,39 @@ public class ConfigurationDocsManager
 
     private TypeDocs generateDocs(CompositeType type)
     {
-        TypeDocs typeDocs = new TypeDocs(type.getSymbolicName());
+        TypeDocs typeDocs = new TypeDocs();
         Messages messages = Messages.getInstance(type.getClazz());
 
         setDetails(messages, typeDocs, "", TYPE_KEY_MAP);
         ensureBrief(typeDocs);
 
-        for (TypeProperty property : type.getProperties())
+        // Deliberately match the order to the Form, so no post-sorting is required.
+        List<String> orderedFields = new ArrayList<>();
+        Form form = type.getAnnotation(Form.class, true);
+        if (form != null)
         {
-            PropertyDocs propertyDocs = new PropertyDocs(property.getName(), property.getType().toString());
-            setDetails(messages, propertyDocs, property.getName() + ".", PROPERTY_KEY_MAP);
-            ensureBrief(propertyDocs);
-            findExamples(messages, propertyDocs, property);
-            typeDocs.addProperty(propertyDocs);
+            orderedFields.addAll(Arrays.asList(form.fieldOrder()));
+        }
+
+        for (String fieldName: type.getSimplePropertyNames())
+        {
+            if (!orderedFields.contains(fieldName))
+            {
+                orderedFields.add(fieldName);
+            }
+        }
+
+        for (String fieldName : orderedFields)
+        {
+            TypeProperty property = type.getProperty(fieldName);
+            if (property != null)
+            {
+                PropertyDocs propertyDocs = new PropertyDocs(property.getName());
+                setDetails(messages, propertyDocs, property.getName() + ".", PROPERTY_KEY_MAP);
+                ensureBrief(propertyDocs);
+                findExamples(messages, propertyDocs, property);
+                typeDocs.addProperty(propertyDocs);
+            }
         }
 
         return typeDocs;

@@ -1,8 +1,11 @@
 package com.zutubi.tove.config.docs;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Holds documentation for a single type in a form that can be rendered for
@@ -10,20 +13,13 @@ import java.util.Map;
  */
 public class TypeDocs implements Docs
 {
-    private String symbolicName;
     private String title;
     private String brief;
     private String verbose;
-    private Map<String, PropertyDocs> properties = new HashMap<String, PropertyDocs>();
+    private List<PropertyDocs> properties;
 
-    public TypeDocs(String symbolicName)
+    public TypeDocs()
     {
-        this.symbolicName = symbolicName;
-    }
-
-    public String getSymbolicName()
-    {
-        return symbolicName;
     }
 
     public String getTitle()
@@ -56,18 +52,30 @@ public class TypeDocs implements Docs
         this.verbose = verbose;
     }
 
-    public Map<String, PropertyDocs> getProperties()
+    public List<PropertyDocs> getProperties()
     {
-        return Collections.unmodifiableMap(properties);
+        return properties == null ? null : Collections.unmodifiableList(properties);
     }
 
-    public PropertyDocs getPropertyDocs(String fieldName)
+    public PropertyDocs getPropertyDocs(final String fieldName)
     {
-        return properties.get(fieldName);
+        return Iterables.find(properties, new Predicate<PropertyDocs>()
+        {
+            @Override
+            public boolean apply(PropertyDocs input)
+            {
+                return input.getName().equals(fieldName);
+            }
+        }, null);
     }
 
     public void addProperty(PropertyDocs property)
     {
-        properties.put(property.getName(), property);
+        if (properties == null)
+        {
+            properties = new ArrayList<>();
+        }
+
+        properties.add(property);
     }
 }

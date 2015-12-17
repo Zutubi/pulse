@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest.model;
 
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.tove.config.docs.TypeDocs;
 
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class ActionModel
     private boolean inputRequired;
     private FormModel form;
     private Map<String, Object> formDefaults;
+    private TypeDocs docs;
 
     public ActionModel(ActionLink actionLink, boolean inputRequired)
     {
@@ -71,5 +73,15 @@ public class ActionModel
     public void setFormDefaults(Map<String, Object> formDefaults)
     {
         this.formDefaults = formDefaults;
+    }
+
+    public TypeDocs getDocs()
+    {
+        return docs;
+    }
+
+    public void setDocs(TypeDocs docs)
+    {
+        this.docs = docs;
     }
 }
