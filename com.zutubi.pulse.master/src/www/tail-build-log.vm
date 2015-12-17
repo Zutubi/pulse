@@ -1,6 +1,9 @@
 #helpTag("Build+Log+View")
 #authorisationTags($principle)
 #stageTags($buildResult "logs")
+<content tag="header.javascript">
+    zutubi/reporting/project/TailSettingsWindow.js
+</content>
 <html>
 <head>
     <title>
@@ -61,11 +64,15 @@
 
         function configureSettings()
         {
-            var popup = new Zutubi.TailSettingsWindow({
-                initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$tailRefreshInterval'
+#if($loggedInUser)
+            var popup = new Zutubi.reporting.project.TailSettingsWindow({
+                username: '#jss($loggedInUser.name)',
+                tailLines: $maxLines,
+                tailRefreshInterval: $tailRefreshInterval
             });
+            popup.bind("saved", function() { window.location.reload(); });
             popup.show();
+#end
         }
     </script>
 </head>
@@ -105,8 +112,10 @@
                     </td>
                     <td id="current-settings">
                         $action.getText("settings.max.lines", ["$maxLines"]), $action.getText("settings.refresh.interval", ["$tailRefreshInterval"])
+#if($loggedInUser)
                         <a class="unadorned" href="#" onclick="configureSettings(); return false;"><img alt="configure" src="$base/images/pencil.gif"/></a>
                         <a id="configure-settings" href="#" onclick="configureSettings(); return false;">#wwtext("name=configure")</a>
+#end
                     </td>
                     <td>
                         <a class="unadorned" href="#" onclick="refreshNow(); return false;"><img alt="refresh now" src="$base/images/arrow_refresh.gif"/></a>

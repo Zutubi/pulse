@@ -552,11 +552,6 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
-        <action name="saveTailSettings" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveTailSettingsAction">
-            <interceptor-ref name="ajaxSideEffectStack"/>
-            <result name="success" type="flexjson">result</result>
-        </action>
-
         <action name="saveArtifactsFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveArtifactsFilterAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
