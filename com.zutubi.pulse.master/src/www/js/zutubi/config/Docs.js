@@ -7,7 +7,18 @@
     Zutubi.config.Docs = Class.extend({
         init: function(data)
         {
-            this.data = data;
+            if (data)
+            {
+                this.data = data;
+            }
+            else
+            {
+                this.data = {
+                    brief: "",
+                    verbose: ""
+                }
+            }
+
             if (!this.data.properties)
             {
                 this.data.properties = [];

@@ -19,6 +19,7 @@
         KEYUP = "keyup" + ns,
         SUBMIT = "submit" + ns,
         SELECTOR_FIELD_WRAPPER = ".k-field-wrapper",
+        SELECTOR_FIELD_HELP = ".k-field-help",
         CREATED = "created",
         BUTTON_CLICKED = "buttonClicked",
         ENTER_PRESSED = "enterPressed",
@@ -59,6 +60,7 @@
             template: '<form name="#: id #" id="#: id #"><table class="k-form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
+            helpTemplate: '<div class="k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
             errorTemplate: '<li>#: message #</li>',
             markRequired: true
@@ -80,8 +82,12 @@
             this.template = kendo.template(this.options.template);
             this.hiddenTemplate = kendo.template(this.options.hiddenTemplate);
             this.fieldTemplate = kendo.template(this.options.fieldTemplate);
+            this.helpTemplate = kendo.template(this.options.helpTemplate);
             this.buttonTemplate = kendo.template(this.options.buttonTemplate);
             this.errorTemplate = kendo.template(this.options.errorTemplate);
+
+            this.docs = new Zutubi.config.Docs(this.options.docs);
+            this.helpShown = false;
 
             this.element.html(this.template({id: this.id}));
             this.formElement = this.element.find("form");
@@ -120,6 +126,7 @@
 
             that.formElement.off(ns);
             that.tableBodyElement.find(SELECTOR_FIELD_WRAPPER).off(ns);
+            that.tableBodyElement.find(SELECTOR_FIELD_HELP).off(ns);
 
             Widget.fn.destroy.call(that);
             kendo.destroy(that.element);
@@ -176,6 +183,27 @@
 
                     this.fields.push(field);
                 }
+
+                this._addFieldDocs(fieldOptions.name, fieldElement);
+            }
+        },
+
+        _addFieldDocs: function(fieldName, fieldElement)
+        {
+            var fieldDocs = this.docs.getPropertyDocs(fieldName),
+                helpElement;
+
+            if (fieldDocs)
+            {
+                helpElement = $(this.helpTemplate({
+                    brief: fieldDocs.brief || "",
+                    verbose: fieldDocs.verbose || ""
+                }));
+                helpElement.appendTo(fieldElement.closest("td"));
+                helpElement.on(CLICK, function()
+                {
+                    helpElement.toggleClass("k-collapsed k-expanded");
+                });
             }
         },
 
@@ -434,6 +462,24 @@
                     }
                 }
             }
+        },
+
+        isHelpShown: function()
+        {
+            return this.helpShown;
+        },
+
+        toggleHelp: function(show)
+        {
+            var els = this.tableBodyElement.find(SELECTOR_FIELD_HELP);
+            if (typeof show === "undefined")
+            {
+                show = !this.helpShown;
+            }
+
+            this.helpShown = show;
+            els.toggleClass("k-expanded", show);
+            els.toggleClass("k-collapsed", !show);
         },
 
         _showErrors: function(errorList, messages)

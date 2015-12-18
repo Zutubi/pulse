@@ -148,6 +148,10 @@
     margin-bottom: 8px;
 }
 
+.k-composite-help-button {
+    float: right;
+}
+
 .k-check-wrapper, .k-collapsed-collection-wrapper {
     border-top: solid 1px #ddd;
     margin-top: 16px;
@@ -421,6 +425,59 @@ div.k-wizard-window {
 
 .k-wizard-content {
     padding: 0.5em;
+}
+
+/* Help */
+
+.k-field-help {
+    opacity: 0.9;
+    cursor: help;
+}
+
+.k-field-help-brief {
+    font-size: 0.85em;
+    font-style: italic;
+    padding: 0.2em 0;
+}
+
+.k-field-help-verbose {
+    padding: 0.3em 0;
+}
+
+.k-collapsed .k-field-help-verbose {
+    display: none;
+}
+
+.k-expanded .k-field-help-brief {
+    display: none;
+}
+
+.k-field-help p {
+    margin: 0.4em 0;
+}
+
+.k-field-help b, .k-field-help strong {
+    font-weight: bold;
+}
+
+.k-field-help i, .k-field-help em {
+    font-style: italic;
+}
+
+.k-field-help ol, .k-field-help ul {
+    margin-left: 1em;
+}
+
+.k-field-help ol {
+    list-style: decimal;
+}
+
+.k-field-help ul {
+    list-style: disc;
+}
+
+.k-field-help li {
+    margin: 0.4em 0;
 }
 
 /* Drag and drop in collection tables */

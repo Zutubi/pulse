@@ -428,7 +428,8 @@
                 markRequired: that._shouldMarkRequired(),
                 values: step.valuesByType[index],
                 submits: submits,
-                defaultSubmit: defaultSubmit
+                defaultSubmit: defaultSubmit,
+                docs: type.docs
             }).data("kendoZaForm");
 
             that.form.bind("buttonClicked", jQuery.proxy(that._formSubmitted, that));
