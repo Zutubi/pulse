@@ -1,6 +1,5 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
-// dependency: ./DocPanel.js
 // dependency: ./Wizard.js
 
 (function($)
@@ -27,29 +26,18 @@
 
             that.view = new kendo.View(
                 '<div class="k-wizard-window">' +
-                    '<div class="k-outer-split" style="width: 100%">' +
-                        '<div>' +
-                            '<div class="k-wizard-content"></div>' +
-                        '</div>' +
-                        '<div>' +
-                            '<div class="k-help-wrapper"></div>' +
-                        '</div>' +
-                    '</div>' +
+                    '<div class="k-wizard-content"></div>' +
                 '</div>',
                 {wrap: false});
 
             that.element = that.view.render("body");
             that.contentEl = that.element.find(".k-wizard-content");
-            that.docPanel = new Zutubi.admin.DocPanel({
-                container: that.element.find(".k-help-wrapper")
-            });
         },
 
         options: {
             label: "config",
             markRequired: true,
-            id: "wizard-window",
-            width: 800
+            width: 720
         },
 
         mask: function(mask)
@@ -86,17 +74,6 @@
                         }
                     }
                 },
-                activate: function()
-                {
-                    that.maxSplitterHeight = maxHeight - that.element.find(".k-window-titlebar").outerHeight();
-                    that.splitter = that.element.find(".k-outer-split").kendoSplitter({
-                        panes: [
-                            { collapsible: false },
-                            { collapsible: true, size: "250px", collapsed: true }
-                        ]
-                    });
-                    that._updateSplitter();
-                },
                 deactivate: function()
                 {
                     that.window.destroy();
@@ -114,7 +91,6 @@
                 {
                     that.mask(false);
                     that._renderWizard(data);
-                    that._updateSplitter();
                 },
                 error: function (jqXHR)
                 {
@@ -141,14 +117,8 @@
                 markRequired: that.options.markRequired
             }).data("kendoZaWizard");
 
-            that.wizard.bind("rendered", jQuery.proxy(that._updateSplitter, that));
             that.wizard.bind("posting", jQuery.proxy(that.mask, that, true));
             that.wizard.bind("posted", jQuery.proxy(that.mask, that, false));
-
-            that.wizard.bind("typeUpdated", function(e)
-            {
-                that._updateDocs(e.type.docs);
-            });
 
             that.wizard.bind("finished", function(e)
             {
@@ -164,18 +134,6 @@
                     that.options.cancel();
                 }
             });
-        },
-
-        _updateDocs: function(docs)
-        {
-            this.docPanel.setDocs(docs);
-        },
-
-        _updateSplitter: function()
-        {
-            var wizardHeight = this.contentEl.outerHeight();
-            this.element.find(".k-outer-split").height(Math.min(wizardHeight, this.maxSplitterHeight));
-            this.splitter.resize();
         }
     });
 }(jQuery));

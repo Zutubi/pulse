@@ -142,7 +142,7 @@ if (window.Zutubi.config === undefined)
                 return null;
             },
 
-            checkConfig: function(path, type, form, checkForm, successCb, errorCb)
+            checkConfig: function(path, type, form, checkForm)
             {
                 var properties = form.getValues(),
                     checkProperties = checkForm.getValues(),
@@ -165,10 +165,6 @@ if (window.Zutubi.config === undefined)
                     {
                         var message = data.success ? "configuration ok" : (data.message || "check failed");
                         checkForm.showStatus(data.success, message);
-                        if (successCb)
-                        {
-                            successCb();
-                        }
                     },
                     error: function (jqXHR)
                     {
@@ -188,11 +184,6 @@ if (window.Zutubi.config === undefined)
                         else
                         {
                             Zutubi.core.reportError("Could not check configuration: " + Zutubi.core.ajaxError(jqXHR));
-                        }
-
-                        if (errorCb)
-                        {
-                            errorCb();
                         }
                     }
                 });
