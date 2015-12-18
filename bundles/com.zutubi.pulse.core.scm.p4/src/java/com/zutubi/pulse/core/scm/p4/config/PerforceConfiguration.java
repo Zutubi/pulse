@@ -36,9 +36,9 @@ public class PerforceConfiguration extends PollableScmConfiguration
     @Wizard.Ignore
     private int timeOffset= 0;
 
-    @ControllingCheckbox(checkedFields = {"charset"})
+    @ControllingCheckbox(checkedFields = {"charset"}) @Wizard.Ignore
     private boolean unicodeServer = false;
-    @Required
+    @Required @Wizard.Ignore
     private String charset = "none";
 
     public PerforceConfiguration()
