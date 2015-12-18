@@ -459,7 +459,6 @@
 
             that.type = type;
             this.trigger(RENDERED);
-            console.dir(type);
             this.trigger(TYPE_UPDATED, {type: type});
         },
 

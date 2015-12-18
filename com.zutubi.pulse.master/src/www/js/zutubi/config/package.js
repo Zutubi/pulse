@@ -5,6 +5,7 @@
 // dependency: ./ComboBox.js
 // dependency: ./ControllingCheckbox.js
 // dependency: ./ControllingDropDownList.js
+// dependency: ./Docs.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
 // dependency: ./ItemPicker.js

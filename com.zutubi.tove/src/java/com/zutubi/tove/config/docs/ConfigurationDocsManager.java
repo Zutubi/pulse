@@ -94,7 +94,6 @@ public class ConfigurationDocsManager
             {
                 PropertyDocs propertyDocs = new PropertyDocs(property.getName());
                 setDetails(messages, propertyDocs, property.getName() + ".", PROPERTY_KEY_MAP);
-                ensureBrief(propertyDocs);
                 findExamples(messages, propertyDocs, property);
                 typeDocs.addProperty(propertyDocs);
             }

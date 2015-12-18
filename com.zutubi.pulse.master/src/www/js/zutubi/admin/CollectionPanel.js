@@ -15,7 +15,8 @@
             var that = this,
                 collection = options.collection,
                 createAllowed = jQuery.inArray("create", collection.allowedActions) !== -1,
-                writeAllowed = (jQuery.inArray("write", collection.allowedActions) !== -1);
+                writeAllowed = (jQuery.inArray("write", collection.allowedActions) !== -1),
+                el;
 
             that.options = options;
 
@@ -56,13 +57,13 @@
 
             if (collection.state && collection.state.fields)
             {
-                stateWrapper = that.view.element.find(".k-state-wrapper");
-                stateWrapper.kendoZaPropertyTable({
+                el = that.view.element.find(".k-state-wrapper");
+                el.kendoZaPropertyTable({
                     id: "composite-state",
                     title: collection.state.label,
                     data: collection.state.fields
                 }).data("kendoZaPropertyTable");
-                stateWrapper.show();
+                el.show();
             }
 
             that.table = $("#collection-table").kendoZaTable({

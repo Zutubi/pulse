@@ -25,7 +25,7 @@
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
-                    model: that.options
+                    model: {introduction:options.introduction}
                 });
 
             that.view.render(options.container);

@@ -53,13 +53,13 @@
 
             if (composite.state && composite.state.fields)
             {
-                stateWrapper = that.view.element.find(".k-state-wrapper");
-                stateWrapper.kendoZaPropertyTable({
+                el = that.view.element.find(".k-state-wrapper");
+                el.kendoZaPropertyTable({
                     id: "composite-state",
                     title: composite.state.label,
                     data: composite.state.fields
                 }).data("kendoZaPropertyTable");
-                stateWrapper.show();
+                el.show();
             }
 
             that.form = $("#composite-form").kendoZaForm({
@@ -71,7 +71,8 @@
                 dirtyChecking: composite.keyed,
                 markRequired: composite.concrete,
                 readOnly: !writable,
-                submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
+                submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"],
+                docs: composite.type.docs
             }).data("kendoZaForm");
 
             if (composite.validationErrors)
