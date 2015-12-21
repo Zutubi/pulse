@@ -35,10 +35,10 @@ public class GitConfiguration extends PollableScmConfiguration
     private String repository;
     @Required
     private String branch = "master";
-    @Required @Wizard.Ignore
+    @Required
     @ControllingSelect(dependentFields = {"cloneDepth", "masterCloneDepth"}, enableSet = {"SHALLOW"})
     private CloneType cloneType = CloneType.NORMAL;
-    @Min(0) @Wizard.Ignore
+    @Min(0)
     private int cloneDepth = 32;
     @Min(0)
     private int masterCloneDepth = 0;
