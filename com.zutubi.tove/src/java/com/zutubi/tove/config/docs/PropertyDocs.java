@@ -1,5 +1,8 @@
 package com.zutubi.tove.config.docs;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,8 @@ import java.util.List;
  */
 public class PropertyDocs implements Docs
 {
+    private static final int BRIEF_LENGTH_LIMIT = 100;
+
     private String name;
     private String label;
     private String brief;
@@ -21,11 +26,17 @@ public class PropertyDocs implements Docs
         this.name = name;
     }
 
-    public PropertyDocs(String name, String label, String brief)
+    public PropertyDocs(String name, String label, String brief, String verbose)
     {
         this.name = name;
         this.label = label;
         this.brief = brief;
+        this.verbose = verbose;
+    }
+
+    public static PropertyDocs createFromUnencodedString(String name, String label, String verbose)
+    {
+        return new PropertyDocs(name, label, TextUtils.htmlEncode(StringUtils.trimmedString(verbose, BRIEF_LENGTH_LIMIT)), TextUtils.htmlEncode(verbose));
     }
 
     public String getName()

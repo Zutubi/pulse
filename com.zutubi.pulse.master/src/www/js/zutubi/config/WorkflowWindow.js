@@ -55,6 +55,7 @@
                 width: Math.min(that.options.width, $(window).width() - 80),
                 maxHeight: $(window).height() - 80,
                 modal: true,
+                actions: [],
                 title: that.options.title,
                 close: function()
                 {

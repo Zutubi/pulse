@@ -25,7 +25,7 @@
 
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-composite-panel">' +
-                    '<button class="k-composite-help-button"><span class="k-sprite"></span> <span class="k-composite-help-label">show full help</span></button>' +
+                    '<button class="k-composite-help-button"></button>' +
                     '<h1>#: label #</h1>' +
                     '<div style="display:none" class="k-state-wrapper">' +
                     '</div>' +
@@ -52,9 +52,6 @@
 
             that.view.render(options.container);
 
-            that.helpButton = that.view.element.find(".k-composite-help-button").kendoButton({spriteCssClass: "fa fa-question-circle"}).data("kendoButton");
-            that.helpButton.bind("click", jQuery.proxy(that._toggleHelpClicked, that));
-
             if (composite.state && composite.state.fields)
             {
                 el = that.view.element.find(".k-state-wrapper");
@@ -78,6 +75,10 @@
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"],
                 docs: composite.type.docs
             }).data("kendoZaForm");
+
+            that.helpButton = that.view.element.find(".k-composite-help-button").kendoZaHelpButton({
+                form: that.form
+            }).data("kendoZaHelpButton");
 
             if (composite.validationErrors)
             {
@@ -153,13 +154,6 @@
             }
 
             return false;
-        },
-
-        _toggleHelpClicked: function()
-        {
-            var text = this.form.isHelpShown() ? "show full help" : "hide full help";
-            this.view.element.find(".k-composite-help-label").html(text);
-            this.form.toggleHelp();
         },
 
         _submitClicked: function(e)

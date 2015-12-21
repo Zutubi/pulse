@@ -424,7 +424,7 @@ div.k-wizard-window {
 }
 
 .k-wizard-content {
-    padding: 0.5em;
+    padding: 0.4em;
 }
 
 /* Help */
@@ -459,13 +459,13 @@ div.k-wizard-window {
 
 .k-field-help {
     opacity: 0.9;
-    cursor: help;
 }
 
 .k-field-help-brief {
     font-size: 0.85em;
     font-style: italic;
     padding: 0.2em 0;
+    cursor: help;
 }
 
 .k-field-help-verbose {
@@ -536,4 +536,17 @@ div.k-wizard-window {
 
 .k-config-actions li:hover {
     cursor: pointer;
+}
+
+/* Windows */
+
+/* We expand the titlebar so it can accommodate buttons */
+.k-window-titlebar {
+    height: 1.3em;
+}
+
+.k-window-help-button {
+    position: absolute;
+    right: 0.2em;
+    top: 0.2em;
 }

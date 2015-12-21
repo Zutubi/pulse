@@ -45,7 +45,8 @@
         _render: function(data, el)
         {
             var that = this,
-                wrapper = $("<div></div>");
+                wrapper = $("<div></div>"),
+                button;
 
             // It's important to add this element to the DOM before rendering a form in it, as it
             // needs a width for downstream calculations to work.
@@ -58,10 +59,20 @@
                 baseName: Zutubi.config.baseName(that.options.path),
                 structure: data.form,
                 values: data.formDefaults || [],
+                docs: data.docs,
                 submits: []
             }).data("kendoZaForm");
 
             that.form.bind("enterPressed", jQuery.proxy(that.complete, that));
+
+            if (that.form.hasHelp())
+            {
+                button = $('<button class="k-window-help-button"></button>');
+                that.window.element.closest(".k-window").append(button);
+                button.kendoZaHelpButton({
+                    form: that.form
+                });
+            }
         },
 
         _translateProperties: function()

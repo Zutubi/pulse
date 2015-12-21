@@ -126,7 +126,6 @@
 
             that.formElement.off(ns);
             that.tableBodyElement.find(SELECTOR_FIELD_WRAPPER).off(ns);
-            that.tableBodyElement.find(SELECTOR_FIELD_HELP).off(ns);
 
             Widget.fn.destroy.call(that);
             kendo.destroy(that.element);
@@ -200,10 +199,13 @@
                     verbose: fieldDocs.verbose || ""
                 }));
                 helpElement.appendTo(fieldElement.closest("td"));
-                helpElement.on(CLICK, function()
+                if (fieldDocs.brief && fieldDocs.verbose && fieldDocs.brief !== fieldDocs.verbose)
                 {
-                    helpElement.toggleClass("k-collapsed k-expanded");
-                });
+                    helpElement.find(".k-field-help-brief").kendoTooltip({
+                        content: fieldDocs.verbose,
+                        width: 400
+                    });
+                }
             }
         },
 
@@ -464,9 +466,14 @@
             }
         },
 
+        hasHelp: function()
+        {
+            return this.element.find(SELECTOR_FIELD_HELP).length > 0;
+        },
+
         isHelpShown: function()
         {
-            return this.helpShown;
+            return this.hasHelp() && this.helpShown;
         },
 
         toggleHelp: function(show)

@@ -202,6 +202,8 @@
             that.stepIndexElement = that.element.find(".k-wizard-step-index");
             that._renderStepIndex();
 
+            that._renderHelpButton();
+
             that.typeSelectWrapper = that.element.find(".k-wizard-type-select");
             that.typeSelectDropDown = that.typeSelectWrapper.children("input").kendoDropDownList({
                 change: jQuery.proxy(that._typeSelected, that)
@@ -212,6 +214,19 @@
             that.checkFormWrapper = that.element.find(".k-wizard-check-form");
 
             that._showStepAtIndex(0);
+        },
+
+        _renderHelpButton: function()
+        {
+            var window = this.element.closest(".k-window"),
+                button;
+
+            if (window.length > 0)
+            {
+                button = $('<button class="k-wizard-help-button"></button>');
+                window.append(button);
+                this.helpButton = button.kendoZaHelpButton({}).data("kendoZaHelpButton");
+            }
         },
 
         _renderStepIndex: function()
@@ -296,6 +311,10 @@
                 form.element.empty();
                 form.destroy();
                 this.form = null;
+                if (this.helpButton)
+                {
+                    this.helpButton.setForm(null);
+                }
             }
 
             if (checkForm)
@@ -433,6 +452,10 @@
             }).data("kendoZaForm");
 
             that.form.bind("buttonClicked", jQuery.proxy(that._formSubmitted, that));
+            if (that.helpButton)
+            {
+                that.helpButton.setForm(that.form);
+            }
 
             if (type.checkType)
             {

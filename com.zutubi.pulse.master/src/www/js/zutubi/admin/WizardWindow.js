@@ -63,6 +63,7 @@
                 },
                 modal: true,
                 resizable: false,
+                actions: [],
                 title: "add new " + that.options.label,
                 close: function()
                 {

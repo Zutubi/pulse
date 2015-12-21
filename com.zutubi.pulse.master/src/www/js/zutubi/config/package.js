@@ -8,6 +8,7 @@
 // dependency: ./Docs.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
+// dependency: ./HelpButton.js
 // dependency: ./ItemPicker.js
 // dependency: ./PasswordField.js
 // dependency: ./StringList.js

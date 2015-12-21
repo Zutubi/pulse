@@ -30,7 +30,6 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfigu
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.ActionResult;
-import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.TreeNode;
@@ -41,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import static com.zutubi.tove.config.docs.PropertyDocs.createFromUnencodedString;
 
 /**
  * Custom action handler for project triggers.
@@ -82,25 +82,25 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
 
             form.addField(new TextFieldModel(FIELD_VERSION, LABEL_VERSION));
             formDefaults.put(FIELD_VERSION, project.getDependencies().getVersion());
-            typeDocs.addProperty(new PropertyDocs(FIELD_VERSION, LABEL_VERSION, "The build version number, e.g. 1.0.4."));
+            typeDocs.addProperty(createFromUnencodedString(FIELD_VERSION, LABEL_VERSION, "The build version number, e.g. 1.0.4."));
 
             form.addField(new DropdownFieldModel(FIELD_MATURITY, LABEL_MATURITY, IvyStatus.getStatuses()));
             formDefaults.put(FIELD_MATURITY, project.getDependencies().getStatus());
-            typeDocs.addProperty(new PropertyDocs(FIELD_MATURITY, LABEL_MATURITY, "The build maturity status, indicating how stable it is."));
+            typeDocs.addProperty(createFromUnencodedString(FIELD_MATURITY, LABEL_MATURITY, "The build maturity status, indicating how stable it is."));
 
             if (hasDependencyOfBuildableStatus(project))
             {
                 form.addField(new CheckboxFieldModel(FIELD_REBUILD, LABEL_REBUILD));
                 formDefaults.put(FIELD_REBUILD, trigger.isRebuildUpstreamDependencies());
-                typeDocs.addProperty(new PropertyDocs(FIELD_REBUILD, LABEL_REBUILD, "If checked, all upstream dependencies will be rebuilt first."));
+                typeDocs.addProperty(createFromUnencodedString(FIELD_REBUILD, LABEL_REBUILD, "If checked, all upstream dependencies will be rebuilt first."));
             }
 
             form.addField(new TextFieldModel(FIELD_REVISION, "revision"));
-            typeDocs.addProperty(new PropertyDocs(FIELD_REVISION, LABEL_REVISION, "The build revision, leave blank to build the latest revision at build activation time."));
+            typeDocs.addProperty(createFromUnencodedString(FIELD_REVISION, LABEL_REVISION, "The build revision, leave blank to build the latest revision at build activation time."));
 
             form.addField(new TextFieldModel(FIELD_PRIORITY, "priority"));
             formDefaults.put(FIELD_PRIORITY, "0");
-            typeDocs.addProperty(new PropertyDocs(FIELD_PRIORITY, LABEL_PRIORITY, "If set to non-zero, the priority of the build (higher priority builds go first)."));
+            typeDocs.addProperty(createFromUnencodedString(FIELD_PRIORITY, LABEL_PRIORITY, "If set to non-zero, the priority of the build (higher priority builds go first)."));
 
             Map<String, ResourcePropertyConfiguration> triggerProperties = trigger.getProperties();
             for (ResourcePropertyConfiguration property: project.getProperties().values())
@@ -132,7 +132,7 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
         field.addParameter("help", property.getDescription());
         form.addField(field);
         formDefaults.put(fieldName, property.getValue());
-        typeDocs.addProperty(new PropertyDocs(fieldName, property.getName(), property.getDescription()));
+        typeDocs.addProperty(createFromUnencodedString(fieldName, property.getName(), property.getDescription()));
     }
 
     private boolean hasDependencyOfBuildableStatus(ProjectConfiguration project)
