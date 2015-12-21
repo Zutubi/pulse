@@ -60,7 +60,7 @@
             template: '<form name="#: id #" id="#: id #"><table class="k-form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
-            helpTemplate: '<div class="k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
+            helpTemplate: '<div class="k-builtin-help k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
             errorTemplate: '<li>#: message #</li>',
             markRequired: true

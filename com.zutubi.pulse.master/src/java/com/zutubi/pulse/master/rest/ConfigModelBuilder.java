@@ -141,7 +141,13 @@ public class ConfigModelBuilder
 
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(new CollectionTypeModel(type));
+            CollectionTypeModel typeModel = new CollectionTypeModel(type);
+            if (typeModel.getTargetType() != null)
+            {
+                typeModel.getTargetType().setDocs(configurationDocsManager.getDocs((CompositeType) type.getTargetType()));
+            }
+
+            model.setType(typeModel);
         }
 
         if (isFieldSelected(filters, "allowedActions"))

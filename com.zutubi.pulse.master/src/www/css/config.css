@@ -429,6 +429,34 @@ div.k-wizard-window {
 
 /* Help */
 
+.k-builtin-help p {
+    margin: 0.4em 0;
+}
+
+.k-builtin-help b, .k-builtin-help strong {
+    font-weight: bold;
+}
+
+.k-builtin-help i, .k-builtin-help em {
+    font-style: italic;
+}
+
+.k-builtin-help ol, .k-builtin-help ul {
+    margin-left: 1em;
+}
+
+.k-builtin-help ol {
+    list-style: decimal;
+}
+
+.k-builtin-help ul {
+    list-style: disc;
+}
+
+.k-builtin-help li {
+    margin: 0.4em 0;
+}
+
 .k-field-help {
     opacity: 0.9;
     cursor: help;
@@ -450,34 +478,6 @@ div.k-wizard-window {
 
 .k-expanded .k-field-help-brief {
     display: none;
-}
-
-.k-field-help p {
-    margin: 0.4em 0;
-}
-
-.k-field-help b, .k-field-help strong {
-    font-weight: bold;
-}
-
-.k-field-help i, .k-field-help em {
-    font-style: italic;
-}
-
-.k-field-help ol, .k-field-help ul {
-    margin-left: 1em;
-}
-
-.k-field-help ol {
-    list-style: decimal;
-}
-
-.k-field-help ul {
-    list-style: disc;
-}
-
-.k-field-help li {
-    margin: 0.4em 0;
 }
 
 /* Drag and drop in collection tables */

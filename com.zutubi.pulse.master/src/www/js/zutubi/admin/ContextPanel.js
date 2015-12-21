@@ -57,7 +57,9 @@
         {
             var that = this,
                 panels = [],
-                element;
+                element,
+                docs,
+                content;
 
             if (that.panelBar)
             {
@@ -105,6 +107,31 @@
                         expanded: true,
                         content: element[0].outerHTML
                     });
+                }
+
+                if (data.kind === "composite")
+                {
+                    docs = data.type.docs;
+                }
+                else if (data.kind === "collection")
+                {
+                    docs = data.type.targetType.docs;
+                }
+
+                if (docs)
+                {
+                    content = docs.verbose || docs.brief;
+                    if (content)
+                    {
+                        element = this._createContentElement();
+                        element.addClass("k-builtin-help");
+                        element.append(content);
+                        panels.push({
+                            text: "documentation",
+                            expanded: true,
+                            content: element[0].outerHTML
+                        });
+                    }
                 }
 
                 that.panelBar = that.contentElement.kendoPanelBar({dataSource: panels}).data("kendoPanelBar");
