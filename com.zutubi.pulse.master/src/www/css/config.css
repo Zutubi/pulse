@@ -429,6 +429,10 @@ div.k-wizard-window {
 
 /* Help */
 
+.k-builtin-help h3 {
+    font-weight: bold;
+}
+
 .k-builtin-help p {
     margin: 0.4em 0;
 }
@@ -457,6 +461,10 @@ div.k-wizard-window {
     margin: 0.4em 0;
 }
 
+.k-builtin-help a {
+    color: inherit;
+}
+
 .k-field-help {
     opacity: 0.9;
 }
@@ -472,7 +480,26 @@ div.k-wizard-window {
     padding: 0.3em 0;
 }
 
-.k-collapsed .k-field-help-verbose {
+.k-field-help-examples {
+    margin-top: 0.5em;
+}
+
+.k-field-help-examples ul {
+    list-style-type: none;
+    margin-left: 0;
+}
+
+.k-field-help-examples li {
+    margin: 0.4em 0 0.8em 0;
+}
+
+.k-field-help-example-value {
+    border-left: 3px solid #eee;
+    margin: 0.3em 0;
+    padding: 0.3em;
+}
+
+.k-collapsed .k-field-help-verbose, .k-collapsed .k-field-help-examples {
     display: none;
 }
 

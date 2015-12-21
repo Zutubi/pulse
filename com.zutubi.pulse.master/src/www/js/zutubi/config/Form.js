@@ -61,6 +61,7 @@
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
             helpTemplate: '<div class="k-builtin-help k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
+            exampleTemplate: '<li class="k-field-help-example">#= blurb #<div class="k-field-help-example-value">#= value #</div></li>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
             errorTemplate: '<li>#: message #</li>',
             markRequired: true
@@ -83,6 +84,7 @@
             this.hiddenTemplate = kendo.template(this.options.hiddenTemplate);
             this.fieldTemplate = kendo.template(this.options.fieldTemplate);
             this.helpTemplate = kendo.template(this.options.helpTemplate);
+            this.exampleTemplate = kendo.template(this.options.exampleTemplate);
             this.buttonTemplate = kendo.template(this.options.buttonTemplate);
             this.errorTemplate = kendo.template(this.options.errorTemplate);
 
@@ -190,7 +192,9 @@
         _addFieldDocs: function(fieldName, fieldElement)
         {
             var fieldDocs = this.docs.getPropertyDocs(fieldName),
-                helpElement;
+                helpElement,
+                i,
+                example;
 
             if (fieldDocs)
             {
@@ -198,13 +202,28 @@
                     brief: fieldDocs.brief || "",
                     verbose: fieldDocs.verbose || ""
                 }));
+
                 helpElement.appendTo(fieldElement.closest("td"));
+
                 if (fieldDocs.brief && fieldDocs.verbose && fieldDocs.brief !== fieldDocs.verbose)
                 {
                     helpElement.find(".k-field-help-brief").kendoTooltip({
                         content: fieldDocs.verbose,
                         width: 400
                     });
+                }
+
+                if (fieldDocs.examples && fieldDocs.examples.length > 0)
+                {
+                    examplesList = $('<div class="k-field-help-examples"><h3>examples</h3><ul></ul></div>').appendTo(helpElement).find("ul");
+                    for (i = 0; i < fieldDocs.examples.length; i++)
+                    {
+                        example = fieldDocs.examples[i];
+                        examplesList.append(this.exampleTemplate({
+                            blurb: example.blurb || "",
+                            value: example.value
+                        }));
+                    }
                 }
             }
         },
