@@ -223,7 +223,7 @@
 
             if (window.length > 0)
             {
-                button = $('<button class="k-wizard-help-button"></button>');
+                button = $('<button class="k-window-help-button"></button>');
                 window.append(button);
                 this.helpButton = button.kendoZaHelpButton({}).data("kendoZaHelpButton");
             }
