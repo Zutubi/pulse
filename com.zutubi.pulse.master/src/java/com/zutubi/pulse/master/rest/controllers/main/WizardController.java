@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.google.common.base.Function;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.PostContext;
 import com.zutubi.pulse.master.rest.Utils;
@@ -16,6 +17,8 @@ import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.docs.PropertyDocs;
+import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TemplatedMapType;
@@ -48,6 +51,7 @@ public class WizardController
 {
     private static final String STEP_HIERARCHY = "meta.hierarchy";
     private static final String FIELD_PARENT_TEMPLATE = "parentTemplate";
+    private static final String LABEL_PARENT_TEMPLATE = "parent template";
     private static final String FIELD_TEMPLATE = "isTemplate";
 
     @Autowired
@@ -108,14 +112,21 @@ public class WizardController
 
         FormModel form = new FormModel();
         Map<String, Object> formDefaults = new HashMap<>();
+        TypeDocs formDocs = new TypeDocs();
 
-        form.addField(new DropdownFieldModel(FIELD_PARENT_TEMPLATE, "parent template", getAllTemplates(hierarchy)));
+        Messages messages = Messages.getInstance(itemType.getClazz());
+        form.addField(new DropdownFieldModel(FIELD_PARENT_TEMPLATE, LABEL_PARENT_TEMPLATE, getAllTemplates(hierarchy)));
         formDefaults.put(FIELD_PARENT_TEMPLATE, parentNode.getId());
-        form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, "template " + StringUtils.stripSuffix(scope, "s")));
+        formDocs.addProperty(new PropertyDocs(FIELD_PARENT_TEMPLATE, LABEL_PARENT_TEMPLATE, null, messages.format("parent.template.verbose")));
+
+        String templateLabel = "template " + StringUtils.stripSuffix(scope, "s");
+        form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, templateLabel));
         formDefaults.put(FIELD_TEMPLATE, false);
+        formDocs.addProperty(new PropertyDocs(FIELD_TEMPLATE, templateLabel, messages.format("template.brief"), messages.format("template.verbose")));
 
         CustomWizardStepModel preludeStep = new CustomWizardStepModel("hierarchy", STEP_HIERARCHY, form);
         preludeStep.setFormDefaults(formDefaults);
+        preludeStep.setDocs(formDocs);
         model.prependStep(preludeStep);
 
         return model;

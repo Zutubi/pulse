@@ -27,6 +27,7 @@
             this.types = [{
                 label: "",
                 form: config.form,
+                docs: config.docs,
                 simpleProperties: []
             }];
 

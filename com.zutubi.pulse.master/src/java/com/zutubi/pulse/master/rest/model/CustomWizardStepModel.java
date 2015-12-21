@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
+import com.zutubi.tove.config.docs.TypeDocs;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ public class CustomWizardStepModel extends WizardStepModel
 {
     private FormModel form;
     private Map<String, Object> formDefaults;
+    private TypeDocs docs;
 
     public CustomWizardStepModel(String label, String key, FormModel form)
     {
@@ -33,5 +35,15 @@ public class CustomWizardStepModel extends WizardStepModel
     public void setFormDefaults(Map<String, Object> formDefaults)
     {
         this.formDefaults = formDefaults;
+    }
+
+    public TypeDocs getDocs()
+    {
+        return docs;
+    }
+
+    public void setDocs(TypeDocs docs)
+    {
+        this.docs = docs;
     }
 }
