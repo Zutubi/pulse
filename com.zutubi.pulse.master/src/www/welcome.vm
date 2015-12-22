@@ -35,7 +35,7 @@
         Major missing pieces include:
     </p>
     <ul style="list-style: circle; width: 720px">
-        <li>Template hiearchy refactoring (e.g. smart clone, move).</li>
+        <li>Template hierarchy refactoring (e.g. smart clone, move).</li>
         <li>Template decoration of forms (showing what is inherited/overridden and from where).</li>
         <li>Field actions (e.g. browsing for files).</li>
         <li>Plugin administration.</li>
