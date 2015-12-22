@@ -14,6 +14,8 @@
         FINISHED = "finished",
         CANCELLED = "cancelled",
         KEY_HIERARCHY = "meta.hierarchy",
+        PARAMETER_IGNORE = "wizardIgnore",
+        PARAMETER_NO_INHERIT = "noInherit",
 
     WizardStep = function(config)
     {
@@ -69,21 +71,41 @@
     WizardStep.prototype = {
         applyDefaults: function(composite)
         {
-            var i;
+            var i,
+                type,
+                fields,
+                field,
+                values = {};
 
             for (i = 0; i < this.types.length; i++)
             {
-                if (this.types[i].symbolicName === composite.type.symbolicName)
+                type = this.types[i];
+                if (type.symbolicName === composite.type.symbolicName)
                 {
+                    values = this.valuesByType[i];
                     break;
                 }
             }
 
             if (i < this.types.length)
             {
-                this.types = [this.types[i]];
-                this.valuesByType = [this.valuesByType[i]];
+                this.types = [type];
+                fields = type.form.fields;
+                for (i = 0; i < fields.length; i++)
+                {
+                    field = fields[i];
+                    if (composite.properties.hasOwnProperty(field.name) && this._isInheritable(field))
+                    {
+                        values[field.name] = composite.properties[field.name];
+                    }
+                }
+                this.valuesByType = [values];
             }
+        },
+
+        _isInheritable: function(field)
+        {
+            return !field.parameters.hasOwnProperty(PARAMETER_IGNORE) && !field.parameters.hasOwnProperty(PARAMETER_NO_INHERIT);
         },
 
         getValue: function()
@@ -484,7 +506,7 @@
         {
             return jQuery.map(jQuery.grep(formStructure.fields, function(field)
             {
-                return field.parameters.hasOwnProperty("wizardIgnore");
+                return field.parameters.hasOwnProperty(PARAMETER_IGNORE);
             }), function(field)
             {
                 return field.name;

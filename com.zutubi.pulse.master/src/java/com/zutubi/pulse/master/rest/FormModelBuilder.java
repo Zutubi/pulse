@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
+import com.zutubi.tove.annotations.NoInherit;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.validation.NameValidator;
@@ -44,6 +45,8 @@ import static com.google.common.collect.Lists.newArrayList;
 public class FormModelBuilder
 {
     private static final Logger LOG = Logger.getLogger(FormModelBuilder.class);
+
+    public static final String PARAMETER_NO_INHERIT = "noInherit";
 
     /**
      * The object factory is required for the instantiation of objects that occurs within the form descriptor.
@@ -246,6 +249,11 @@ public class FormModelBuilder
     private void addFieldParameters(CompositeType type, TypeProperty property, FieldModel field, List<Validator> validators)
     {
         field.setRequired(hasRequiredValidator(field.getName(), validators));
+        if (property.getAnnotation(NoInherit.class) != null)
+        {
+            field.addParameter(PARAMETER_NO_INHERIT, Boolean.toString(true));
+        }
+
         handleAnnotations(type, property, field, null);
 
         if (!property.isWritable())

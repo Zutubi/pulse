@@ -17,7 +17,10 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.annotations.Listing;
+import com.zutubi.tove.annotations.NoOverride;
+import com.zutubi.tove.annotations.Password;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -497,10 +500,7 @@ public class ConfigModelBuilder
 
             // Note that if a field has both noInherit and noOverride,
             // noInherit takes precedence.
-            if (fieldHasAnnotation(type, fieldName, NoInherit.class))
-            {
-                field.addParameter("noInherit", "true");
-            } else
+            if (!field.hasParameter(FormModelBuilder.PARAMETER_NO_INHERIT))
             {
                 String ownerId = record.getOwner(fieldName);
                 if (ownerId != null)
@@ -510,7 +510,7 @@ public class ConfigModelBuilder
                         if (fieldHasAnnotation(type, fieldName, NoOverride.class))
                         {
                             // This field should be read-only.
-                            field.addParameter("noOverride", "true");
+                            field.addParameter("noOverride", Boolean.toString(true));
                         } else
                         {
                             field.addParameter("inheritedFrom", ownerId);
