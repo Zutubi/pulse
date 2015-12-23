@@ -137,8 +137,12 @@ public class WizardModelBuilder
         }
         else
         {
+            // Start with the record we would get by inheriting and adding nothing (note this will exclude e.g.
+            // non-inheritable values), then apply the values provided by the wizard, then fill in any empty values with
+            // defaults where available.
+            TemplateRecord trivialChild = new TemplateRecord("", templateParentRecord, type, type.createNewRecord(false));
+            record = trivialChild.flatten(false);
             MutableRecord providedRecord = Utils.convertProperties(type, templateOwnerPath, model.getProperties());
-            record = templateParentRecord.flatten(false);
             // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
             // passwords.  So replace any suppressions with values from the parent.
             ToveUtils.unsuppressPasswords(record, providedRecord, type, false);
