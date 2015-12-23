@@ -1300,8 +1300,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     }
 
     /**
-     * Performs a shallow validation of the given instance, recording errors
-     * on the instance itself.
+     * Performs a validation of the given instance, recording errors on the instance itself.
      *
      * @param type           instance type
      * @param instance       instance to validate
@@ -1313,11 +1312,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *                       completeness
      * @param checkEssential if true, validation will check for essential
      *                       complex fields
-     * @param deep           if true, recursively validate child records
+     * @param deep           if true, recursively validate child instances
      * @param ignoredFields  a set of names of fields that should not be
      *                       validated
      */
-    private void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential, boolean deep, Set<String> ignoredFields)
+    public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential, boolean deep, Set<String> ignoredFields)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
         ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentPath, baseName, !concrete, checkEssential, this);

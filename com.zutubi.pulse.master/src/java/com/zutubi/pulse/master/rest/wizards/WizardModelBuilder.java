@@ -9,17 +9,17 @@ import com.zutubi.pulse.master.rest.model.CompositeTypeModel;
 import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
 import com.zutubi.pulse.master.rest.model.WizardTypeModel;
 import com.zutubi.pulse.master.tove.handler.FormContext;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.i18n.MessagesTextProvider;
+import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,11 +34,9 @@ public class WizardModelBuilder
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigModelBuilder configModelBuilder;
     private TypeRegistry typeRegistry;
-    private ValidationManager validationManager;
 
     public TypedWizardStepModel buildStepForClass(String key, Class<? extends Configuration> clazz, FormContext context)
     {
-
         return buildStepForType(key, getCompositeType(clazz), context);
     }
 
@@ -65,13 +63,23 @@ public class WizardModelBuilder
         return step;
     }
 
-    public MutableRecord buildRecord(String templateOwnerPath, Class<? extends Configuration> clazz, String key, CompositeModel model) throws TypeException
+    public CompositeType typeCheck(Map<String, CompositeModel> models, String key, Class<? extends Configuration> expectedClazz)
     {
-        return buildRecord(templateOwnerPath, getCompositeType(clazz), key, model);
+        return typeCheck(models, key, getCompositeType(expectedClazz));
     }
 
-    public MutableRecord buildRecord(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException
+    /**
+     * Checks that an expected model is both provided and compatible with its expected type.
+     *
+     * @param models all provided models
+     * @param key key of the expected model to check
+     * @param expectedType type the model must be compatible with
+     * @return the actual type of the model (may be an extension of the expected type)
+     * @throws IllegalArgumentException if the model is not found or has an unknown or incompatible type
+     */
+    public CompositeType typeCheck(Map<String, CompositeModel> models, String key, CompositeType expectedType)
     {
+        CompositeModel model = models.get(key);
         if (model == null)
         {
             throw new IllegalArgumentException("A model with key '" + key + "' is required");
@@ -117,17 +125,39 @@ public class WizardModelBuilder
             throw new IllegalArgumentException("Model for key '" + key + "' has incompatible type '" + actualType.getSymbolicName() + "'.");
         }
 
-        return Utils.convertProperties(actualType, templateOwnerPath, model.getProperties());
+        return actualType;
     }
 
-    public MutableRecord buildAndValidateRecord(Class<? extends Configuration> clazz, String parentPath, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
+    public MutableRecord buildRecord(TemplateRecord templateParentRecord, String templateOwnerPath, CompositeType type, CompositeModel model) throws TypeException
     {
-        return buildAndValidateRecord(getCompositeType(clazz), parentPath, templateOwnerPath, concrete, models, key);
+        MutableRecord record;
+        if (templateParentRecord == null)
+        {
+            record = Utils.convertProperties(type, templateOwnerPath, model.getProperties());
+        }
+        else
+        {
+            MutableRecord providedRecord = Utils.convertProperties(type, templateOwnerPath, model.getProperties());
+            record = templateParentRecord.flatten(false);
+            // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
+            // passwords.  So replace any suppressions with values from the parent.
+            ToveUtils.unsuppressPasswords(record, providedRecord, type, false);
+            record.update(providedRecord, false, true);
+            record.update(type.createNewRecord(true), false, false);
+        }
+
+        return record;
     }
 
-    public MutableRecord buildAndValidateRecord(CompositeType type, String parentPath, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
+    public MutableRecord buildAndValidateRecord(CompositeType type, String parentPath, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
     {
-        MutableRecord record = buildRecord(templateOwnerPath, type, key, models.get(key));
+        CompositeType actualType = typeCheck(models, key, type);
+        if (templateParentRecord != null && StringUtils.stringSet(key))
+        {
+            templateParentRecord = (TemplateRecord) templateParentRecord.get(key);
+        }
+
+        MutableRecord record = buildRecord(templateParentRecord, templateOwnerPath, actualType, models.get(key));
         Configuration instance = configurationTemplateManager.validate(parentPath, null, record, concrete, false);
         if (!instance.isValid())
         {
@@ -136,28 +166,13 @@ public class WizardModelBuilder
         return record;
     }
 
-    public Configuration buildInstance(String templateOwnerPath, Class<? extends Configuration> expectedClazz, String key, CompositeModel model) throws TypeException
+    public Configuration buildAndValidateCreatorInstance(CompositeType type, String parentPath, String baseName, MutableRecord record) throws TypeException
     {
-        return buildInstance(templateOwnerPath, getCompositeType(expectedClazz), key, model);
-    }
-
-    public Configuration buildInstance(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException
-    {
-        MutableRecord record = buildRecord(templateOwnerPath, expectedType, key, model);
-        SimpleInstantiator instantiator = new SimpleInstantiator(templateOwnerPath, configurationReferenceManager, configurationTemplateManager);
-        return (Configuration) instantiator.instantiate(expectedType, record);
-    }
-
-    public void validateInstance(Configuration instance, String parentPath, String baseName, boolean concrete)
-    {
-        ConfigurationValidationContext validationContext = new ConfigurationValidationContext(instance, new MessagesTextProvider(instance), parentPath, baseName, !concrete, false, configurationTemplateManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationReferenceManager, configurationTemplateManager);
+        Configuration instance = (Configuration) instantiator.instantiate(type, record);
         try
         {
-            validationManager.validate(instance, validationContext);
-        }
-        catch (com.zutubi.validation.ValidationException e)
-        {
-            instance.addInstanceError(e.getMessage());
+            configurationTemplateManager.validateInstance(getCompositeType(instance.getClass()), instance, parentPath, baseName, true, true, false, null);
         }
         catch (Throwable e)
         {
@@ -169,9 +184,16 @@ public class WizardModelBuilder
 
             instance.addInstanceError(message);
         }
+
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance, "");
+        }
+
+        return instance;
     }
 
-    private CompositeType getCompositeType(Class<? extends Configuration> clazz)
+    public CompositeType getCompositeType(Class<? extends Configuration> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -199,10 +221,5 @@ public class WizardModelBuilder
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
-    }
-
-    public void setValidationManager(ValidationManager validationManager)
-    {
-        this.validationManager = validationManager;
     }
 }

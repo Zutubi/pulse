@@ -26,6 +26,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.List;
 import java.util.Map;
@@ -55,11 +56,13 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
-        MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateOwnerPath, concrete, models, "");
-        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(ScmConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_SCM));
-        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(TypeConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_TYPE));
+        MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
+        CompositeType scmType = wizardModelBuilder.getCompositeType(ScmConfiguration.class);
+        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_SCM));
+        CompositeType typeType = wizardModelBuilder.getCompositeType(TypeConfiguration.class);
+        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(typeType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_TYPE));
         return projectRecord;
     }
 

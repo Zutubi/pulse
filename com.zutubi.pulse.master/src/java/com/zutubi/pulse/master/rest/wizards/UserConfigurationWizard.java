@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -8,6 +7,7 @@ import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.Map;
 
@@ -28,15 +28,11 @@ public class UserConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
-        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildInstance(null, UserConfigurationCreator.class, "", models.get(""));
-        wizardModelBuilder.validateInstance(creator, parentPath, baseName, concrete);
-        if (!creator.isValid())
-        {
-            throw new ValidationException(creator, "");
-        }
-
+        CompositeType actualType = wizardModelBuilder.typeCheck(models, "", UserConfigurationCreator.class);
+        MutableRecord record = wizardModelBuilder.buildRecord(templateParentRecord, templateOwnerPath, actualType, models.get(""));
+        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildAndValidateCreatorInstance(actualType, parentPath, baseName, record);
         UserConfiguration userConfiguration = creator.create();
         return type.unstantiate(userConfiguration, templateOwnerPath);
     }

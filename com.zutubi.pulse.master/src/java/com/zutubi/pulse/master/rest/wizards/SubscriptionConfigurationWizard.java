@@ -17,6 +17,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.HashSet;
 import java.util.List;
@@ -96,12 +97,13 @@ public class SubscriptionConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
     {
-        MutableRecord subscriptionRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateOwnerPath, concrete, models, "");
+        MutableRecord subscriptionRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
         if (models.containsKey(KEY_CONDITION))
         {
-            subscriptionRecord.put(KEY_CONDITION, wizardModelBuilder.buildAndValidateRecord(SubscriptionConditionConfiguration.class, parentPath, templateOwnerPath, concrete, models, KEY_CONDITION));
+            CompositeType conditionType = wizardModelBuilder.getCompositeType(SubscriptionConditionConfiguration.class);
+            subscriptionRecord.put(KEY_CONDITION, wizardModelBuilder.buildAndValidateRecord(conditionType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_CONDITION));
         }
         return subscriptionRecord;
     }

@@ -26,6 +26,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -243,7 +244,7 @@ public class WizardController
         boolean templated = isTemplate == null ? false : Boolean.valueOf(isTemplate.toString());
 
         ConfigurationWizard wizard = buildWizard(itemType);
-        MutableRecord record = wizard.buildRecord(itemType, scope, null, null, !templated, body);
+        MutableRecord record = wizard.buildRecord(itemType, scope, null, (TemplateRecord) templateParentRecord, null, !templated, body);
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if (templated)
@@ -263,7 +264,7 @@ public class WizardController
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ConfigurationWizard wizard = buildWizard(context.getPostableType());
         boolean concrete = templateOwnerPath == null || configurationTemplateManager.isConcrete(templateOwnerPath);
-        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), templateOwnerPath, concrete, body);
+        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), null, templateOwnerPath, concrete, body);
 
         return configurationTemplateManager.insertRecord(configPath, record);
     }
