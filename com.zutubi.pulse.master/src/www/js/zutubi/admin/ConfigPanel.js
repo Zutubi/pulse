@@ -13,6 +13,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
+        DELTA ='delta',
         PATHSELECT = 'pathselect';
 
     Zutubi.admin.ConfigPanel = Observable.extend({
@@ -61,6 +62,7 @@
         },
 
         events: [
+            DELTA,
             PATHSELECT
         ],
 
@@ -146,6 +148,8 @@
                 Zutubi.admin.replaceConfigPath(newPath);
                 this.path = newPath;
             }
+
+            this.trigger(DELTA, {delta: delta});
         },
 
         beginNavigation: function()
@@ -461,6 +465,7 @@
 
                             if (delta.deletedPaths && delta.deletedPaths.indexOf(rootPath) >= 0)
                             {
+                                that.trigger(DELTA, {delta: delta});
                                 Zutubi.admin.openConfigPath(Zutubi.config.parentPath(rootPath));
                             }
                             else

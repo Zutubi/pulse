@@ -64,6 +64,10 @@ if (window.Zutubi.admin === undefined)
             if (!app.configPanel)
             {
                 app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
+                app.configPanel.bind("delta", function(e)
+                {
+                    app.navbar.applyDelta(e.delta);
+                });
                 app.configPanel.bind("pathselect", function(e)
                 {
                     app.router.navigate("/config/" + Zutubi.config.encodePath(e.path), true);
@@ -182,6 +186,7 @@ if (window.Zutubi.admin === undefined)
                 label: label,
                 success: function(delta)
                 {
+                    app.navbar.applyDelta(delta);
                     app.router.navigate("/config/" + Zutubi.config.encodePath(delta.addedPaths[0]), false);
                 }
             });

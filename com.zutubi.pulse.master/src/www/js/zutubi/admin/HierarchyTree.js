@@ -51,14 +51,18 @@
             }
         },
 
+
         setScope: function(scope)
         {
-            var dataSource;
-
-            if (this.scope && this.scope === scope)
+            if (this.scope !== scope)
             {
-                return;
+                this._setScope(scope);
             }
+        },
+
+        _setScope: function (scope)
+        {
+            var dataSource;
 
             this.scope = scope;
             this.bound = false;
@@ -81,8 +85,7 @@
                 }
             });
 
-            dataSource.bind('error', function(e)
-            {
+            dataSource.bind('error', function (e) {
                 Zutubi.core.reportError('Could not load hierarchy tree: ' + Zutubi.core.ajaxError(e.xhr));
             });
 
@@ -106,6 +109,40 @@
             if (this.bound)
             {
                 this._updateSelected();
+            }
+        },
+
+        _updateSelected: function()
+        {
+            var that = this,
+                root = that._getRoot(),
+                node;
+
+            if (that.item)
+            {
+                node = that.findByText(that.item);
+            }
+
+            if (node)
+            {
+                if (node !== root)
+                {
+                    that.expandTo(that.dataItem(node));
+                }
+
+                that.select(node);
+            }
+        },
+
+        prefixFilter: function(s)
+        {
+            if (s)
+            {
+                this._prefixFilterSubtree(this.root.children("li").first(), this.dataSource.at(0), s.toLowerCase());
+            }
+            else
+            {
+                this.root.find("li").css("display", "");
             }
         },
 
@@ -146,37 +183,47 @@
             return visible;
         },
 
-        prefixFilter: function(s)
+        applyDelta: function(delta)
         {
-            if (s)
-            {
-                this._prefixFilterSubtree(this.root.children("li").first(), this.dataSource.at(0), s.toLowerCase());
-            }
-            else
-            {
-                this.root.find("li").css("display", "");
-            }
-        },
+            var i, path;
 
-        _updateSelected: function()
-        {
-            var that = this,
-                root = that._getRoot(),
-                node;
-
-            if (that.item)
+            // If there is an addition or rename that applies to us, we just do a full reload (overkill but easy).
+            // Deletes are easy to handle directly.
+            if (delta.addedPaths)
             {
-                node = that.findByText(that.item);
-            }
-
-            if (node)
-            {
-                if (node !== root)
+                for (i = 0; i < delta.addedPaths.length; i++)
                 {
-                    that.expandTo(that.dataItem(node));
+                    path = delta.addedPaths[i];
+                    if (this.scope === Zutubi.config.parentPath(path))
+                    {
+                        this._setScope(this.scope);
+                        return;
+                    }
                 }
+            }
 
-                that.select(node);
+            if (delta.renamedPaths)
+            {
+                for (path in delta.renamedPaths)
+                {
+                    if (delta.renamedPaths.hasOwnProperty(path) && this.scope === Zutubi.config.parentPath(path))
+                    {
+                        this._setScope(this.scope);
+                        return;
+                    }
+                }
+            }
+
+            if (delta.deletedPaths)
+            {
+                for (i = 0; i < delta.deletedPaths.length; i++)
+                {
+                    path = delta.deletedPaths[i];
+                    if (this.scope === Zutubi.config.parentPath(path))
+                    {
+                        this.remove(this.findByText(Zutubi.config.subPath(path, 1, 2)));
+                    }
+                }
             }
         }
     });

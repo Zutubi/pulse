@@ -94,6 +94,11 @@
             this._filter();
         },
 
+        getScope: function()
+        {
+            return this.scope;
+        },
+
         setScope: function(scope)
         {
             this.scope = scope;
@@ -114,6 +119,11 @@
             }
 
             this.tree.selectItem(name);
+        },
+
+        applyDelta: function(delta)
+        {
+            this.tree.applyDelta(delta);
         }
     });
 

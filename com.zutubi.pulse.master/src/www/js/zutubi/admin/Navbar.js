@@ -183,6 +183,22 @@
         setScope: function(scope)
         {
             this.selector.setScope(scope);
+        },
+
+        applyDelta: function(delta)
+        {
+            var ourPath = this.selector.getScope() + "/" + this.selected,
+                newPath;
+
+            this.selector.applyDelta(delta);
+            if (delta.renamedPaths)
+            {
+                newPath = delta.renamedPaths[ourPath];
+                if (newPath)
+                {
+                    this.select(Zutubi.config.subPath(newPath, 1, 2));
+                }
+            }
         }
     });
 
@@ -273,6 +289,11 @@
             }
 
             this._updateAddButton(scope);
+        },
+
+        applyDelta: function(delta)
+        {
+            this.hierarchyCrumb.applyDelta(delta);
         },
 
         _updateAddButton: function()
