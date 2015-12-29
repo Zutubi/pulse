@@ -35,6 +35,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
@@ -394,13 +395,15 @@ public class ConfigModelBuilder
             }
 
             // If there is a table annotation, it could reference transient properties which we
-            // include with no extra formatting.
+            // include with default formatting.
             Table table = type.getAnnotation(Table.class, true);
             if (table != null)
             {
                 for (String column: table.columns())
                 {
-                    if (!properties.containsKey(column) && !type.hasProperty(column))
+                    // We ignore properties which are already in the formatted or default list, taking care around
+                    // enums which are formatted by default (so the existing property value can't be directly used).
+                    if (!properties.containsKey(column) && (!type.hasProperty(column) || type.getPropertyType(column) instanceof EnumType))
                     {
                         String methodName = getGetterMethodName(column);
                         try
@@ -409,6 +412,10 @@ public class ConfigModelBuilder
                             Object result = getter.invoke(instance);
                             if (result != null)
                             {
+                                if (result instanceof Enum)
+                                {
+                                    result = EnumUtils.toPrettyString((Enum) result);
+                                }
                                 properties.put(column, result);
                             }
                         }

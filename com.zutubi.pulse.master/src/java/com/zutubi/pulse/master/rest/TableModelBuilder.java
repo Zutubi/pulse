@@ -16,9 +16,6 @@ import java.util.List;
 /**
  * Builds {@link TableModel} instances out of annotated type information.
  *
- * FIXME kendo this replaces TableDescriptorFactory (TableModel replaces TableDescriptor, and Table
- *       dies)
- *
  * FIXME kendo it feels like this belongs in Tove (along with the models) see FormModelBuilder for
  *       details
  */
