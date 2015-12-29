@@ -307,16 +307,16 @@ public class ConfigActionsController
         ActionResult actionResult = handler.doAction(configPath, null, body.getProperties());
 
         String newPath = null;
-        CompositeModel model = null;
+        ConfigModel model = null;
         List<String> invalidatedPaths = actionResult.getInvalidatedPaths();
         if (invalidatedPaths.size() > 0)
         {
             newPath = invalidatedPaths.get(0);
-            model = (CompositeModel) configModelBuilder.buildModel(null, newPath, -1);
+            model = configModelBuilder.buildModel(null, newPath, -1);
         }
-        else if (configurationTemplateManager.pathExists(configPath))
+        else if (Utils.hasModellableType(configPath, configurationTemplateManager))
         {
-            model = (CompositeModel) configModelBuilder.buildModel(null, configPath, -1);
+            model = configModelBuilder.buildModel(null, configPath, -1);
         }
 
         return new ResponseEntity<>(new ActionResultModel(actionResult, newPath, model), HttpStatus.OK);

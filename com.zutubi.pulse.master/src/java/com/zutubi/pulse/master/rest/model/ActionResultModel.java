@@ -11,9 +11,9 @@ public class ActionResultModel
     private boolean success;
     private String message;
     private String newPath;
-    private CompositeModel model;
+    private ConfigModel model;
 
-    private ActionResultModel(boolean success, String message, String newPath, CompositeModel model)
+    private ActionResultModel(boolean success, String message, String newPath, ConfigModel model)
     {
         this.success = success;
         this.message = message;
@@ -21,12 +21,12 @@ public class ActionResultModel
         this.model = model;
     }
 
-    public ActionResultModel(ActionResult result, String newPath, CompositeModel model) throws TypeException
+    public ActionResultModel(ActionResult result, String newPath, ConfigModel model) throws TypeException
     {
         this(result.getStatus() == ActionResult.Status.SUCCESS, result.getMessage(), newPath, model);
     }
 
-    public ActionResultModel(boolean success, String message, CompositeModel model)
+    public ActionResultModel(boolean success, String message, ConfigModel model)
     {
         this(success, message, null, model);
     }
@@ -46,7 +46,7 @@ public class ActionResultModel
         return newPath;
     }
 
-    public CompositeModel getModel()
+    public ConfigModel getModel()
     {
         return model;
     }

@@ -39,6 +39,28 @@ public class Utils
         return path;
     }
 
+    /**
+     * Indicates if the given path has a known, complex type (thus we can return a model for the
+     * path). Such paths reference existing records or a defined but non-configured composite
+     * property of a parent composite.
+     *
+     * @param configPath the path to test
+     * @param configurationTemplateManager required resource
+     * @return true iff the given path has a type we can model
+     */
+    public static boolean hasModellableType(String configPath, ConfigurationTemplateManager configurationTemplateManager)
+    {
+        try
+        {
+            configurationTemplateManager.getType(configPath);
+            return true;
+        }
+        catch (IllegalArgumentException e)
+        {
+            return false;
+        }
+    }
+
     public static ComplexType getType(String configPath, ConfigurationTemplateManager configurationTemplateManager)
     {
         try
