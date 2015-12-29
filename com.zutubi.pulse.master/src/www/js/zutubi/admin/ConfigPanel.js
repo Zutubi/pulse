@@ -459,6 +459,7 @@
                     Zutubi.core.ajax({
                         type: "DELETE",
                         url: "/api/config/" + Zutubi.config.encodePath(path),
+                        maskAll: true,
                         success: function (delta)
                         {
                             var rootPath = that.getRootPath();
