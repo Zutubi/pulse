@@ -694,8 +694,9 @@ public class ConfigModelBuilder
                 if (sourceIndex > targetIndex)
                 {
                     children.add(targetIndex, children.remove(sourceIndex));
-                    targetIndex++;
                 }
+
+                targetIndex++;
             }
         }
     }
