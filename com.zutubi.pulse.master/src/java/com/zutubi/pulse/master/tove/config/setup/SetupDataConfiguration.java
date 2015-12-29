@@ -17,7 +17,7 @@ import java.io.IOException;
  * directory is available.
  */
 @SymbolicName("zutubi.setupDataConfig")
-@Form(fieldOrder = { "data" }, actions = { "next"})
+@Form(fieldOrder = { "data" })
 public class SetupDataConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required

@@ -10,7 +10,7 @@ import java.util.List;
  * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(labelWidth = 300, fieldOrder = {"showAllProjects", "sortProjectsAlphabetically", "shownProjects", "groupsShown", "showUngrouped", "showAllGroups", "sortGroupsAlphabetically", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(fieldOrder = {"showAllProjects", "sortProjectsAlphabetically", "shownProjects", "groupsShown", "showUngrouped", "showAllGroups", "sortGroupsAlphabetically", "shownGroups", "hierarchyShown", "hiddenHierarchyLevels", "buildsPerProject", "columns", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends ProjectsSummaryConfiguration
 {

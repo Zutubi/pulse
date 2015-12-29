@@ -19,7 +19,7 @@ import static com.google.common.collect.Iterables.transform;
  * A condition that is a disjunction of some common simple conditions.
  */
 @SymbolicName("zutubi.selectedBuildsConditionConfig")
-@Form(labelWidth = 350, fieldOrder = {"broken", "failed", "warnings", "statusChange", "includeChanges", "changesByMe", "changesSinceHealthy", "changesSinceSuccess", "upstreamChanges"})
+@Form(fieldOrder = {"broken", "failed", "warnings", "statusChange", "includeChanges", "changesByMe", "changesSinceHealthy", "changesSinceSuccess", "upstreamChanges"})
 public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration implements Validateable
 {
     private boolean broken;

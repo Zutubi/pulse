@@ -19,7 +19,7 @@ import java.util.Map;
 @SymbolicName("zutubi.userPreferencesConfig")
 @Classification(single = "settings")
 @Listing(order = {"dashboard", "browseView", "contacts", "subscriptions"})
-@Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval", "defaultTimestampDisplay"})
+@Form(fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval", "defaultTimestampDisplay"})
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
     public static final String COLUMN_NUMBER = "number";

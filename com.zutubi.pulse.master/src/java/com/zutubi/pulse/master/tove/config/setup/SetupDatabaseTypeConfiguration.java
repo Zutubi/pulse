@@ -18,7 +18,7 @@ import java.util.jar.JarFile;
  * setup procedure.
  */
 @SymbolicName("zutubi.setupDatabaseTypeConfig")
-@Form(fieldOrder = {"type", "driverFile", "host", "port", "database", "user", "password"}, actions = {"next"})
+@Form(fieldOrder = {"type", "driverFile", "host", "port", "database", "user", "password"})
 public class SetupDatabaseTypeConfiguration extends AbstractConfiguration implements Validateable
 {
     @ControllingSelect(enableSet = {"MYSQL", "POSTGRESQL", "RUBBISH"})

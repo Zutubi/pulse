@@ -16,7 +16,7 @@ import com.zutubi.validation.annotations.Required;
  * Used for the setup license page.
  */
 @SymbolicName("zutubi.setupLicenseConfig")
-@Form(fieldOrder = { "license" }, actions = { "next" })
+@Form(fieldOrder = { "license" })
 public class SetupLicenseConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
