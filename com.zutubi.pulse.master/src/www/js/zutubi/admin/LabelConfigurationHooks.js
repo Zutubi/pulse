@@ -19,7 +19,7 @@
 
         window = new Zutubi.core.PromptWindow({
             title: "Rename Label",
-            message: message,
+            messageHTML: message,
             width: 640,
             buttons: [{
                 label: allLabel,

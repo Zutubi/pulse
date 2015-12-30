@@ -6,7 +6,11 @@
     var ui = kendo.ui,
         TreeView = ui.TreeView,
         BOUND = "bound",
-        NODESELECT = "nodeselect";
+        DATABOUND = "dataBound",
+        DRAG = "drag",
+        DROP = "drop",
+        NODESELECT = "nodeselect",
+        SELECT = "select";
 
     Zutubi.admin.HierarchyTree = TreeView.extend({
         init: function(element, options)
@@ -22,15 +26,18 @@
         },
 
         events: [
-            // FIXME kendo: to subscribe to our own select event we need to have this here, is there a better way?
-            "dataBound",
-            "select",
-            NODESELECT
+            BOUND,
+            DATABOUND,
+            DRAG,
+            DROP,
+            NODESELECT,
+            SELECT
         ],
 
         options: {
             name: "ZaHierarchyTree",
             dataTextField: "name",
+            dragAndDrop: true,
             loadOnDemand: false,
             dataBound: function(e)
             {
@@ -44,6 +51,30 @@
                     this.trigger(BOUND);
                 }
             },
+            drag: function(e)
+            {
+                var targetNode;
+
+                if (e.statusClass === "add")
+                {
+                    targetNode = $(e.dropTarget).closest("li");
+                    if (this._isValidDropTarget(e.sourceNode, targetNode))
+                    {
+                        return;
+                    }
+                }
+
+                // Non-valid cases fall through to here, setting the class to indicate dropping is not allowed.
+                e.setStatusClass("k-denied");
+            },
+            drop: function(e)
+            {
+                if (e.valid && this._isValidDropTarget(e.sourceNode, e.destinationNode))
+                {
+                    e.preventDefault();
+                    this._previewMove(this.dataItem(e.sourceNode).name, this.dataItem(e.destinationNode).name);
+                }
+            },
             select: function(e)
             {
                 var that = this;
@@ -51,6 +82,98 @@
             }
         },
 
+        _isValidDropTarget: function(sourceNode, targetNode)
+        {
+            var targetItem = this.dataItem(targetNode),
+                currentParentNode = this.parent(sourceNode);
+
+            return targetItem && !targetItem.concrete && targetNode[0] !== currentParentNode[0];
+        },
+
+        _previewMove: function(name, newParentName)
+        {
+            var that = this;
+
+            Zutubi.core.ajax({
+                type: "POST",
+                url: "/api/hierarchy/previewMove",
+                data: {
+                    scope: that.scope,
+                    key: name,
+                    newParentKey: newParentName
+                },
+                maskAll: true,
+                success: function (model)
+                {
+                    that._confirmMove(model);
+                },
+                error: function (jqXHR)
+                {
+                    Zutubi.core.reportError("Could not preview move: " + Zutubi.core.ajaxError(jqXHR));
+                }
+            });
+        },
+
+        _confirmMove: function(model)
+        {
+            var that = this,
+                messageHTML,
+                i,
+                window;
+
+            messageHTML = '<p>Are you sure you&apos;d like to move &apos;' + kendo.htmlEncode(model.key) + '&apos; to the new template parent &apos;' + kendo.htmlEncode(model.newParentKey) + '&apos;?</p>';
+            if (model.pathsToDelete && model.pathsToDelete.length > 0)
+            {
+                messageHTML += '<p>Note that some paths are incompatible with the new parent, and will be deleted (this is not reversible):</p><ul>';
+                for (i = 0; i < model.pathsToDelete.length; i++)
+                {
+                    messageHTML += '<li>' + kendo.htmlEncode(model.pathsToDelete[i]) + '</li>';
+                }
+                messageHTML += '</ul>';
+            }
+
+            window = new Zutubi.core.PromptWindow({
+                title: "Confirm Move",
+                messageHTML: messageHTML,
+                width: 640,
+                buttons: [{
+                    label: "move",
+                    value: true,
+                    spriteCssClass: "fa fa-check-circle"
+                }, {
+                    label: "cancel",
+                    value: false,
+                    spriteCssClass: "fa fa-times-circle"
+                }],
+                select: function(value)
+                {
+                    if (value)
+                    {
+                        // Small optimisation so these are not needlessly POSTed back the server.
+                        model.pathsToDelete = null;
+
+                        Zutubi.core.ajax({
+                            type: "POST",
+                            maskAll: true,
+                            url: "/api/hierarchy/move",
+                            data: model,
+                            success: function(model)
+                            {
+                                // Since we cancel the drop event (because we don't know if the move will be confirmed
+                                // and succeed) we now need to manually move the node.
+                                that._setScope(that.scope);
+                            },
+                            error: function(jqXHR)
+                            {
+                                Zutubi.core.reportError("Could not move to new parent: " + Zutubi.core.ajaxError(jqXHR));
+                            }
+                        });
+                    }
+                }
+            });
+
+            window.show();
+        },
 
         setScope: function(scope)
         {

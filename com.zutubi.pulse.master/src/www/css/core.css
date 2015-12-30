@@ -20,6 +20,19 @@
     padding: 0.4em;
 }
 
+.k-dialog-window-content p {
+    margin-bottom: 0.5em;
+}
+
+.k-dialog-window-content ul {
+    margin-left: 1.6em;
+    list-style-type: disc;
+}
+
+.k-dialog-window-content li {
+    margin: 0.4em 0;
+}
+
 .k-dialog-window-actions {
     text-align: center;
 }

@@ -7,7 +7,7 @@
     Zutubi.core.PromptWindow = Observable.extend({
         // options: {
         //    title: window title (default: "")
-        //    message: message to prompt the user with (default: "Continue?")
+        //    messageHTML: message to prompt the user with, may contain any HTML (default: "Continue?")
         //    buttons: array of button definitions (default ok:true/cancel:false), each contains:
         //      - label: button text
         //      - spriteCssClass: classes for icon
@@ -26,14 +26,14 @@
 
             that.view = new kendo.View(
                 '<div style="display: none">' +
-                    '<div class="k-dialog-window-content">#: message #</div>' +
+                    '<div class="k-dialog-window-content">#= message #</div>' +
                     '<div class="k-dialog-window-actions"></div>' +
                 '</div>',
                 {
                     wrap: false,
                     evalTemplate: true,
                     model: {
-                        message: options.message
+                        message: options.messageHTML
                     }
                 });
 
