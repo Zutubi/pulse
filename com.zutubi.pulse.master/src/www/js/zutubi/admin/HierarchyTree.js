@@ -161,7 +161,7 @@
                             {
                                 // Since we cancel the drop event (because we don't know if the move will be confirmed
                                 // and succeed) we now need to manually move the node.
-                                that._setScope(that.scope);
+                                that._moveNode(model.key, model.newParentKey);
                             },
                             error: function(jqXHR)
                             {
@@ -173,6 +173,39 @@
             });
 
             window.show();
+        },
+
+        _moveNode: function(name, newParentName)
+        {
+            var node = this.findByText(name),
+                item = this.dataItem(node),
+                newParentNode = this.findByText(newParentName),
+                newParentItem = this.dataItem(newParentNode),
+                dataSource,
+                data,
+                i;
+
+            if (node && newParentNode)
+            {
+                this.expand(newParentNode);
+                this.remove(node);
+                dataSource = newParentItem.children;
+                data = dataSource.data();
+                for (i = 0; i < data.length; i++)
+                {
+                    if (data[i].name > name)
+                    {
+                        break;
+                    }
+                }
+
+                dataSource.insert(i, item);
+                if (this.item !== name)
+                {
+                    this.selectItem(name);
+                    this.trigger(NODESELECT, {name: name});
+                }
+            }
         },
 
         setScope: function(scope)
