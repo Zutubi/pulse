@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.model.TemplateNodeModel;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -9,11 +10,16 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Spring web controller for the /template subset of the RESTish API.
@@ -62,11 +68,21 @@ public class TemplateController
 
     private void addChildren(TemplateNodeModel model, TemplateNode node)
     {
-        Iterable<TemplateNode> visibleChildren = Iterables.filter(node.getChildren(), new Predicate<TemplateNode>()
+        List<TemplateNode> visibleChildren = Lists.newArrayList(Iterables.filter(node.getChildren(), new Predicate<TemplateNode>()
         {
             public boolean apply(TemplateNode templateNode)
             {
                 return configurationSecurityManager.hasPermission(templateNode.getPath(), AccessManager.ACTION_VIEW);
+            }
+        }));
+
+        final Sort.StringComparator comparator = new Sort.StringComparator();
+        Collections.sort(visibleChildren, new Comparator<TemplateNode>()
+        {
+            @Override
+            public int compare(TemplateNode o1, TemplateNode o2)
+            {
+                return comparator.compare(o1.getId(), o2.getId());
             }
         });
 
