@@ -7,10 +7,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.FormModelBuilder;
 import com.zutubi.pulse.master.rest.Utils;
-import com.zutubi.pulse.master.rest.actions.ActionHandler;
-import com.zutubi.pulse.master.rest.actions.CloneHandler;
-import com.zutubi.pulse.master.rest.actions.PullUpHandler;
-import com.zutubi.pulse.master.rest.actions.PushDownHandler;
+import com.zutubi.pulse.master.rest.actions.*;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
@@ -275,6 +272,18 @@ public class ConfigActionsController
         return postWithHandler(request, body, PushDownHandler.class);
     }
 
+    @RequestMapping(value = "introduceParent/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getIntroduceParent(HttpServletRequest request) throws Exception
+    {
+        return getWithHandler(request, IntroduceParentHandler.class);
+    }
+
+    @RequestMapping(value = "introduceParent/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postIntroduceParent(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
+    {
+        return postWithHandler(request, body, IntroduceParentHandler.class);
+    }
+
     @RequestMapping(value = "restore/**", method = RequestMethod.POST)
     public ResponseEntity<CollectionModel> postRestore(HttpServletRequest request) throws TypeException
     {
@@ -414,7 +423,7 @@ public class ConfigActionsController
             result = context.handler.doAction(context.path, context.variant, input);
         }
 
-        return new ResponseEntity<>(new ActionResultModel(result, null, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(result, null, configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "descendant/**", method = RequestMethod.POST)
@@ -439,7 +448,7 @@ public class ConfigActionsController
             message += ", failed on " + failureCount;
         }
 
-        return new ResponseEntity<>(new ActionResultModel(failureCount == 0, message, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(failureCount == 0, message, configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
     private ActionContext createContext(HttpServletRequest request, boolean single) throws Exception

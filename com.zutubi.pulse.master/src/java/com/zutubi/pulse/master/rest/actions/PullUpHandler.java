@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.rest.actions;
 
-import com.zutubi.pulse.master.rest.errors.ValidationException;
+import com.zutubi.pulse.master.rest.Validation;
 import com.zutubi.pulse.master.rest.model.ActionModel;
 import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
@@ -40,20 +40,10 @@ public class PullUpHandler implements ActionHandler
             throw new IllegalArgumentException("Cannot pull up path '" + path + "'");
         }
 
-        Object ancestorKey = input.get(FIELD_ANCESTOR_KEY);
-        if (ancestorKey == null || !(ancestorKey instanceof String) || ((String) ancestorKey).length() == 0)
-        {
-            ValidationException exception = new ValidationException();
-            exception.addFieldError(FIELD_ANCESTOR_KEY, "ancestor is required");
-            throw exception;
-        }
-
-        String ancestor = (String) ancestorKey;
+        String ancestor = Validation.getRequiredString(FIELD_ANCESTOR_KEY, "ancestor", input);
         if (!configurationRefactoringManager.canPullUp(path, ancestor))
         {
-            ValidationException exception = new ValidationException();
-            exception.addFieldError(FIELD_ANCESTOR_KEY, "cannot pull up to ancestor '" + ancestor + "'");
-            throw exception;
+            throw Validation.newFieldError(FIELD_ANCESTOR_KEY, "cannot pull up to ancestor '" + ancestor + "'");
         }
 
         return ancestor;

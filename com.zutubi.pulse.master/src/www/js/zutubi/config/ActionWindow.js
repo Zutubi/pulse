@@ -7,8 +7,17 @@
         CLONE = "clone",
         CLONE_KEY = "cloneKey",
         CLONE_KEY_PREFIX = "cloneKey_",
-        DEFAULT_ACTIONS = [CLONE, "pullUp", "pushDown"];
+        DEFAULT_ACTIONS = [CLONE, "introduceParent", "pullUp", "pushDown"];
 
+    // A window that handles the workflow of GETing an action form, then POSTing it to execute the
+    // action.
+    //
+    // options:
+    //   - path: config path to execute the action on
+    //   - action: model of the action to execute (must have action and label properties, may have
+    //             a variant property)
+    //   - executed: a function(data) invoked when the action is successfully executed, with the
+    //               data returned by the server (typically an ActionResultModel)
     Zutubi.config.ActionWindow = WorkflowWindow.extend({
         init: function (options)
         {

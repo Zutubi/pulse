@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.rest.actions;
 
-import com.zutubi.pulse.master.rest.errors.ValidationException;
+import com.zutubi.pulse.master.rest.Validation;
 import com.zutubi.pulse.master.rest.model.ActionModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.rest.model.forms.ItemPickerFieldModel;
@@ -42,9 +42,7 @@ public class PushDownHandler implements ActionHandler
         Object childKeysValue = input.get(FIELD_CHILD_KEYS);
         if (childKeysValue == null || !(childKeysValue instanceof List) || ((List) childKeysValue).size() == 0)
         {
-            ValidationException ex = new ValidationException();
-            ex.addFieldError(FIELD_CHILD_KEYS, "at least one child is required");
-            throw ex;
+            throw Validation.newFieldError(FIELD_CHILD_KEYS, "at least one child is required");
         }
 
         List childKeys = (List) childKeysValue;
@@ -53,9 +51,7 @@ public class PushDownHandler implements ActionHandler
         {
             if (!configurationRefactoringManager.canPushDown(path, childKey.toString()))
             {
-                ValidationException ex = new ValidationException();
-                ex.addFieldError(FIELD_CHILD_KEYS, "cannot push down to child '" + childKey + "'");
-                throw ex;
+                throw Validation.newFieldError(FIELD_CHILD_KEYS, "cannot push down to child '" + childKey + "'");
             }
 
             childSet.add(childKey.toString());

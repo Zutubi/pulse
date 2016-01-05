@@ -5,7 +5,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.PostContext;
 import com.zutubi.pulse.master.rest.Utils;
-import com.zutubi.pulse.master.rest.errors.ValidationException;
+import com.zutubi.pulse.master.rest.Validation;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.rest.model.forms.CheckboxFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
@@ -227,17 +227,13 @@ public class WizardController
         Object parentTemplateName = hierarchyDetails.getProperties().get(FIELD_PARENT_TEMPLATE);
         if (parentTemplateName == null)
         {
-            ValidationException e = new ValidationException(null, STEP_HIERARCHY);
-            e.addFieldError(FIELD_PARENT_TEMPLATE, "parent template is required");
-            throw e;
+            throw Validation.newFieldError(FIELD_PARENT_TEMPLATE, "parent template is required");
         }
 
         Record templateParentRecord = configurationTemplateManager.getRecord(PathUtils.getPath(scope, parentTemplateName.toString()));
         if (templateParentRecord == null)
         {
-            ValidationException e = new ValidationException(null, STEP_HIERARCHY);
-            e.addFieldError(FIELD_PARENT_TEMPLATE, "invalid parent template '" + parentTemplateName + "'");
-            throw e;
+            throw Validation.newFieldError(FIELD_PARENT_TEMPLATE, "invalid parent template '" + parentTemplateName + "'");
         }
 
         Object isTemplate = hierarchyDetails.getProperties().get(FIELD_TEMPLATE);

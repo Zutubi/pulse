@@ -124,6 +124,11 @@
         applyDelta: function(delta)
         {
             this.tree.applyDelta(delta);
+        },
+
+        reload: function()
+        {
+            this.tree.reload();
         }
     });
 

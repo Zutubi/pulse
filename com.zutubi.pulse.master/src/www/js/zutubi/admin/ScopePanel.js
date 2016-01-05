@@ -9,7 +9,8 @@
 (function($)
 {
     var Observable = kendo.Observable,
-        SELECT = 'select';
+        SELECT = 'select',
+        ACTION_INTRODUCE_PARENT = "introduceParent";
 
     Zutubi.admin.ScopePanel = Observable.extend({
         init: function (container)
@@ -59,6 +60,8 @@
             {
                 that._selectItem(e.name);
             });
+
+            that.contextPanel.bind("action", jQuery.proxy(that._doAction, that));
         },
 
         events: [
@@ -95,6 +98,40 @@
                 name = "";
             }
             this.trigger(SELECT, {scope: this.scope, name: name});
+        },
+
+        _doAction: function(e)
+        {
+            var that = this,
+                path = this.scope + "/" + this.name,
+                actionWindow;
+
+            actionWindow = new Zutubi.config.ActionWindow({
+                path: path,
+                action: e.action,
+                executed: jQuery.proxy(that._handleActionResult, that)
+            });
+
+            actionWindow.show();
+        },
+
+        _handleActionResult: function(data)
+        {
+            if (data.success)
+            {
+                Zutubi.core.reportSuccess(data.message);
+            }
+            else
+            {
+                Zutubi.core.reportError(data.message);
+            }
+
+            if (data.model)
+            {
+                this._showContent(data.model);
+            }
+
+            this.hierarchySelector.reload();
         },
 
         getItem: function()
@@ -145,7 +182,8 @@
 
         _showContent: function(data)
         {
-            var links;
+            var links,
+                contextData;
 
             this._clearContent();
             this.data = data;
@@ -165,6 +203,7 @@
                 });
             }
 
+            // Deliberately pick out the subset of data we want to show in the scope view.
             links = data.links || [];
             // FIXME kendo it would be nicer not to do a full page load here, since we point back into
             // admin.  Can this be done in a navigation handler?
@@ -174,8 +213,16 @@
                 url: "admin/config/" + Zutubi.config.encodePath(this.scope + "/" + this.name)
             });
 
-            // Deliberately pick out the subset of data we want to show in the scope view.
-            this.contextPanel.setData(null, {links: links});
+            contextData = {links: links};
+            if (this.hierarchySelector.getRootName() !== data.key)
+            {
+                contextData.actions = [{
+                    action: ACTION_INTRODUCE_PARENT,
+                    label: "introduce parent template"
+                }];
+            }
+
+            this.contextPanel.setData(this.scope + "/" + data.key, contextData);
         },
 
         _clearContent: function()

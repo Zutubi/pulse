@@ -194,6 +194,7 @@
             var fieldDocs = this.docs.getPropertyDocs(fieldName),
                 helpElement,
                 i,
+                examplesList,
                 example;
 
             if (fieldDocs)

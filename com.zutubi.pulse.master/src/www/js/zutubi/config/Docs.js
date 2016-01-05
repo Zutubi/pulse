@@ -16,7 +16,7 @@
                 this.data = {
                     brief: "",
                     verbose: ""
-                }
+                };
             }
 
             if (!this.data.properties)

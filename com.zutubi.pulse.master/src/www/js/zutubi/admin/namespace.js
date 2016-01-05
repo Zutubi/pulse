@@ -250,6 +250,7 @@ if (window.Zutubi.admin === undefined)
                 "fire": "bolt",
                 "hide": "trash-o",
                 "initialise": "refresh",
+                "introduceParent": "caret-square-o-up",
                 "kill": "exclamation-circle",
                 "pause": "pause",
                 "pin": "thumb-tack",

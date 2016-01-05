@@ -352,7 +352,7 @@
                     path = delta.addedPaths[i];
                     if (this.scope === Zutubi.config.parentPath(path))
                     {
-                        this._setScope(this.scope);
+                        this.reload();
                         return;
                     }
                 }
@@ -364,7 +364,7 @@
                 {
                     if (delta.renamedPaths.hasOwnProperty(path) && this.scope === Zutubi.config.parentPath(path))
                     {
-                        this._setScope(this.scope);
+                        this.reload();
                         return;
                     }
                 }
@@ -381,6 +381,11 @@
                     }
                 }
             }
+        },
+
+        reload: function()
+        {
+            this._setScope(this.scope);
         }
     });
 
