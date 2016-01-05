@@ -263,6 +263,7 @@ if (window.Zutubi.admin === undefined)
                 "restore": "plus-square-o",
                 "resume": "play",
                 "setPassword": "key",
+                "smartClone": "magic",
                 "takeResponsibility": "wrench",
                 "trigger": "bolt",
                 "unpin": "minus",

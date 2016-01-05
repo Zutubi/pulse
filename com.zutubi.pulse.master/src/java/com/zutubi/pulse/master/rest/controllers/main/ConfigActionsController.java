@@ -284,6 +284,18 @@ public class ConfigActionsController
         return postWithHandler(request, body, IntroduceParentHandler.class);
     }
 
+    @RequestMapping(value = "smartClone/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getSmartClone(HttpServletRequest request) throws Exception
+    {
+        return getWithHandler(request, SmartCloneHandler.class);
+    }
+
+    @RequestMapping(value = "smartClone/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postSmartClone(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
+    {
+        return postWithHandler(request, body, SmartCloneHandler.class);
+    }
+
     @RequestMapping(value = "restore/**", method = RequestMethod.POST)
     public ResponseEntity<CollectionModel> postRestore(HttpServletRequest request) throws TypeException
     {

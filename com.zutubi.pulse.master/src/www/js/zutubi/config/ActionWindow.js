@@ -5,9 +5,11 @@
 {
     var WorkflowWindow = Zutubi.config.WorkflowWindow,
         CLONE = "clone",
+        SMART_CLONE = "smartClone",
         CLONE_KEY = "cloneKey",
+        PARENT_KEY = "parentKey",
         CLONE_KEY_PREFIX = "cloneKey_",
-        DEFAULT_ACTIONS = [CLONE, "introduceParent", "pullUp", "pushDown"];
+        DEFAULT_ACTIONS = [CLONE, "introduceParent", "pullUp", "pushDown", SMART_CLONE];
 
     // A window that handles the workflow of GETing an action form, then POSTing it to execute the
     // action.
@@ -95,7 +97,7 @@
             // Some actions need to transform from the form to a more direct representation.
             // FIXME kendo this is perhaps where we also need to coerce? Could generic actions
             // have a type to allow this?
-            if (this.action.action === CLONE)
+            if (this.action.action === CLONE || this.action.action === SMART_CLONE)
             {
                 properties = {};
                 properties[Zutubi.config.baseName(this.options.path)] = this.form.getFieldNamed(CLONE_KEY).getValue();
@@ -107,6 +109,10 @@
                     if (name.indexOf(CLONE_KEY_PREFIX) === 0 && field.isEnabled())
                     {
                         properties[name.substring(CLONE_KEY_PREFIX.length)] = field.getValue();
+                    }
+                    else if (name === PARENT_KEY)
+                    {
+                        properties[name] = field.getValue();
                     }
                 }
             }
@@ -124,7 +130,7 @@
                 field,
                 translated;
 
-            if (this.action.action === CLONE)
+            if (this.action.action === CLONE || this.action.action === SMART_CLONE)
             {
                 if (errors)
                 {
@@ -137,6 +143,10 @@
                             if (field === baseName)
                             {
                                 translated[CLONE_KEY] = errors[field];
+                            }
+                            else if (field === PARENT_KEY)
+                            {
+                                translated[PARENT_KEY] = errors[field];
                             }
                             else
                             {

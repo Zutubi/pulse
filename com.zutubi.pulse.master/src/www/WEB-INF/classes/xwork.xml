@@ -589,13 +589,6 @@
                 <param name="location">result</param>
             </result>
         </action>
-
-        <action name="smartclone" class="com.zutubi.pulse.master.tove.webwork.CloneAction">
-            <param name="smart">true</param>
-            <result name="cancel" type="flexjson">configurationResponse</result>
-            <result name="success" type="flexjson">configurationResponse</result>
-            <result name="input" type="flexjson">newPanel</result>
-        </action>
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">

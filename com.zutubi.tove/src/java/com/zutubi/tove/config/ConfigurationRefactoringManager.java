@@ -33,6 +33,7 @@ public class ConfigurationRefactoringManager
     private static final Messages I18N = Messages.getInstance(ConfigurationRefactoringManager.class);
 
     public static final String ACTION_CLONE = "clone";
+    public static final String ACTION_SMART_CLONE = "smartClone";
     public static final String ACTION_PULL_UP = "pullUp";
     public static final String ACTION_PUSH_DOWN = "pushDown";
     public static final String ACTION_INTRODUCE_PARENT = "introduceParent";

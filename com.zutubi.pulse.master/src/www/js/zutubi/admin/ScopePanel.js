@@ -9,8 +9,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
-        SELECT = 'select',
-        ACTION_INTRODUCE_PARENT = "introduceParent";
+        SELECT = 'select';
 
     Zutubi.admin.ScopePanel = Observable.extend({
         init: function (container)
@@ -217,8 +216,11 @@
             if (this.hierarchySelector.getRootName() !== data.key)
             {
                 contextData.actions = [{
-                    action: ACTION_INTRODUCE_PARENT,
+                    action: "introduceParent",
                     label: "introduce parent template"
+                }, {
+                    action: "smartClone",
+                    label: "smart clone"
                 }];
             }
 

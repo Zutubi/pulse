@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.pulse.master.tove.webwork.CloneAction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +43,8 @@ public class CloneForm extends SeleniumForm
 
         for(int i = 0; i < descendants.size(); i++)
         {
-            fieldNames[i * 2 + offset] = CloneAction.CHECK_FIELD_PREFIX + descendants.get(i);
-            fieldNames[i * 2 + offset + 1] = CloneAction.KEY_FIELD_PREFIX + descendants.get(i);
+            fieldNames[i * 2 + offset] = "cloneCheck_" + descendants.get(i);
+            fieldNames[i * 2 + offset + 1] = "cloneKey_" + descendants.get(i);
         }
 
         return fieldNames;
