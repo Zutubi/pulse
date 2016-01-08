@@ -59,11 +59,6 @@ public class ToveUtils
     private static final String[] EMPTY_ARRAY = {};
     private static final Sort.StringComparator STRING_COMPARATOR = new Sort.StringComparator();
 
-    public static String getConfigURL(String path, String action, String submitField)
-    {
-        return getConfigURL(path, action, submitField, null);
-    }
-
     public static String getConfigURL(String path, String action, String submitField, String namespace)
     {
         String result = (namespace != null) ? namespace : PulseActionMapper.ADMIN_NAMESPACE;
@@ -158,7 +153,7 @@ public class ToveUtils
 
         if (path.length() == 0)
         {
-            listing = new ArrayList<String>(configurationTemplateManager.getPersistentScopes());
+            listing = new ArrayList<>(configurationTemplateManager.getPersistentScopes());
             Collections.sort(listing, STRING_COMPARATOR);
             listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
         }
@@ -167,7 +162,7 @@ public class ToveUtils
             Record record = configurationTemplateManager.getRecord(path);
             if (record != null)
             {
-                listing = new ArrayList<String>(((CollectionType) type).getOrder(record));
+                listing = new ArrayList<>(((CollectionType) type).getOrder(record));
                 listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
             }
         }
@@ -191,7 +186,7 @@ public class ToveUtils
 
     private static List<String> getSortedNestedProperties(final String path, final CompositeType type, final ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         List<String> nestedProperties = type.getNestedPropertyNames();
         nestedProperties = configurationSecurityManager.filterPaths(path, nestedProperties, AccessManager.ACTION_VIEW);
 
@@ -221,7 +216,7 @@ public class ToveUtils
                 {
                     String propertyPath = PathUtils.getPath(path, s);
                     ComplexType propertyType = configurationTemplateManager.getType(propertyPath);
-                    return new Pair<String, String>(s, getDisplayName(propertyPath, propertyType, type, (Record) value.get(s)));
+                    return new Pair<>(s, getDisplayName(propertyPath, propertyType, type, (Record) value.get(s)));
                 }
             }));
 
@@ -384,7 +379,7 @@ public class ToveUtils
      */
     public static List<String> evaluateFieldOrder(Iterable<String> declaredOrder, Collection<String> allFields)
     {
-        LinkedList<String> ordered = new LinkedList<String>();
+        LinkedList<String> ordered = new LinkedList<>();
         if (declaredOrder != null)
         {
             for (String declared: declaredOrder)
@@ -409,29 +404,6 @@ public class ToveUtils
         }
 
         return ordered;
-    }
-
-    /**
-     * Tests if the given property will appear on a form field for its parent
-     * type (as opposed to complex properties, which have their own forms).
-     *
-     * @param typeProperty the property to test
-     * @return true if this property is rendered as a single form field
-     */
-    public static boolean isFormField(TypeProperty typeProperty)
-    {
-        Type type = typeProperty.getType();
-        if(type instanceof SimpleType)
-        {
-            return true;
-        }
-
-        if(type instanceof CollectionType)
-        {
-            return ((CollectionType)type).getCollectionType() instanceof SimpleType;
-        }
-
-        return false;
     }
 
     public static String getFormHeading(CompositeType type)
@@ -564,12 +536,6 @@ public class ToveUtils
             value = key;
         }
         return value;
-    }
-
-    public static Map<String, Object> initialiseContext(Class clazz)
-    {
-        Map<String, Object> context = new HashMap<String, Object>();
-        return populateContext(clazz, context);
     }
 
     public static Map<String, Object> populateContext(Class clazz, Map<String, Object> context)
