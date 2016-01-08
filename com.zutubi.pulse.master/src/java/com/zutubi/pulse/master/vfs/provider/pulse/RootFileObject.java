@@ -14,24 +14,20 @@ public class RootFileObject extends StaticMappingFileObject
     
     public static final String NODE_ARTIFACTS       = "artifacts";
     public static final String NODE_BUILDS          = "builds";
-    public static final String NODE_CONFIG          = "config";
     public static final String NODE_PLUGINS         = "plugins";
     public static final String NODE_PROJECTS        = "projects";
     public static final String NODE_PROJECT_CONFIGS = PREFIX_CONFIG + "projects";
     public static final String NODE_REFERENCE       = "reference";
-    public static final String NODE_TEMPLATES       = "templates";
 
     static
     {
         // setup the default root node definitions.
         nodesDefinitions.put(NODE_ARTIFACTS, GlobalArtifactsFileObject.class);
         nodesDefinitions.put(NODE_BUILDS, BuildsFileObject.class);
-        nodesDefinitions.put(NODE_CONFIG, ConfigFileObject.class);
         nodesDefinitions.put(NODE_PLUGINS, PluginsFileObject.class);
         nodesDefinitions.put(NODE_PROJECTS, ProjectsFileObject.class);
         nodesDefinitions.put(NODE_PROJECT_CONFIGS, ProjectConfigsFileObject.class);
         nodesDefinitions.put(NODE_REFERENCE, ReferenceRootFileObject.class);
-        nodesDefinitions.put(NODE_TEMPLATES, TemplateScopesFileObject.class);
     }
 
     public RootFileObject(final FileName name, final AbstractFileSystem fs)
