@@ -270,6 +270,7 @@ public class ConfigModelBuilder
                         if (configurationTemplateManager.pathExists(descendantPath) && configurationSecurityManager.hasPermission(descendantPath, AccessManager.ACTION_VIEW))
                         {
                             result.add(new Pair<>(currentNode.getDepth() - topDepth, currentNode.getId()));
+                            return false;
                         }
 
                         return true;

@@ -65,31 +65,26 @@
 
         _showConfiguredDescendants: function(descendants)
         {
-            var i,
+            var i, j,
                 descendant,
-                lastIndent = 0,
-                template = kendo.template('<li><a>#: second #</a></li>'),
+                template = kendo.template('<li><a>#= levels # #: name #</a></li>'),
                 list = $('<ul></ul>'),
-                currentList = list,
-                lastItem= $(),
+                levels,
                 el;
 
             for (i = 0; i < descendants.length; i++)
             {
                 descendant = descendants[i];
-                if (descendant.first > lastIndent)
+                levels = ' ';
+                for (j = 0; j < descendant.first; j++)
                 {
-                    currentList = $('<ul></ul>').appendTo(lastItem);
-                }
-                else if (descendant.first < lastIndent)
-                {
-                    currentList = currentList.parent().parent();
+                    levels += '<span class="fa fa-caret-right"></span> ';
                 }
 
-                lastIndent = descendant.first;
-
-                lastItem = $(template(descendant));
-                currentList.append(lastItem);
+                list.append($(template({
+                    levels: levels,
+                    name: descendant.second
+                })));
             }
 
             el = $('<div class="k-configured-descendants"></div>').appendTo(this.contentElement);
