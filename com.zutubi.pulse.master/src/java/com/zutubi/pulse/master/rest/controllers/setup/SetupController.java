@@ -17,10 +17,7 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
-import com.zutubi.pulse.master.rest.model.CheckModel;
-import com.zutubi.pulse.master.rest.model.CheckResultModel;
-import com.zutubi.pulse.master.rest.model.CompositeModel;
-import com.zutubi.pulse.master.rest.model.TransientModel;
+import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.rest.model.setup.SetupModel;
 import com.zutubi.pulse.master.rest.model.setup.TaskModel;
 import com.zutubi.pulse.master.rest.model.setup.VersionModel;
@@ -47,6 +44,8 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.StringUtils;
+import org.apache.xmlrpc.XmlRpcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +60,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -299,6 +299,27 @@ public class SetupController
         SetupLicenseConfiguration instance = convertAndValidate(SetupLicenseConfiguration.class, model);
         setupManager.setLicense(instance);
         return get();
+    }
+
+    @RequestMapping(value = "/requestLicense", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postRequestLicense(@RequestBody CompositeModel model) throws Exception
+    {
+        RequestLicenseConfiguration instance = convertAndValidate(RequestLicenseConfiguration.class, model);
+        try
+        {
+            XmlRpcClient client = new XmlRpcClient("http://zutubi.com/xmlrpc/");
+            Vector<String> args = new Vector<>(2);
+            args.add(instance.getFullName());
+            args.add(instance.getEmail());
+
+            String license = (String) client.execute("evaluation", args);
+            license = StringUtils.wrapString(license.replaceAll("\\s", ""), 42, null);
+            return new ResponseEntity<>(new ActionResultModel(true, license, null), HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(new ActionResultModel(false, e.getMessage(), null), HttpStatus.OK);
+        }
     }
 
     @RequestMapping(value = "/admin", method = RequestMethod.POST)

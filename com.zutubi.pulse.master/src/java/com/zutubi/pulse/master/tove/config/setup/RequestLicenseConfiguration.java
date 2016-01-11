@@ -10,23 +10,23 @@ import com.zutubi.validation.annotations.Required;
  * Used for the AJAX request license form on the setup license page.
  */
 @SymbolicName("zutubi.requestLicenseConfig")
-@Form(fieldOrder = { "name", "email" })
+@Form(fieldOrder = { "fullName", "email" })
 public class RequestLicenseConfiguration extends AbstractConfiguration
 {
     @Required
-    private String name;
+    private String fullName;
     @Required
     @Email
     private String email;
 
-    public String getName()
+    public String getFullName()
     {
-        return name;
+        return fullName;
     }
 
-    public void setName(String name)
+    public void setFullName(String fullName)
     {
-        this.name = name;
+        this.fullName = fullName;
     }
 
     public String getEmail()

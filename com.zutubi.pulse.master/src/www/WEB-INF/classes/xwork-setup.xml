@@ -58,12 +58,6 @@
             </result>
         </action>
 
-        <action name="requestLicense" class="com.zutubi.pulse.master.xwork.actions.ajax.RequestLicenseAction">
-            <result name="render" type="velocity">request-license.vm</result>
-            <result name="input" type="flexjson">configurationErrors</result>
-            <result name="success" type="flexjson">result</result>
-        </action>
-
         <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeDirectoryAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">data</result>

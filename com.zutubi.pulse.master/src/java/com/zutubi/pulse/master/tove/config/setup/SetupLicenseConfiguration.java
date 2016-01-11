@@ -23,6 +23,15 @@ public class SetupLicenseConfiguration extends AbstractConfiguration implements 
     @TextArea(rows = 10, cols = 60)
     private String license;
 
+    public SetupLicenseConfiguration()
+    {
+    }
+
+    public SetupLicenseConfiguration(String license)
+    {
+        this.license = license;
+    }
+
     public String getLicense()
     {
         return license;

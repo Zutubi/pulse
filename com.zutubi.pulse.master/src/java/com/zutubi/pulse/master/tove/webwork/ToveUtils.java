@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -23,10 +22,12 @@ import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -56,7 +57,6 @@ public class ToveUtils
     private static final String KEY_FORM_HEADING = "form.heading";
     private static final String KEY_TABLE_HEADING = "table.heading";
 
-    private static final String[] EMPTY_ARRAY = {};
     private static final Sort.StringComparator STRING_COMPARATOR = new Sort.StringComparator();
 
     public static String getConfigURL(String path, String action, String submitField, String namespace)
@@ -84,55 +84,6 @@ public class ToveUtils
         }
 
         return result;
-    }
-
-    /**
-     * Convert the parameters from the HTTP post into a record, according to the type definition.
-     * <p/>
-     * NOTE: This method does not do any real type conversion. Instead, it 'unwraps' data that has been
-     * wrapped in String[]s'.
-     *
-     * @param type       instance that defines the data contained in the parameters map.
-     * @param parameters map that contains the http parameters to be converted into a record.
-     * @return a record instance containing the parameter data that applies to the map.
-     */
-    public static MutableRecord toRecord(CompositeType type, Map<String, String[]> parameters)
-    {
-        MutableRecord record = new MutableRecordImpl();
-        record.setSymbolicName(type.getSymbolicName());
-
-        for (TypeProperty property : type.getProperties())
-        {
-            String propertyName = property.getName();
-
-            String[] parameterValue = parameters.get(propertyName);
-            if (parameterValue == null)
-            {
-                parameterValue = parameters.get(propertyName + "__default");
-                if (parameterValue == null)
-                {
-                    continue;
-                }
-            }
-
-            parameterValue = transform(Arrays.asList(parameterValue), StringUtils.trim()).toArray(new String[parameterValue.length]);
-
-            if (Collection.class.isAssignableFrom(property.getClazz()))
-            {
-                if(parameterValue.length == 1 && parameterValue[0].length() == 0)
-                {
-                    // This indicates an empty array: something the UI is
-                    // incapable of sending directly for custom components.
-                    parameterValue = EMPTY_ARRAY;
-                }
-                record.put(propertyName, parameterValue);
-            }
-            else
-            {
-                record.put(propertyName, parameterValue[0]);
-            }
-        }
-        return record;
     }
 
     public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
@@ -449,23 +400,6 @@ public class ToveUtils
         {
             // Auto-pluralise
             return StringUtils.pluralise(messages.format("label"));
-        }
-    }
-
-    public static void mapErrors(Configuration instance, ValidationAware validationAware, String fieldSuffix)
-    {
-        for(String instanceError: instance.getInstanceErrors())
-        {
-            validationAware.addActionError(instanceError);
-        }
-
-        for(Map.Entry<String, List<String>> fieldEntry: instance.getFieldErrors().entrySet())
-        {
-            String fieldName = fieldSuffix == null ? fieldEntry.getKey() : fieldEntry.getKey() + fieldSuffix;
-            for(String error: fieldEntry.getValue())
-            {
-                validationAware.addFieldError(fieldName, error);
-            }
         }
     }
 
