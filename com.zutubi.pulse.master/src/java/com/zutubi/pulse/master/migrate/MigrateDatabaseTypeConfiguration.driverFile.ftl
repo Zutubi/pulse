@@ -1,10 +1,15 @@
-${form.name}.items.last().on('browse', function(field)
+(function(form, field)
 {
-    var browser = new Zutubi.fs.LocalFileSystemBrowser({
-        baseUrl : '${base}',
-        isWindows: ${isWindows},
-        title : '${"driverFile.popup.title"?i18n}',
-        target : '${parameters.id?js_string}'
+    form.bind('action', function(e)
+    {
+        if (e.field !== field || e.action !== 'browse') return;
+
+        var browser = new Zutubi.fs.LocalFileSystemBrowser({
+            baseUrl : window.baseUrl,
+            isWindows: ${isWindows},
+            title : 'select database driver',
+            target : field.element.get().id
+        });
+        browser.show();
     });
-    browser.show();
 });

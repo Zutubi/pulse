@@ -1,41 +1,40 @@
-${form.name}.items.last().on('browse', function(field)
+(function(form, field)
 {
-    function findProjectPath(path)
+    form.bind('action', function(e)
     {
-<#if field.parameters.baseName?exists>
-        var start = 'c';
-<#else>
-        var start = 'wizards/';
-</#if>
-        var parentPath = getParentPath(path);
-        while(parentPath != null && parentPath != 'projects')
+        if (e.field !== field || e.action !== 'browse') return;
+
+        function findProjectPath(path)
         {
-            path = parentPath;
-            parentPath = getParentPath(path);
-            start = 'c';
+            var parentPath = Zutubi.config.parentPath(path);
+            while(parentPath != null && parentPath != 'projects')
+            {
+                path = parentPath;
+                parentPath = Zutubi.config.parentPath(path);
+            }
+
+            return 'c' + path;
         }
 
-        return start + path;
-    }
-
-    var projectPath = findProjectPath('${field.parameters.path?js_string}');
-    var prefix = '';
+        var projectPath = findProjectPath(form.options.parentPath + "/" + form.options.baseName);
+        var prefix = '';
 <#if field.parameters.baseDirField?exists>
-    var dirField = Ext.getCmp('zfid.${field.parameters.baseDirField}');
-    prefix += dirField.getValue();
+        var dirField = form.getFieldNamed('${field.parameters.baseDirField}');
+        prefix += dirField.getValue();
 </#if>
-<#assign title = "${field.name}" + ".popup.title"/>
-    var browser = new Zutubi.fs.WorkingCopyFileSystemBrowser({
-        baseUrl : '${base}',
-        showFiles: true,
-        prefix:prefix,
-        basePath: projectPath + '/scm/' + prefix,
-        title : '${title?i18n}',
-        target : '${parameters.id?js_string}',
-        onClose: function()
-        {
-            updateButtons();
-        }
+
+        var browser = new Zutubi.fs.WorkingCopyFileSystemBrowser({
+            baseUrl : window.baseUrl,
+            showFiles: true,
+            prefix: prefix,
+            basePath: projectPath + '/scm/' + prefix,
+            title : 'browse',
+            target : field.element.get().id,
+            onClose: function()
+            {
+                form._updateButtons();
+            }
+        });
+        browser.show();
     });
-    browser.show();
 });

@@ -1,16 +1,31 @@
-${form.name}.items.last().on('select', function(field)
+(function(form, field)
 {
-    var ports = {'EMBEDDED': '0', 'MYSQL': '3306', 'POSTGRESQL': '5432'};
-    var port = ports[field.getValue()];
-    if(port)
+    var ports = {'EMBEDDED': '0', 'MYSQL': '3306', 'POSTGRESQL': '5432'},
+        drivers = {'EMBEDDED': 'org.hsqldb.jdbcDriver', 'MYSQL': 'com.mysql.jdbc.Driver', 'POSTGRESQL': 'org.postgresql.Driver'};
+
+    function applyDefaults()
     {
-        ${form.name}.findById('zfid.port').setValue(port);
+        var db = field.getValue(), port, driver;
+        port = ports[db];
+        if (port)
+        {
+            form.getFieldNamed('port').bindValue(port);
+        }
+
+        driver = drivers[db];
+        if (driver)
+        {
+            form.getFieldNamed('driver').bindValue(driver);
+        }
     }
 
-    var drivers = {'EMBEDDED': 'org.hsqldb.jdbcDriver', 'MYSQL': 'com.mysql.jdbc.Driver', 'POSTGRESQL': 'org.postgresql.Driver'};
-    var driver = drivers[field.getValue()];
-    if (driver)
+    form.bind('created', function(e)
     {
-        ${form.name}.findById('zfid.driver').setValue(driver);
-    }
+        applyDefaults();
+    });
+
+    field.bind('change', function(e)
+    {
+        applyDefaults();
+    });
 });

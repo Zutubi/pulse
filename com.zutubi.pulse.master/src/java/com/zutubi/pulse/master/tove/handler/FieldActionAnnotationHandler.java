@@ -8,6 +8,7 @@ import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
 
 import java.lang.annotation.Annotation;
 
@@ -18,6 +19,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
 {
     private static final Logger LOG = Logger.getLogger(FieldActionAnnotationHandler.class);
 
+    private Configuration freemarkerConfiguration;
     private ObjectFactory objectFactory;
 
     @Override
@@ -41,11 +43,7 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
         }
 
         field.addAction(fieldAction.actionKey());
-        if (StringUtils.stringSet(fieldAction.template()))
-        {
-            // FIXME kendo actually load the JS, not just the template name, at some point!
-            field.addScript(fieldAction.template());
-        }
+        FieldScriptAnnotationHandler.loadTemplate(annotatedType.getClazz(), field, fieldAction.template(), freemarkerConfiguration);
     }
 
     private boolean satisfied(Class<Object> filterClass, FieldModel field, FieldAction fieldAction, FormContext context)
@@ -60,6 +58,10 @@ public class FieldActionAnnotationHandler implements AnnotationHandler
         return predicate.satisfied(field, fieldAction, context);
     }
 
+    public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
+    {
+        this.freemarkerConfiguration = freemarkerConfiguration;
+    }
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {

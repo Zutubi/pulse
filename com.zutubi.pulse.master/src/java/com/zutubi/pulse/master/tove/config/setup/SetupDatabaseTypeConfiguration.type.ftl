@@ -1,9 +1,23 @@
-${form.name}.items.last().on('select', function(field)
+(function(form, field)
 {
     var ports = {'EMBEDDED': '0', 'MYSQL': '3306', 'POSTGRESQL': '5432'};
-    var port = ports[field.getValue()];
-    if(port)
+
+    function applyDefaults()
     {
-        ${form.name}.findById('zfid.port').setValue(port);
+        var port = ports[field.getValue()];
+        if (port)
+        {
+            form.getFieldNamed('port').bindValue(port);
+        }
     }
+
+    form.bind('created', function(e)
+    {
+        applyDefaults();
+    });
+
+    field.bind('change', function(e)
+    {
+        applyDefaults();
+    });
 });

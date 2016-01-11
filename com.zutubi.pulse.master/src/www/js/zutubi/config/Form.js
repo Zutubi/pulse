@@ -20,6 +20,7 @@
         SUBMIT = "submit" + ns,
         SELECTOR_FIELD_WRAPPER = ".k-field-wrapper",
         SELECTOR_FIELD_HELP = ".k-field-help",
+        ACTION = "action",
         CREATED = "created",
         BUTTON_CLICKED = "buttonClicked",
         ENTER_PRESSED = "enterPressed",
@@ -48,8 +49,8 @@
         },
 
         events: [
+            ACTION,
             CREATED,
-
             BUTTON_CLICKED,
             ENTER_PRESSED
         ],
@@ -59,7 +60,11 @@
             formName: "form",
             template: '<form name="#: id #" id="#: id #"><table class="k-form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
-            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
+            fieldTemplate: '<tr>' +
+                               '<th><label id="#: id #-label" for="#: id #">#: label #</label></th>' +
+                               '<td><span id="#: id #-wrap" class="k-field-wrapper"></span></td>' +
+                               '<td id="#: id #-actions"></td>' +
+                           '</tr>',
             helpTemplate: '<div class="k-builtin-help k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
             exampleTemplate: '<li class="k-field-help-example">#= blurb #<div class="k-field-help-example-value">#= value #</div></li>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
@@ -105,7 +110,7 @@
 
             if (!this.options.readOnly)
             {
-                this.tableBodyElement.append('<tr><td class="k-submit" colspan="2"></td></tr>');
+                this.tableBodyElement.append('<tr><td class="k-submit" colspan="3"></td></tr>');
                 submitCell = this.tableBodyElement.find(".k-submit");
                 for (i = 0; i < submits.length; i++)
                 {
@@ -185,7 +190,58 @@
                     this.fields.push(field);
                 }
 
+                this._addFieldActions(field, fieldOptions, rowElement.find("td").last());
+                this._addFieldScripts(field, fieldOptions);
                 this._addFieldDocs(fieldOptions.name, fieldElement);
+            }
+        },
+
+        _addFieldActions: function(field, fieldOptions, actionsElement)
+        {
+            var actions = fieldOptions.actions, i;
+            if (actions)
+            {
+                for (i = 0; i < actions.length; i++)
+                {
+                    this._addFieldAction(field, actions[i], actionsElement);
+                }
+            }
+        },
+
+        _addFieldAction: function(field, action, actionsElement)
+        {
+            var id = this.id + "-action-" + action,
+                buttonEl = $(this.buttonTemplate({name: action, value: action, id: id}));
+
+            buttonEl.kendoZaButton({click: jQuery.proxy(this._actionClicked, this, field, action)});
+
+            actionsElement.append(buttonEl);
+        },
+
+        _actionClicked: function(field, action)
+        {
+            this.trigger(ACTION, {
+                field: field,
+                action: action
+            });
+        },
+
+        _addFieldScripts: function(field, fieldOptions)
+        {
+            var scripts = fieldOptions.scripts,
+                i,
+                result;
+
+            if (scripts)
+            {
+                for (i = 0; i < scripts.length; i++)
+                {
+                    result = eval(scripts[i]);
+                    if (typeof result === "function")
+                    {
+                        result(this, field);
+                    }
+                }
             }
         },
 
