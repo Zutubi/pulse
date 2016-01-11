@@ -488,7 +488,8 @@
                 model,
                 info,
                 path,
-                index = -1;
+                index = -1,
+                reloaded = false;
 
             if (delta.addedPaths)
             {
@@ -536,7 +537,8 @@
                         // The root path has been renamed, reload fully. This is overkill but rare
                         // and it resets our paths properly.
                         that.setRootPath(newPath);
-                        return;
+                        reloaded = true;
+                        return false;
                     }
                     else
                     {
@@ -561,6 +563,11 @@
                         }
                     }
                 });
+
+                if (reloaded)
+                {
+                    return;
+                }
             }
 
             if (delta.updatedPaths)
