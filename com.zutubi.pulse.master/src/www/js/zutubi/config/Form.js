@@ -123,7 +123,7 @@
                 this.bindValues(this.options.values);
             }
 
-            this._updateButtons();
+            this.updateButtons();
             this.trigger(CREATED);
         },
 
@@ -182,8 +182,8 @@
                     {
                         if (this.options.dirtyChecking)
                         {
-                            fieldElement.on(CLICK, jQuery.proxy(this._updateButtons, this));
-                            field.bind("change", jQuery.proxy(this._updateButtons, this));
+                            fieldElement.on(CLICK, jQuery.proxy(this.updateButtons, this));
+                            field.bind("change", jQuery.proxy(this.updateButtons, this));
                         }
                     }
 
@@ -326,7 +326,7 @@
 
             if (this.options.dirtyChecking)
             {
-                this._updateButtons();
+                this.updateButtons();
             }
 
             if (e.which === 13)
@@ -351,7 +351,7 @@
             return ["zatextfield", "zapasswordfield", "zacheckbox", "zacontrollingcheckbox"].indexOf(wrapperEl.attr("data-role")) >= 0;
         },
 
-        _updateButtons: function()
+        updateButtons: function()
         {
             var i,
                 enabled;
@@ -386,7 +386,7 @@
                 }
             }
 
-            this._updateButtons();
+            this.updateButtons();
         },
 
         resetValues: function()

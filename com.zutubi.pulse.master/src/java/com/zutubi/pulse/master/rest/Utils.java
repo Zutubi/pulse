@@ -25,13 +25,18 @@ public class Utils
 {
     private static final Logger LOG = Logger.getLogger(Utils.class);
 
-    public static String getConfigPath(HttpServletRequest request)
+    public static String getRequestedPath(HttpServletRequest request)
+    {
+        return getRequestedPath(request, false);
+    }
+
+    public static String getRequestedPath(HttpServletRequest request, boolean allowEmpty)
     {
         String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         AntPathMatcher apm = new AntPathMatcher();
         String path = PathUtils.normalisePath(apm.extractPathWithinPattern(bestMatchPattern, requestPath));
-        if (path.length() == 0)
+        if (!allowEmpty && path.length() == 0)
         {
             throw new IllegalArgumentException("Path cannot be empty");
         }

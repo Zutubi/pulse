@@ -57,7 +57,7 @@ public class ConfigController
                                            @RequestParam(value = "predicate", required = false) String[] predicates,
                                            @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
 
         filters = canonicaliseFilters(filters);
 
@@ -134,7 +134,7 @@ public class ConfigController
                                                 @RequestBody ConfigModel config,
                                                 @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
 
         Record existingRecord = configurationTemplateManager.getRecord(configPath);
         if (existingRecord == null)
@@ -202,7 +202,7 @@ public class ConfigController
     @RequestMapping(value = "/**", method = RequestMethod.DELETE)
     public ResponseEntity<ConfigDeltaModel> delete(HttpServletRequest request) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
 
         Record existingRecord = configurationTemplateManager.getRecord(configPath);
         if (existingRecord == null)

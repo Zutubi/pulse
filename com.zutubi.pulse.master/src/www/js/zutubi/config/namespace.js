@@ -81,6 +81,17 @@ if (window.Zutubi.config === undefined)
                 return path;
             },
 
+            templateOwner: function(path)
+            {
+                var normalisedPath = Zutubi.config.normalisedPath(path);
+                if (normalisedPath.indexOf("/") < 0)
+                {
+                    return null;
+                }
+
+                return Zutubi.config.subPath(normalisedPath, 1, 2);
+            },
+
             encodePath: function(path)
             {
                 var pieces, encodedPath, i;

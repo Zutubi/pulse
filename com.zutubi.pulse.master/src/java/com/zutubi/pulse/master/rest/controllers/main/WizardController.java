@@ -67,7 +67,7 @@ public class WizardController
     @RequestMapping(value = "/**", method = RequestMethod.GET)
     public ResponseEntity<WizardModel> get(HttpServletRequest request) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         WizardModel model;
 
         String[] configPathElements = PathUtils.getPathElements(configPath);
@@ -185,7 +185,7 @@ public class WizardController
     public ResponseEntity<ConfigDeltaModel> put(HttpServletRequest request,
                                                 @RequestBody Map<String, CompositeModel> body) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
 
         String[] configPathElements = PathUtils.getPathElements(configPath);
         String scope = configPathElements[0];

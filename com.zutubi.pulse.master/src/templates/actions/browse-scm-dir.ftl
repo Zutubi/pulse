@@ -2,33 +2,23 @@
 {
     form.bind('action', function(e)
     {
+        var fsw, project;
+
         if (e.field !== field || e.action !== 'browse') return;
 
-        function findProjectPath(path)
-        {
-            var parentPath = Zutubi.config.parentPath(path);
-            while(parentPath != null && parentPath != 'projects')
-            {
-                path = parentPath;
-                parentPath = Zutubi.config.parentPath(path);
-            }
-
-            return 'c' + path;
-        }
-
-        var projectPath = findProjectPath(form.options.parentPath + "/" + form.options.baseName);
-        var browser = new Zutubi.fs.WorkingCopyFileSystemBrowser({
-            baseUrl : window.baseUrl,
+        project = Zutubi.config.templateOwner(form.options.parentPath + "/" + form.options.baseName);
+        fsw = new Zutubi.core.FileSystemWindow({
+            title: 'select working directory',
+            fs: 'scm',
             showFiles: false,
-            prefix: 'scm',
-            basePath: projectPath + '/scm/',
-            title : 'browse',
-            target : field.element.get().id,
-            onClose: function()
+            basePath: project,
+            select: function(path)
             {
-                form._updateButtons();
+                field.bindValue(path);
+                form.updateButtons();
             }
         });
-        browser.show();
+
+        fsw.show();
     });
 });

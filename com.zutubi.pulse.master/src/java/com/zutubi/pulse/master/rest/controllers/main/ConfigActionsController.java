@@ -81,7 +81,7 @@ public class ConfigActionsController
     @RequestMapping(value = "delete/**", method = RequestMethod.GET)
     public ResponseEntity<CleanupTaskModel> delete(HttpServletRequest request) throws Exception
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         // This is to validate the path, we don't need the type.
         Utils.getType(configPath, configurationTemplateManager);
 
@@ -94,7 +94,7 @@ public class ConfigActionsController
     @RequestMapping(value = "options/**", method = RequestMethod.POST)
     public ResponseEntity<List<String>> options(HttpServletRequest request, @RequestBody OptionsModel body) throws Exception
     {
-        String parentPath = Utils.getConfigPath(request);
+        String parentPath = Utils.getRequestedPath(request);
 
         CompositeType type = typeRegistry.getType(body.getSymbolicName());
         if (type == null)
@@ -149,7 +149,7 @@ public class ConfigActionsController
     @RequestMapping(value = "validate/**", method = RequestMethod.POST)
     public ResponseEntity<String> validate(HttpServletRequest request, @RequestBody ValidateModel model) throws TypeException
     {
-        String parentPath = Utils.getConfigPath(request);
+        String parentPath = Utils.getRequestedPath(request);
 
         String symbolicName = model.getComposite().getType().getSymbolicName();
         CompositeType type = typeRegistry.getType(symbolicName);
@@ -172,7 +172,7 @@ public class ConfigActionsController
     public ResponseEntity<CheckResultModel> check(HttpServletRequest request,
                                       @RequestBody CheckModel check) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
 
         CompositeType compositeType;
         String symbolicName = check.getMain().getType().getSymbolicName();
@@ -299,7 +299,7 @@ public class ConfigActionsController
     @RequestMapping(value = "restore/**", method = RequestMethod.POST)
     public ResponseEntity<CollectionModel> postRestore(HttpServletRequest request) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         String parentPath = PathUtils.getParentPath(configPath);
         configurationTemplateManager.restore(configPath);
         return new ResponseEntity<>((CollectionModel) configModelBuilder.buildModel(null, parentPath, -1), HttpStatus.OK);
@@ -307,7 +307,7 @@ public class ConfigActionsController
 
     private ResponseEntity<ActionModel> getWithHandler(HttpServletRequest request, Class<? extends ActionHandler> handlerClass)
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         // This is a validation step to check a composite record exists.
         Utils.getComposite(configPath, configurationTemplateManager);
 
@@ -319,7 +319,7 @@ public class ConfigActionsController
 
     private ResponseEntity<ActionResultModel> postWithHandler(HttpServletRequest request, @RequestBody CompositeModel body, Class<? extends ActionHandler> handlerClass) throws TypeException
     {
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         Utils.getComposite(configPath, configurationTemplateManager);
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
@@ -466,7 +466,7 @@ public class ConfigActionsController
     private ActionContext createContext(HttpServletRequest request, boolean single) throws Exception
     {
         final ActionContext context = new ActionContext();
-        String configPath = Utils.getConfigPath(request);
+        String configPath = Utils.getRequestedPath(request);
         if (configPath.length() == 0)
         {
             throw new IllegalArgumentException("Action name is required");
