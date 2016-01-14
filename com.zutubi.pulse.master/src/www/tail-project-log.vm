@@ -1,6 +1,9 @@
 #helpTag("Project+Log+Tab")
 #authorisationTags($principle)
 #projectTags($project)
+<content tag="header.javascript">
+    zutubi/reporting/project/TailSettingsWindow.js
+</content>
 <html>
 <head>
     <title>#wwtext("name=project") $project.name</title>
@@ -25,10 +28,12 @@
 
         function configureSettings()
         {
-            var popup = new Zutubi.TailSettingsWindow({
-                initialMaxLines: '$maxLines',
-                initialRefreshInterval: '$tailRefreshInterval'
+            var popup = new Zutubi.reporting.project.TailSettingsWindow({
+                username: '#jss($loggedInUser.name)',
+                tailLines: $maxLines,
+                tailRefreshInterval: $tailRefreshInterval
             });
+            popup.bind("saved", function() { window.location.reload(); });
             popup.show();
         }
     </script>
