@@ -39,7 +39,7 @@
                 selectedResultId = selectedNode.attributes.extraAttributes.resultId;
             }
 
-            resultTree.getLoader()._doLoad(resultTree.getRootNode(), function()
+            resultTree.getLoader().load(resultTree.getRootNode(), function()
             {
                 rootNode.expand(true);
             });
@@ -51,7 +51,7 @@
 
             paneLoading = true;
             var scrollPosition = detailPanel.body.getScroll();
-            detailPanel.body._doLoad({
+            detailPanel.body.load({
                 url: '${base}/ajax/buildDetailsPanel.action',
                 params: node.attributes.extraAttributes,
                 scripts: true,

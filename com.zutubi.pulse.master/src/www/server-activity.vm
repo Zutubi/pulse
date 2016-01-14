@@ -12,7 +12,7 @@
         
         function refresh(callback)
         {
-            panel._doLoad(callback);
+            panel.load(callback);
         }
         
         Ext.onReady(function() {

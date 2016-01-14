@@ -1079,7 +1079,7 @@ Zutubi.ActiveView.prototype = {
         }
     },
 
-    _doLoad: function(callback) {
+    load: function(callback) {
         var view;
 
         view = this;

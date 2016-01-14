@@ -21,7 +21,7 @@
             runAjaxRequest({
                 url: window.baseUrl + '/user/hideDashboardProject.action?projectName=' + encodedName,
                 callback: function() {
-                    view._doLoad();
+                    view.load();
                 }
             })
         }
@@ -32,7 +32,7 @@
             runAjaxRequest({
                 url: window.baseUrl + '/user/hideDashboardGroup.action?groupName=' + encodedName,
                 callback: function() {
-                    view._doLoad();
+                    view.load();
                 }
             })
         }

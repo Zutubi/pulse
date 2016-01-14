@@ -13,7 +13,7 @@
         
         function refresh(cb)
         {
-            panel._doLoad(cb);
+            panel.load(cb);
         }
             
         Ext.onReady(function() {

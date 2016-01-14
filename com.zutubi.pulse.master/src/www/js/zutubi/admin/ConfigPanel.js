@@ -121,7 +121,7 @@
          *              the data will be loaded
          * @private
          */
-        _openPathElements: function(path, model)
+        _openPath: function(path, model)
         {
             this.configTree.selectAbsolutePath(path);
             this.trigger(PATHSELECT, {path: path});

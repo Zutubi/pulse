@@ -34,7 +34,7 @@
         
         function onSelect(selectionModel, node)
         {
-            Ext.get('content')._doLoad({
+            Ext.get('content').load({
                 url: '$base/ajax/reference.action',
                 params: { 'path': node.getPath('baseName') },
                 method: 'GET',

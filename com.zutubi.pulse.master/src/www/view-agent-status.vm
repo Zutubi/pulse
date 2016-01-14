@@ -13,7 +13,7 @@
 
         function refresh(cb)
         {
-            panel._doLoad(function()
+            panel.load(function()
             {
                 if (cb)
                 {

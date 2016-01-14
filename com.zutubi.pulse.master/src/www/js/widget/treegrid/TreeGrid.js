@@ -39,7 +39,7 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
                 requestMethod: this.requestMethod,
                 store: this.store
             });
-        }else if(Ext.isObject(l) && !l._doLoad){
+        }else if(Ext.isObject(l) && !l.load){
             l = new Ext.ux.tree.TreeGridLoader(l);
         }
         else if(l) {
