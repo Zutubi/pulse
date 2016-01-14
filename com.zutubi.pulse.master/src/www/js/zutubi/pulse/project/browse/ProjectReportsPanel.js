@@ -68,7 +68,7 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
                             panel.data.group = Ext.getCmp('report-group').getValue();
                             panel.data.timeFrame = Ext.getCmp('report-time-frame').getValue();
                             panel.data.timeUnit = Ext.getCmp('report-time-unit').getValue();
-                            panel.load();
+                            panel._doLoad();
                         }
                     }
                 }]
@@ -138,7 +138,7 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
         this.renderReports();
     },
 
-    load: function()
+    _doLoad: function()
     {
         this.loaded = false;
         this.clear();

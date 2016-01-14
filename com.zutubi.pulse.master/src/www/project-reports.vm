@@ -18,7 +18,7 @@
             var nestedCenter = Ext.getCmp('nested-center');
             nestedCenter.add(panel);
             viewport.doLayout();
-            panel.load();
+            panel._doLoad();
         });
     </script>
 

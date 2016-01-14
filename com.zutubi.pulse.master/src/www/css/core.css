@@ -43,9 +43,16 @@
 
 /* File System Window */
 
+.k-fs-window-toolbar-wrapper {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 43px;
+}
+
 .k-fs-window-content {
     position: absolute;
-    top: 10px;
+    top: 53px;
     left: 10px;
     right: 10px;
     bottom: 53px;

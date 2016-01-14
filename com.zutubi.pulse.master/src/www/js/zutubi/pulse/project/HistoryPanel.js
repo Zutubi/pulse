@@ -160,7 +160,7 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
             url: window.baseUrl + '/ajax/customiseHistoryBuilds.action',
             params: {'buildsPerPage': Ext.get('builds-per-page').getValue() },
             success: function() {
-                panel.load(function() {
+                panel._doLoad(function() {
                     toolbar.unmask();
                 });
             },

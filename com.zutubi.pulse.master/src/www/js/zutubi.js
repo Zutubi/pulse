@@ -125,10 +125,10 @@ Ext.extend(Zutubi.DetailPanel, Ext.Panel, {
         this.helpType = type || '';
     },
 
-    load: function(o)
+    _doLoad: function(o)
     {
         this.clearHelp();
-        this.body.load(o);
+        this.body._doLoad(o);
     },
 
     update: function(html)
@@ -226,7 +226,7 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
             if(path)
             {
                 panel = this;
-                this.body.load({
+                this.body._doLoad({
                     url: window.baseUrl + '/ajax/help/' + encodeURIPath(path) + '?' + type + '=',
                     scripts: true,
                     callback: function() {

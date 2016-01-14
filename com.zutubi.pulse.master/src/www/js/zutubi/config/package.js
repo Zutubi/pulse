@@ -7,6 +7,8 @@
 // dependency: ./ControllingDropDownList.js
 // dependency: ./Docs.js
 // dependency: ./DropDownList.js
+// dependency: ./FileSystemTree.js
+// dependency: ./FileSystemWindow.js
 // dependency: ./Form.js
 // dependency: ./HelpButton.js
 // dependency: ./ItemPicker.js

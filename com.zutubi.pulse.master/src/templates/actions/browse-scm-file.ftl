@@ -12,15 +12,11 @@
         basePath = Zutubi.config.normalisedPath(basePath + "/" + dirField.getValue());
 </#if>
 
-        fsw = new Zutubi.core.FileSystemWindow({
+        fsw = new Zutubi.config.FileSystemWindow({
             title: 'select file',
             fs: 'scm',
             basePath: basePath,
-            select: function(path)
-            {
-                field.bindValue(path);
-                form.updateButtons();
-            }
+            targetField: field
         });
 
         fsw.show();

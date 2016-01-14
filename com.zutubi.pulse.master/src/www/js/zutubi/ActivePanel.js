@@ -83,7 +83,7 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
         }
     },
 
-    load: function(callback)
+    _doLoad: function(callback)
     {
         var panel;
 

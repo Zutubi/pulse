@@ -20,7 +20,7 @@
 
             function refresh(cb)
             {
-                panel.load(cb);
+                panel._doLoad(cb);
             }
 
             Ext.onReady(function() {

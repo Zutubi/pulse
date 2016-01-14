@@ -27,15 +27,20 @@ public class Utils
 
     public static String getRequestedPath(HttpServletRequest request)
     {
-        return getRequestedPath(request, false);
+        return getRequestedPath(request, true, false);
     }
 
-    public static String getRequestedPath(HttpServletRequest request, boolean allowEmpty)
+    public static String getRequestedPath(HttpServletRequest request, boolean normalise, boolean allowEmpty)
     {
         String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         AntPathMatcher apm = new AntPathMatcher();
-        String path = PathUtils.normalisePath(apm.extractPathWithinPattern(bestMatchPattern, requestPath));
+        String path = apm.extractPathWithinPattern(bestMatchPattern, requestPath);
+        if (normalise)
+        {
+            path = PathUtils.normalisePath(path);
+        }
+
         if (!allowEmpty && path.length() == 0)
         {
             throw new IllegalArgumentException("Path cannot be empty");
