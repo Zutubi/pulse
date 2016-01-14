@@ -577,3 +577,50 @@ div.k-wizard-window {
     right: 0.2em;
     top: 0.2em;
 }
+
+/* File System Window */
+
+.k-fs-window-toolbar-wrapper {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 43px;
+}
+
+.k-fs-window-content {
+    position: absolute;
+    top: 53px;
+    left: 10px;
+    right: 10px;
+    bottom: 53px;
+}
+
+.k-fs-tree-wrapper {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+    border: solid 1px #eee;
+    padding: 0.3em;
+}
+
+.k-fs-tree .fa.k-sprite::before {
+    font-size: 12px;
+    line-height: 12px;
+    vertical-align: middle;
+}
+
+.k-fs-window-actions {
+    position: absolute;
+    height: 33px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    text-align: center;
+}
+
+.k-fs-window-actions .k-button {
+    margin-right: 10px;
+    height: 100%;
+    min-width: 60px;
+}
