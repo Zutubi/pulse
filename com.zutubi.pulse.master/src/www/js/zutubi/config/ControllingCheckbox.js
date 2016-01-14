@@ -40,6 +40,7 @@
         _updateDependents: function()
         {
             var checked,
+                form,
                 fields,
                 field,
                 i;
@@ -55,13 +56,14 @@
                 }
                 else
                 {
-                    fields = this.options.parentForm.getFields();
+                    form = this.options.parentForm;
+                    fields = form.getFields();
                     for (i = 0; i < fields.length; i++)
                     {
                         field = fields[i];
-                        if (field !== this && field.enable)
+                        if (field !== this)
                         {
-                            field.enable(checked);
+                            form.enableField(field, checked);
                         }
                     }
                 }
@@ -86,7 +88,7 @@
                     field = form.getFieldNamed(fieldNames[i]);
                     if (field)
                     {
-                        field.enable(enable);
+                        form.enableField(field, enable);
                     }
                 }
             }

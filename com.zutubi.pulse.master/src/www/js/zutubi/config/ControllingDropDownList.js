@@ -54,7 +54,7 @@
                         field = form.getFieldNamed(fieldNames[i]);
                         if (field)
                         {
-                            field.enable(enable);
+                            form.enableField(field, enable);
                         }
                     }
                 }
@@ -66,7 +66,7 @@
                         field = fields[i];
                         if (field !== this)
                         {
-                            field.enable(enable);
+                            form.enableField(field, enable);
                         }
                     }
                 }

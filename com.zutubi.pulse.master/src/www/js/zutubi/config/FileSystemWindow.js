@@ -91,16 +91,20 @@
 
                 parentElement.append('<span class="k-flex-spacer"></span>');
 
-                this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
-                    label: "add",
-                    spriteCssClass: "fa fa-plus fa-folder-o",
-                    click: jQuery.proxy(that._createDirClicked, that)
-                }));
-                this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
-                    label: "remove",
-                    spriteCssClass: "fa fa-minus fa-folder-o",
-                    click: jQuery.proxy(that._removeDirClicked, that)
-                }));
+                if (!that.tree.options.showFiles)
+                {
+                    this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
+                        label: "add",
+                        spriteCssClass: "fa fa-plus fa-folder-o",
+                        click: jQuery.proxy(that._createDirClicked, that)
+                    }));
+
+                    this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
+                        label: "remove",
+                        spriteCssClass: "fa fa-minus fa-folder-o",
+                        click: jQuery.proxy(that._removeDirClicked, that)
+                    }));
+                }
             }
         },
 

@@ -19,6 +19,7 @@
         KEYUP = "keyup" + ns,
         SUBMIT = "submit" + ns,
         SELECTOR_FIELD_WRAPPER = ".k-field-wrapper",
+        SELECTOR_FIELD_ACTIONS = ".k-field-action-cell",
         SELECTOR_FIELD_HELP = ".k-field-help",
         ACTION = "action",
         CREATED = "created",
@@ -63,7 +64,7 @@
             fieldTemplate: '<tr>' +
                                '<th><label id="#: id #-label" for="#: id #">#: label #</label></th>' +
                                '<td><span id="#: id #-wrap" class="k-field-wrapper"></span></td>' +
-                               '<td id="#: id #-actions"></td>' +
+                               '<td id="#: id #-actions" class="k-field-action-cell"></td>' +
                            '</tr>',
             helpTemplate: '<div class="k-builtin-help k-field-help k-collapsed"><div class="k-field-help-brief">#= brief #</div><div class="k-field-help-verbose">#= verbose #</div></div>',
             exampleTemplate: '<li class="k-field-help-example">#= blurb #<div class="k-field-help-example-value">#= value #</div></li>',
@@ -190,7 +191,11 @@
                     this.fields.push(field);
                 }
 
-                this._addFieldActions(field, fieldOptions, rowElement.find("td").last());
+                if (!this.options.readOnly)
+                {
+                    this._addFieldActions(field, fieldOptions, rowElement.find("td").last());
+                }
+
                 this._addFieldScripts(field, fieldOptions);
                 this._addFieldDocs(fieldOptions.name, fieldElement);
             }
@@ -505,6 +510,25 @@
             }
 
             return null;
+        },
+
+        enableField: function(field, enable)
+        {
+            var buttons;
+            if (field && field.enable)
+            {
+                field.enable(enable);
+                buttons = field.element.closest("tr").find(SELECTOR_FIELD_ACTIONS).find("button");
+                buttons.prop("disabled", !enable);
+                if (enable)
+                {
+                    buttons.removeClass("k-state-disabled");
+                }
+                else
+                {
+                    buttons.addClass("k-state-disabled");
+                }
+            }
         },
 
         clearMessages: function()

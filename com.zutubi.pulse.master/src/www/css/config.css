@@ -388,6 +388,11 @@ ul.k-form-validation-errors {
     margin: 0.4em 0;
 }
 
+input.k-state-disabled, input.k-state-disabled:hover {
+    background-color: #f2f2f2;
+    border-color: #ddd;
+}
+
 /* Wizards */
 
 .k-wizard-step-index, .k-wizard-type-select {

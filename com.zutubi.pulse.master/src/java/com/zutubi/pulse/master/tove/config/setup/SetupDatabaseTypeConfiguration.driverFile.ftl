@@ -2,14 +2,15 @@
 {
     form.bind('action', function(e)
     {
+        var fsw;
+
         if (e.field !== field || e.action !== 'browse') return;
 
-        var browser = new Zutubi.fs.LocalFileSystemBrowser({
-            baseUrl : window.baseUrl,
-            isWindows: ${isWindows},
-            title : 'select database driver',
-            target : field.element.get().id
+        fsw = new Zutubi.config.FileSystemWindow({
+            title: 'select database driver',
+            targetField: field
         });
-        browser.show();
+
+        fsw.show();
     });
 });
