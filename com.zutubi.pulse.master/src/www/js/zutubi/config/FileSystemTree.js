@@ -63,7 +63,7 @@
                         // simpler if we could just access the node).  So we don't need to
                         // wastefully pass the path from the server, we construct it client side in
                         // our success callback.
-                        var url = "/api/fs/" + that.fs + "/" + Zutubi.config.encodePath(that.basePath),
+                        var url = window.apiPath + "/fs/" + that.fs + "/" + Zutubi.config.encodePath(that.basePath),
                             path = null;
 
                         if (options.data && options.data.path)
@@ -141,25 +141,82 @@
             this._doLoad();
         },
 
-        _findItem: function(dataSource, name)
+        _normaliseSeparators: function(path)
         {
             var i,
-                data = dataSource.data;
+                c,
+                lastSep = false,
+                normalised = "";
 
-            for (i = 0; i < data.length; i++)
+            for (i = 0; i < path.length; i++)
             {
-                if (data[i].name === name)
+                c = path.charAt(i);
+                if (c === "/" || c === "\\")
                 {
-                    return data[i];
+                    if (!lastSep && i !== path.length - 1)
+                    {
+                        normalised += "/";
+                    }
+
+                    lastSep = true;
+                }
+                else
+                {
+                    normalised += c;
+                    lastSep = false;
                 }
             }
 
-            return null;
+            return normalised;
+        },
+
+        getSelectedPath: function()
+        {
+            var node = this.select();
+            if (node.length === 0)
+            {
+                return null;
+            }
+
+            return this.dataItem(node).path;
+        },
+
+        addDir: function(dirname)
+        {
+            var node = this.select(),
+                item;
+            if (node.length > 0)
+            {
+                item = this.dataItem(node);
+                item.children.add({
+                    directory: true,
+                    name: dirname,
+                    path: item.path + "/" + dirname
+                });
+            }
+        },
+
+        removeDir: function()
+        {
+            var node = this.select(),
+                item,
+                parentItem;
+            if (node.length > 0)
+            {
+                item = this.dataItem(node);
+                parentItem = item.parentNode();
+                parentItem.children.remove(item);
+                node = this.findByUid(parentItem.uid);
+                this.select(node);
+                node.get(0).scrollIntoView();
+            }
+
         },
 
         selectPath: function(path, complete)
         {
             var that = this,
+                absolute,
                 metaPath = [],
                 root = that.wrapper.find(".k-item:first"),
                 prefix = "",
@@ -183,13 +240,20 @@
             //    is used as the name of the root node in that case (and are included in all
             //    child paths too).
 
-            if (path.indexOf("/") === 0 && this.text(root) === "/")
+            path = that._normaliseSeparators(path);
+            absolute = path.indexOf("/") === 0;
+
+            if (absolute)
             {
-                metaPath.push("/");
-                prefix = "/";
+                if (this.text(root) === "/")
+                {
+                    metaPath.push("/");
+                    prefix = "/";
+                }
+
+                path = path.substring(1);
             }
 
-            path = Zutubi.config.normalisedPath(path);
             elements = path.split("/");
             for (end = 1; end <= elements.length; end++)
             {
@@ -201,18 +265,27 @@
                 var i,
                     dataSource = that.dataSource,
                     item = null,
+                    next,
                     node = null;
 
                 for (i = 0; i < metaPath.length; i++)
                 {
-                    item = dataSource.get(metaPath[i]);
-                    dataSource = item.children;
+                    next = dataSource.get(metaPath[i]);
+                    if (next)
+                    {
+                        item = next;
+                        dataSource = item.children;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 if (item)
                 {
                     node = that.findByUid(item.uid);
-                    if (node)
+                    if (node.length > 0)
                     {
                         node.get(0).scrollIntoView();
                         that.select(node);

@@ -12,6 +12,7 @@
 
     <script>
         window.baseUrl = "${base}";
+        window.apiPath = "/api";
     </script>
 
     #javascript()

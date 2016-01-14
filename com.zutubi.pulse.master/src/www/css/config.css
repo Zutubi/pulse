@@ -587,6 +587,22 @@ div.k-wizard-window {
     bottom: 43px;
 }
 
+.k-fs-window-toolbar {
+    display: flex;
+}
+
+.k-fs-window-toolbar button {
+    margin-left: 10px;
+}
+
+.k-fs-window-toolbar button.k-fs-window-toolbar-first {
+    margin-left: 0;
+}
+
+.k-fs-window-toolbar .k-flex-spacer {
+    flex: 1 0 auto;
+}
+
 .k-fs-window-content {
     position: absolute;
     top: 53px;

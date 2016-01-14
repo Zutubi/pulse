@@ -94,14 +94,18 @@ if (window.Zutubi.config === undefined)
 
             encodePath: function(path)
             {
-                var pieces, encodedPath, i;
+                var pieces, encodedPath, i, first = true;
 
                 pieces = path.split('/');
                 encodedPath = '';
 
                 for (i = 0; i < pieces.length; i++)
                 {
-                    if (encodedPath.length > 0)
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
                     {
                         encodedPath += '/';
                     }

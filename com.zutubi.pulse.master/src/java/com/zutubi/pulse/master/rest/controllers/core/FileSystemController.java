@@ -3,6 +3,9 @@ package com.zutubi.pulse.master.rest.controllers.core;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.EnvConfig;
@@ -12,6 +15,7 @@ import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.model.fs.FileModel;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.StringUtils;
@@ -26,16 +30,19 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 
+
 /**
  * A RESTish API controller that allows browsing of a file system.
  */
 @RestController
 @RequestMapping("/fs")
-public class FileSystemController
+public class FileSystemController implements EventListener
 {
     @Autowired
     private AccessManager accessManager;
+    private EventManager eventManager;
 
+    private boolean mainStarted = false;
     private ProjectManager projectManager;
     private ScmManager scmManager;
 
@@ -44,9 +51,9 @@ public class FileSystemController
                                            @PathVariable final String projectName,
                                            @RequestParam(value = "showFiles", required = false, defaultValue = "true") boolean showFiles) throws TypeException, ScmException
     {
-        if (projectManager == null)
+        if (!mainStarted)
         {
-            SpringComponentContext.autowire(this);
+            throw new IllegalStateException("Server not ready to handle SCM file system requests.");
         }
 
         final String path = Utils.getRequestedPath(request, true, true);
@@ -102,11 +109,7 @@ public class FileSystemController
     public ResponseEntity<FileModel[]> getLocal(HttpServletRequest request,
                                                 @RequestParam(value = "showFiles", required = false, defaultValue = "true") final boolean showFiles) throws IOException
     {
-        // We use the raw path info because we want to allow leading slashes, i.e. if the URL is
-        // pulse/api/fs/local//my/path then path should be /my/path (not my/path).
-        String pathString = StringUtils.stripPrefix(request.getPathInfo(), "/fs/local/");
-
-        accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+        String pathString = getLocalPathAndCheckAccess(request);
 
         FileSystem fileSystem = FileSystems.getDefault();
         FileModel[] models;
@@ -160,19 +163,81 @@ public class FileSystemController
         return new ResponseEntity<>(models, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/local/**", method = RequestMethod.POST)
+    public ResponseEntity<String> postLocal(HttpServletRequest request) throws IOException
+    {
+        String pathString = getLocalPathAndCheckAccess(request);
+
+        FileSystem fileSystem = FileSystems.getDefault();
+        Path path = fileSystem.getPath(pathString);
+        Files.createDirectories(path);
+        return new ResponseEntity<>(path.toString(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/local/**", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteLocal(HttpServletRequest request) throws IOException
+    {
+        String pathString = getLocalPathAndCheckAccess(request);
+
+        FileSystem fileSystem = FileSystems.getDefault();
+        Path path = fileSystem.getPath(pathString);
+        Path parent = path.getParent();
+
+        try
+        {
+            Files.delete(path);
+        }
+        catch (DirectoryNotEmptyException e)
+        {
+            DirectoryNotEmptyException wrap = new DirectoryNotEmptyException("Directory not empty: " + e.getMessage());
+            wrap.initCause(e);
+            throw wrap;
+        }
+        catch (NoSuchFileException e)
+        {
+            NoSuchFileException wrap = new NoSuchFileException("Path does not exist: " + e.getMessage());
+            wrap.initCause(e);
+            throw wrap;
+        }
+
+        return new ResponseEntity<>(parent == null ? "" : parent.toString(), HttpStatus.OK);
+    }
+
+    private String getLocalPathAndCheckAccess(HttpServletRequest request)
+    {
+        if (mainStarted)
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+        }
+
+        // We use the raw path info because we want to allow leading slashes, i.e. if the URL is
+        // pulse/api/fs/local//my/path then path should be /my/path (not my/path).
+        return StringUtils.stripPrefix(request.getPathInfo(), "/fs/local/");
+    }
+
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public String getHome()
     {
         return FileSystemUtils.normaliseSeparators(System.getProperty(EnvConfig.USER_HOME, ""));
     }
 
-    public void setProjectManager(ProjectManager projectManager)
+    @Override
+    public void handleEvent(Event event)
     {
-        this.projectManager = projectManager;
+        projectManager = SpringComponentContext.getBean("projectManager");
+        scmManager = SpringComponentContext.getBean("scmManager");
+        mainStarted = true;
     }
 
-    public void setScmManager(ScmManager scmManager)
+    @Override
+    public Class[] getHandledEvents()
     {
-        this.scmManager = scmManager;
+        return new Class[]{SystemStartedEvent.class};
+    }
+
+    @Autowired
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: ./CreateDirWindow.js
 // dependency: ./FileSystemTree.js
 
 (function($)
@@ -45,15 +46,18 @@
             that.element = that.view.render("body");
             that.tree = that.element.find(".k-fs-tree").kendoZaFileSystemTree(that.options).data("kendoZaFileSystemTree");
             that.tree.bind("select", jQuery.proxy(that._nodeSelected, that));
+
+            that.buttonTemplate = kendo.template(that.options.buttonTemplate);
+            that.selectedNodeButtons = [];
             that._renderToolbar();
             that._renderButtons();
 
             if (that.options.targetField)
             {
-                kendo.ui.progress(that.element, true);
+                that._mask(true);
                 that.tree.selectPath(that.options.targetField.getValue(), function()
                 {
-                    kendo.ui.progress(that.element, false);
+                    that._mask(false);
                 });
             }
         },
@@ -76,7 +80,7 @@
             this._addToolbarButton(parentElement, {
                 spriteCssClass: "fa fa-refresh",
                 click: jQuery.proxy(that._reloadClicked, that)
-            });
+            }).element.addClass("k-fs-window-toolbar-first");
 
             if (that.options.fs === "local")
             {
@@ -84,14 +88,27 @@
                     spriteCssClass: "fa fa-home",
                     click: jQuery.proxy(that._homeClicked, that)
                 });
+
+                parentElement.append('<span class="k-flex-spacer"></span>');
+
+                this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
+                    label: "add",
+                    spriteCssClass: "fa fa-plus fa-folder-o",
+                    click: jQuery.proxy(that._createDirClicked, that)
+                }));
+                this.selectedNodeButtons.push(this._addToolbarButton(parentElement, {
+                    label: "remove",
+                    spriteCssClass: "fa fa-minus fa-folder-o",
+                    click: jQuery.proxy(that._removeDirClicked, that)
+                }));
             }
         },
 
         _addToolbarButton: function (parentElement, options)
         {
-            var buttonElement = $('<button><span class="k-sprite"></span></button>');
+            var buttonElement = $(this.buttonTemplate({label: options.label || ""}));
             parentElement.append(buttonElement);
-            buttonElement.kendoButton(options);
+            return buttonElement.kendoButton(options).data("kendoButton");
         },
 
         _renderButtons: function()
@@ -100,15 +117,13 @@
                 parentElement = that.element.find(".k-fs-window-actions"),
                 buttonElement;
 
-            that.buttonTemplate = kendo.template(that.options.buttonTemplate);
-
             buttonElement = $(that.buttonTemplate({label: that.options.selectLabel}));
             parentElement.append(buttonElement);
-            that.okButton = buttonElement.kendoButton({
+            that.selectedNodeButtons.push(buttonElement.kendoButton({
                 enable: false,
                 spriteCssClass: "fa fa-check-circle",
                 click: jQuery.proxy(that._buttonClicked, that, true)
-            }).data("kendoButton");
+            }).data("kendoButton"));
 
             buttonElement = $(that.buttonTemplate({label: "cancel"}));
             parentElement.append(buttonElement);
@@ -120,7 +135,15 @@
 
         _nodeSelected: function(e)
         {
-            this.okButton.enable(e.node);
+            jQuery.each(this.selectedNodeButtons, function(i, button)
+            {
+                button.enable(e.node);
+            });
+        },
+
+        _mask: function(mask)
+        {
+            kendo.ui.progress(this.element, mask);
         },
 
         _reloadClicked: function()
@@ -132,21 +155,83 @@
         {
             var that = this;
 
-            kendo.ui.progress(that.element, true);
+            that._mask(true);
             Zutubi.core.ajax({
-                url: "/api/fs/home",
+                url: window.apiPath + "/fs/home",
                 success: function(data)
                 {
                     that.tree.selectPath(data, function()
                     {
-                        kendo.ui.progress(that.element, false);
+                        that._mask(false);
                     });
                 },
                 error: function()
                 {
-                    kendo.ui.progress(that.element, false);
+                    that._mask(false);
                 }
             });
+        },
+
+        _createDirClicked: function()
+        {
+            var that = this,
+                prompt,
+                path;
+
+            prompt = new Zutubi.config.CreateDirWindow({
+                create: function(dirname)
+                {
+                    prompt.close();
+
+                    path = that.tree.getSelectedPath() + "/" + dirname;
+
+                    that._mask(true);
+                    Zutubi.core.ajax({
+                        url: window.apiPath + "/fs/local/" + Zutubi.config.encodePath(path),
+                        method: "POST",
+                        success: function()
+                        {
+                            that.tree.addDir(dirname);
+                            that.tree.selectPath(path, function()
+                            {
+                                that._mask(false);
+                            });
+                        },
+                        error: function(jqXHR)
+                        {
+                            that._mask(false);
+                            Zutubi.core.reportError("Could not create directory: " + Zutubi.core.ajaxError(jqXHR));
+                        }
+                    });
+
+                }
+            });
+            prompt.show();
+        },
+
+        _removeDirClicked: function()
+        {
+            var that = this,
+                path = that.tree.getSelectedPath();
+
+            if (path)
+            {
+                that._mask(true);
+                Zutubi.core.ajax({
+                    url: window.apiPath + "/fs/local/" + Zutubi.config.encodePath(path),
+                    method: "DELETE",
+                    success: function()
+                    {
+                        that.tree.removeDir();
+                        that._mask(false);
+                    },
+                    error: function(jqXHR)
+                    {
+                        that._mask(false);
+                        Zutubi.core.reportError("Could not remove directory: " + Zutubi.core.ajaxError(jqXHR));
+                    }
+                });
+            }
         },
 
         _buttonClicked: function(ok)
@@ -176,11 +261,17 @@
         show: function()
         {
             var that = this,
-                maxWidth = $(window).width() - 80,
+                windowWidth = $(window).width(),
+                maxWidth = windowWidth - 80,
+                width = Math.min(that.options.width, maxWidth),
                 maxHeight = $(window).height() - 80;
 
             that.window = $(that.element).kendoWindow({
-                width: Math.min(that.options.width, maxWidth),
+                position: {
+                    top: 40,
+                    left: (windowWidth - width) / 2
+                },
+                width: width,
                 height: Math.min(that.options.height, maxHeight),
                 minWidth: 200,
                 maxWidth: maxWidth,
@@ -194,7 +285,7 @@
                 }
             }).data("kendoWindow");
 
-            that.window.center();
+            //that.window.center();
             that.window.open();
         },
 

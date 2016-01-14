@@ -3,10 +3,11 @@
 
 (function($)
 {
-    var Observable = kendo.Observable,
+    var FormWindow = Zutubi.config.FormWindow,
+        BUTTON_CLICKED = "buttonClicked",
         SAVED = "saved";
 
-    Zutubi.reporting.project.TailSettingsWindow = Observable.extend({
+    Zutubi.reporting.project.TailSettingsWindow = FormWindow.extend({
         // options:
         //   - username: for the logged in user
         //   - tailLines: initial setting for max tail lines
@@ -17,39 +18,30 @@
 
             that.options = jQuery.extend({}, that.options, options);
 
-            Observable.fn.init.call(that);
+            FormWindow.fn.init.call(that, {
+                title: "tail view settings",
+                formOptions: {
+                    structure: {
+                        fields: [{
+                            name: 'tailLines',
+                            label: 'maximum lines to show',
+                            value: options.tailLines
+                        }, {
+                            name: 'tailRefreshInterval',
+                            label: 'refresh interval (seconds)',
+                            value: options.tailRefreshInterval
 
-            that.view = new kendo.View(
-                '<div class="k-form-window">' +
-                    '<div class="k-form-window-content">' +
-                    '</div>',
-                '</div>',
-                {wrap: false});
+                        }]
+                    },
+                    values: {
+                        tailLines: options.tailLines,
+                        tailRefreshInterval: options.tailRefreshInterval
+                    },
+                    submits: ["apply", "cancel"]
+                }
+            });
 
-            that.element = that.view.render("body");
-
-            that.contentEl = that.element.find(".k-form-window-content");
-            that.form = that.contentEl.kendoZaForm({
-                structure: {
-                    fields: [{
-                        name: 'tailLines',
-                        label: 'maximum lines to show',
-                        value: options.tailLines
-                    }, {
-                        name: 'tailRefreshInterval',
-                        label: 'refresh interval (seconds)',
-                        value: options.tailRefreshInterval
-
-                    }]
-                },
-                values: {
-                    tailLines: options.tailLines,
-                    tailRefreshInterval: options.tailRefreshInterval
-                },
-                submits: ["apply", "cancel"]
-            }).data("kendoZaForm");
-
-            that.form.bind("buttonClicked", function(e)
+            that.bind(BUTTON_CLICKED, function(e)
             {
                 if (e.value === "apply")
                 {
@@ -68,49 +60,9 @@
         },
 
         events: [
+            BUTTON_CLICKED,
             SAVED
         ],
-
-        mask: function(mask)
-        {
-            kendo.ui.progress(this.element.closest(".k-widget"), mask);
-        },
-
-        show: function()
-        {
-            var that = this;
-
-            that.completed = false;
-
-            that.window = $(that.element).kendoWindow({
-                width: 300,
-                modal: true,
-                resizable: false,
-                title: "tail view settings",
-                close: function()
-                {
-                    if (!that.completed)
-                    {
-                        if (that.options.cancel)
-                        {
-                            that.options.cancel();
-                        }
-                    }
-                },
-                deactivate: function()
-                {
-                    that.window.destroy();
-                }
-            }).data("kendoWindow");
-
-            that.window.open();
-            that.window.center();
-        },
-
-        close: function()
-        {
-            this.window.close();
-        },
 
         _applySettings: function()
         {
