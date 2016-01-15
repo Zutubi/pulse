@@ -33,5 +33,10 @@ public interface ResourceManager
 
     List<AgentConfiguration> addDiscoveredResources(String location, List<ResourceConfiguration> resources);
 
-    Map<String, List<ResourceConfiguration>> findAll();
+    /**
+     * Returns all resources from all agents visible to the calling user, mapped by agent name.
+     *
+     * @return a mapping from agent name to resources on that agent
+     */
+    Map<String, List<ResourceConfiguration>> findAllVisible();
 }

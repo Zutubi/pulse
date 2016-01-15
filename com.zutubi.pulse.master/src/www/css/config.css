@@ -625,12 +625,6 @@ div.k-wizard-window {
     padding: 0.3em;
 }
 
-.k-fs-tree .fa.k-sprite::before {
-    font-size: 12px;
-    line-height: 12px;
-    vertical-align: middle;
-}
-
 .k-fs-window-actions {
     position: absolute;
     height: 33px;
@@ -641,6 +635,48 @@ div.k-wizard-window {
 }
 
 .k-fs-window-actions .k-button {
+    margin-right: 10px;
+    height: 100%;
+    min-width: 60px;
+}
+
+/* Resource Browser Window */
+
+.k-resource-window-content {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 53px;
+}
+
+.k-resource-splitter {
+    box-sizing: border-box;
+}
+
+.k-resource-window-pane {
+    padding: 0.3em;
+    box-sizing: border-box;
+}
+
+.k-resource-window-actions {
+    position: absolute;
+    height: 33px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    text-align: center;
+}
+
+.k-resource-window-agents ul {
+    margin-left: 0.4em;
+}
+
+.k-resource-window-agents strong {
+    font-weight: bold;
+}
+
+.k-resource-window-actions .k-button {
     margin-right: 10px;
     height: 100%;
     min-width: 60px;

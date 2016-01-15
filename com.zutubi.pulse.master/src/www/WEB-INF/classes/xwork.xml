@@ -594,10 +594,6 @@
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeReadOnlyStack"/>
 
-        <action name="browseResources" class="com.zutubi.pulse.master.xwork.actions.project.BrowseResourcesAction">
-            <result name="success" type="velocity">resource-browser.vm</result>
-        </action>
-
         <action name="reference" class="com.zutubi.pulse.master.xwork.actions.ReferencePopupAction">
             <result name="success" type="velocity">reference.vm</result>
         </action>

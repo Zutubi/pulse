@@ -15,6 +15,7 @@ import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.model.fs.FileModel;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeException;
@@ -40,6 +41,9 @@ public class FileSystemController implements EventListener
 {
     @Autowired
     private AccessManager accessManager;
+    @Autowired
+    private StartupManager startupManager;
+
     private EventManager eventManager;
 
     private boolean mainStarted = false;
@@ -221,12 +225,18 @@ public class FileSystemController implements EventListener
         return FileSystemUtils.normaliseSeparators(System.getProperty(EnvConfig.USER_HOME, ""));
     }
 
-    @Override
-    public void handleEvent(Event event)
+    private void wireMain()
     {
         projectManager = SpringComponentContext.getBean("projectManager");
         scmManager = SpringComponentContext.getBean("scmManager");
         mainStarted = true;
+    }
+
+    @Override
+    public void handleEvent(Event event)
+    {
+        wireMain();
+        eventManager.unregister(this);
     }
 
     @Override
@@ -238,6 +248,14 @@ public class FileSystemController implements EventListener
     @Autowired
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
+        this.eventManager = eventManager;
+        if (startupManager.isSystemStarted())
+        {
+            wireMain();
+        }
+        else
+        {
+            eventManager.register(this);
+        }
     }
 }

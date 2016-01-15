@@ -289,7 +289,6 @@
                 }
             }).data("kendoWindow");
 
-            //that.window.center();
             that.window.open();
         },
 

@@ -14,6 +14,7 @@
 // dependency: ./navigation.js
 // dependency: ./OverviewPanel.js
 // dependency: ./ProjectOverviewPanel.js
+// dependency: ./ResourceBrowserWindow.js
 // dependency: ./ScopePanel.js
 // dependency: ./Table.js
 // dependency: ./TypeSelectPanel.js

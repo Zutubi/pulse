@@ -18,21 +18,21 @@ import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.*;
 
-/**
- */
 public class DefaultResourceManager implements ResourceManager, com.zutubi.events.EventListener
 {
-    private Map<Long, AgentResourceRepository> agentRepositories = new TreeMap<Long, AgentResourceRepository>();
-    private Map<Long, ResourceConfiguration> resourcesByHandle = new HashMap<Long, ResourceConfiguration>();
-    private Map<Long, ResourceVersionConfiguration> resourceVersionsByHandle = new HashMap<Long, ResourceVersionConfiguration>();
+    private Map<Long, AgentResourceRepository> agentRepositories = new TreeMap<>();
+    private Map<Long, ResourceConfiguration> resourcesByHandle = new HashMap<>();
+    private Map<Long, ResourceVersionConfiguration> resourceVersionsByHandle = new HashMap<>();
 
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private AccessManager accessManager;
 
     private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
@@ -230,7 +230,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
 
     public Set<AgentConfiguration> getCapableAgents(Collection<? extends ResourceRequirement> requirements)
     {
-        Set<AgentConfiguration> agents = new HashSet<AgentConfiguration>();
+        Set<AgentConfiguration> agents = new HashSet<>();
         for (AgentResourceRepository repository: agentRepositories.values())
         {
             if (repository.satisfies(requirements))
@@ -266,7 +266,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 }
 
                 Collection<AgentConfiguration> agentConfigs = configurationTemplateManager.getHighestInstancesSatisfying(new DefinesLocation(hostLocation), AgentConfiguration.class);
-                List<AgentConfiguration> affectedAgents = new LinkedList<AgentConfiguration>();
+                List<AgentConfiguration> affectedAgents = new LinkedList<>();
                 for (AgentConfiguration config: agentConfigs)
                 {
                     String agentPath = config.getConfigurationPath();
@@ -350,12 +350,15 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         }
     }
 
-    public Map<String, List<ResourceConfiguration>> findAll()
+    public Map<String, List<ResourceConfiguration>> findAllVisible()
     {
-        Map<String, List<ResourceConfiguration>> allResources = new HashMap<String, List<ResourceConfiguration>>();
+        Map<String, List<ResourceConfiguration>> allResources = new HashMap<>();
         for (AgentResourceRepository repo : agentRepositories.values())
         {
-            allResources.put(repo.getAgentConfig().getName(), new LinkedList<ResourceConfiguration>(repo.getAll().values()));
+            if (accessManager.hasPermission(AccessManager.ACTION_VIEW, repo.getAgentConfig()))
+            {
+                allResources.put(repo.getAgentConfig().getName(), new LinkedList<>(repo.getAll().values()));
+            }
         }
 
         return allResources;
@@ -386,6 +389,11 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 
     private static class DefinesLocation implements Predicate<AgentConfiguration>
