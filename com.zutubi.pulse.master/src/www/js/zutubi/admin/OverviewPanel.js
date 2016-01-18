@@ -42,8 +42,8 @@
 
             that.view = new kendo.View(
                 '<div id="#= id #" class="k-overview-panel">' +
-                '<h1><a class="k-summary-edit">#: name # <span class="fa fa-pencil"></span></a></h1>' +
-                '<table id="#= id #-summary"></table>' +
+                    '<h1><a class="k-summary-edit">#: name # <span class="fa fa-pencil"></span></a></h1>' +
+                    '<table id="#= id #-summary"></table>' +
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
@@ -67,13 +67,6 @@
         {
             this.view.element.find(".k-summary-edit").off(ns);
             this.view.destroy();
-        },
-
-        _addSummary: function(tableEl)
-        {
-            this._addRow(tableEl, "scm", "scm", this._addScmSummary);
-            this._addRow(tableEl, "stages", "build stages", this._addStagesSummary);
-            this._addRow(tableEl, "dependencies", "dependencies", this._addDependenciesSummary);
         },
 
         _addRow: function(tableEl, path, heading, summary)

@@ -11,7 +11,7 @@ public interface Plugin
     /**
      * The state of the plugin within its lifecycle. 
      */
-    public enum State
+    enum State
     {
         /**
          * The plugin is loaded and available for use.
@@ -113,7 +113,9 @@ public interface Plugin
      * @param message the message to record
      */
     void addErrorMessage(String message);
-    
+
+    boolean canEnable();
+
     /**
      * Enable the plugin.  This will start the plugin and make it available to other
      * plugins that may depend on it.
@@ -127,7 +129,11 @@ public interface Plugin
      */
     void enable() throws PluginException;
 
+    boolean canDisable();
+
     void disable() throws PluginException;
+
+    boolean canUninstall();
 
     void uninstall() throws PluginException;
 

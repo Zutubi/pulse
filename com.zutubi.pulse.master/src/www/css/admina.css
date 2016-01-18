@@ -88,3 +88,27 @@ body {
     color: #bb2222;
     font-weight: bold;
 }
+
+/* Plugins Tree */
+
+.k-plugins-tree {
+    padding: 0.4em;
+}
+
+.k-plugins-tree .k-in::before {
+    font-family: FontAwesome;
+    margin-right: 0.5em;
+    font-size: 12px;
+    line-height: 12px;
+    vertical-align: middle;
+    content: '\f1e6'
+}
+
+.k-plugins-tree.k-treeview .k-item {
+    padding-left: 0;
+}
+
+.k-plugin-handles a {
+    text-decoration: underline;
+    cursor: pointer;
+}

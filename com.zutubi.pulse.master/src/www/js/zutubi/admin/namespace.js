@@ -31,6 +31,12 @@ if (window.Zutubi.admin === undefined)
                 delete app.configPanel;
             }
 
+            if (app.pluginsPanel)
+            {
+                app.pluginsPanel.destroy();
+                delete app.pluginsPanel;
+            }
+
             if (!app.scopePanel)
             {
                 app.scopePanel = new Zutubi.admin.ScopePanel("#config-view");
@@ -61,6 +67,12 @@ if (window.Zutubi.admin === undefined)
                 delete app.scopePanel;
             }
 
+            if (app.pluginsPanel)
+            {
+                app.pluginsPanel.destroy();
+                delete app.pluginsPanel;
+            }
+
             if (!app.configPanel)
             {
                 app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
@@ -75,6 +87,41 @@ if (window.Zutubi.admin === undefined)
             }
 
             app.configPanel.setPaths(rootPath, configPath);
+        }
+
+        function _showPlugins(id)
+        {
+            if (app.scopePanel)
+            {
+                app.scopePanel.destroy();
+                delete app.scopePanel;
+            }
+
+            if (app.configPanel)
+            {
+                app.configPanel.destroy();
+                delete app.configPanel;
+            }
+
+            if (!app.pluginsPanel)
+            {
+                app.pluginsPanel = new Zutubi.admin.PluginsPanel("#config-view");
+            }
+
+            app.pluginsPanel.setId(id);
+            app.pluginsPanel.bind("pluginSelected", function(e)
+            {
+                var url = "/plugins/" + Zutubi.config.encodePath(e.id);
+                if (e.initialDefault)
+                {
+                    app.router.replace(url);
+
+                }
+                else
+                {
+                    app.router.navigate(url, true);
+                }
+            });
         }
 
         function _createRouter()
@@ -155,6 +202,7 @@ if (window.Zutubi.admin === undefined)
             router.route("/plugins(/)(:id)", function(id)
             {
                 app.navbar.selectScope("plugins");
+                _showPlugins(id);
             });
 
             return router;

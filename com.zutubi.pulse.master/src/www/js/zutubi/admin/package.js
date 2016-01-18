@@ -13,6 +13,7 @@
 // dependency: ./Navbar.js
 // dependency: ./navigation.js
 // dependency: ./OverviewPanel.js
+// dependency: ./PluginsPanel.js
 // dependency: ./ProjectOverviewPanel.js
 // dependency: ./ResourceBrowserWindow.js
 // dependency: ./ScopePanel.js
