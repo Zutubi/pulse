@@ -8,6 +8,9 @@
 #else
     #set($resultId = $buildResult.id)
 #end
+<content tag="header.javascript">
+    zutubi/tree/package.js
+</content>
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>

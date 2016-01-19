@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ext/package.js
 // dependency: ./FSTreeLoader.js
+// dependency: zutubi/tree/ConfigTree.js
 
 /**
  * A tree browser window that supports navigation of the Pulse File System.

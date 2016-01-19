@@ -200,19 +200,6 @@
                                     collapseMode:'mini',
                                     hideCollapseTool:true,
                                     hidden: true
-                                }, {
-                                    region: 'east',
-                                    id: 'nested-east',
-                                    xtype: 'xzhelppanel',
-                                    split: true,
-                                    collapsible: true,
-                                    collapsed: true,
-                                    collapseMode:'mini',
-                                    hideCollapseTool:true,
-                                    width: 450,
-                                    hidden: true,
-                                    autoScroll: true,
-                                    bodyStyle: "padding: 10px"
                                 }]
                             }]
                         });
