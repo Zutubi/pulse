@@ -310,7 +310,7 @@
                 that.addButton = that.addButtonElement = null;
             }
 
-            if (that.createAllowed.indexOf(scope) >= 0 || scope === "plugins" && that.isAdmin)
+            if (that.createAllowed.indexOf(scope) >= 0 || (scope === "plugins" && that.isAdmin))
             {
                 if (scope === "plugins")
                 {

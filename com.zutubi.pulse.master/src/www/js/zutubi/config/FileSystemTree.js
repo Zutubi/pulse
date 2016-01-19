@@ -257,7 +257,7 @@
             elements = path.split("/");
             for (end = 1; end <= elements.length; end++)
             {
-                metaPath.push(prefix + elements.slice(0, end).join("/"))
+                metaPath.push(prefix + elements.slice(0, end).join("/"));
             }
 
             that.expandPath(metaPath, function()

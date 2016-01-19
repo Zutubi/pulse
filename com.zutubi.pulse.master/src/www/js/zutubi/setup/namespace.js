@@ -166,40 +166,6 @@ if (window.Zutubi.setup === undefined)
             });
         }
 
-        function _showLicensePanel()
-        {
-            var view, form;
-
-            view = new kendo.View('<div id="request-license" class="k-check-wrapper">' +
-                                      '<h1>request evaluation license</h1>' +
-                                      '<p>enter your detail below to request a free, 30-day evaluation license</p>' +
-                                      '<div id="request-license-form">' +
-                                      '</div>' +
-                                  '</div>', {wrap: false});
-            view.render("#input");
-
-            form = $("#request-license-form").kendoZaForm({
-                formName: "request license",
-                structure: {
-                    fields: [{
-                        name: 'fullName',
-                        required: true,
-                        label: 'full name'
-                    }, {
-                        name: 'email',
-                        required: true,
-                        label: 'email address'
-                    }]
-                },
-                submits: ["request license"]
-            }).data("kendoZaForm");
-
-            form.bind("buttonClicked", function()
-            {
-                _requestLicense(form);
-            });
-        }
-
         function _requestLicense(form)
         {
             kendo.ui.progress(app.mainView, true);
@@ -236,6 +202,40 @@ if (window.Zutubi.setup === undefined)
                         Zutubi.core.reportError("Could not request license: " + Zutubi.core.ajaxError(jqXHR));
                     }
                 }
+            });
+        }
+
+        function _showLicensePanel()
+        {
+            var view, form;
+
+            view = new kendo.View('<div id="request-license" class="k-check-wrapper">' +
+                                      '<h1>request evaluation license</h1>' +
+                                      '<p>enter your detail below to request a free, 30-day evaluation license</p>' +
+                                      '<div id="request-license-form">' +
+                                      '</div>' +
+                                  '</div>', {wrap: false});
+            view.render("#input");
+
+            form = $("#request-license-form").kendoZaForm({
+                formName: "request license",
+                structure: {
+                    fields: [{
+                        name: 'fullName',
+                        required: true,
+                        label: 'full name'
+                    }, {
+                        name: 'email',
+                        required: true,
+                        label: 'email address'
+                    }]
+                },
+                submits: ["request license"]
+            }).data("kendoZaForm");
+
+            form.bind("buttonClicked", function()
+            {
+                _requestLicense(form);
             });
         }
 
