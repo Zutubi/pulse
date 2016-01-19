@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -24,6 +25,7 @@ import org.osgi.framework.wiring.BundleWiring;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -359,14 +361,22 @@ public class PluginManager
 
     public synchronized Plugin install(URI uri, String filename) throws PluginException
     {
-        LocalPlugin plugin = downloadAndAdd(uri, filename);
+        LocalPlugin plugin = addPlugin(downloadPlugin(uri, filename, paths.getPluginStorageDir()));
         enablePlugin(plugin);
         return plugin;
     }
-    
+
+    public synchronized Plugin install(InputStream stream, String filename) throws PluginException
+    {
+        LocalPlugin plugin = addPlugin(downloadPlugin(stream, filename, paths.getPluginStorageDir()));
+        enablePlugin(plugin);
+        return plugin;
+    }
+
+
     public synchronized Plugin requestInstall(URI uri) throws PluginException
     {
-        LocalPlugin plugin = downloadAndAdd(uri, null);
+        LocalPlugin plugin = addPlugin(downloadPlugin(uri, null, paths.getPluginStorageDir()));
         plugin.setState(Plugin.State.INSTALLING);
         return plugin;
     }
@@ -376,16 +386,15 @@ public class PluginManager
         List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
         for (URI uri: uris)
         {
-            plugins.add(downloadAndAdd(uri, null));
+            plugins.add(addPlugin(downloadPlugin(uri, null, paths.getPluginStorageDir())));
         }
         
         enableAll(plugins);
         return plugins;
     }
 
-    private LocalPlugin downloadAndAdd(URI uri, String filename) throws PluginException
+    private LocalPlugin addPlugin(File file) throws PluginException
     {
-        File file = downloadPlugin(uri, filename, paths.getPluginStorageDir());
         LocalPlugin installedPlugin;
         try
         {
@@ -406,7 +415,7 @@ public class PluginManager
         plugins.add(installedPlugin);
         return installedPlugin;
     }
-    
+
     synchronized void disablePlugin(LocalPlugin plugin) throws PluginException
     {
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
@@ -732,13 +741,14 @@ public class PluginManager
 
     public synchronized List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)
     {
-        BundleWiring wiring = plugin.getBundle().adapt(BundleWiring.class);
+        Bundle bundle = plugin.getBundle();
+        BundleWiring wiring = bundle == null ? null : bundle.adapt(BundleWiring.class);
         if (wiring == null)
         {
             // It is the bundles description that tells us about the bundles requirements.
             // No description == no requirement information.  The plugin does have requirements,
             // but to get at them, we would need to read the raw bundle description ourselves.
-            return new LinkedList<PluginDependency>();
+            return new LinkedList<>();
         }
 
         List<BundleWire> requiredWires = wiring.getRequiredWires(null);
@@ -764,6 +774,27 @@ public class PluginManager
         return new PluginVersion(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier());
     }
 
+    private File downloadPlugin(InputStream source, String filename, File dest) throws PluginException
+    {
+        if (filename == null)
+        {
+            filename = "plugin-" + RandomUtils.insecureRandomString(10) + ".jar";
+        }
+
+        File downloadedFile = checkTargetFile(filename, dest);
+
+        try
+        {
+            Files.asByteSink(downloadedFile).writeFrom(source);
+        }
+        catch (IOException e)
+        {
+            throw new PluginException("Cannot save plugin data: " + e.getMessage(), e);
+        }
+
+        return downloadedFile;
+    }
+
     private File downloadPlugin(URI source, File dest) throws PluginException
     {
         return downloadPlugin(source, null, dest);
@@ -785,18 +816,7 @@ public class PluginManager
             filename = deriveName(source);
         }
 
-        if (!dest.exists() && !dest.mkdirs())
-        {
-            throw new PluginException("Can not download plugin.  Failed to create destination: " + dest.getAbsolutePath());
-        }
-
-        File downloadedFile = new File(dest, filename);
-
-        if (downloadedFile.exists())
-        {
-            throw new PluginException("Can not download plugin.  Plugin with name " + downloadedFile.getName() + " already exists.");
-        }
-
+        File downloadedFile = checkTargetFile(filename, dest);
         try
         {
             // treat local URIs differently because they may be either files or expanded directories.
@@ -814,6 +834,22 @@ public class PluginManager
             throw new PluginException(e);
         }
 
+        return downloadedFile;
+    }
+
+    private File checkTargetFile(String filename, File dest) throws PluginException
+    {
+        if (!dest.exists() && !dest.mkdirs())
+        {
+            throw new PluginException("Can not download plugin.  Failed to create destination: " + dest.getAbsolutePath());
+        }
+
+        File downloadedFile = new File(dest, filename);
+
+        if (downloadedFile.exists())
+        {
+            throw new PluginException("Can not download plugin.  Plugin with name " + downloadedFile.getName() + " already exists.");
+        }
         return downloadedFile;
     }
 

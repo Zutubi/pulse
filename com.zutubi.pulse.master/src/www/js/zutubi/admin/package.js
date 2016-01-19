@@ -9,6 +9,7 @@
 // dependency: ./DeleteWindow.js
 // dependency: ./HierarchySelector.js
 // dependency: ./HierarchyTree.js
+// dependency: ./InstallPluginsWindow.js
 // dependency: ./LabelConfigurationHooks.js
 // dependency: ./Navbar.js
 // dependency: ./navigation.js

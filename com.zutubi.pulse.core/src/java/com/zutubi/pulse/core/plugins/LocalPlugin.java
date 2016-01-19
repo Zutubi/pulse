@@ -259,7 +259,7 @@ public abstract class LocalPlugin implements Plugin
 
     public boolean canUninstall()
     {
-        return (isEnabled() || isDisabled());
+        return !isUninstalling() && !isUpgrading();
     }
 
     public boolean isUpgrading()

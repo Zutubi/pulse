@@ -146,6 +146,11 @@
             }
 
             return message;
+        },
+
+        csrfToken: function()
+        {
+            return headers[HEADER_CSRF];
         }
     });
 }(jQuery));

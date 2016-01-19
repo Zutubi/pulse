@@ -95,20 +95,39 @@ body {
     padding: 0.4em;
 }
 
-.k-plugins-tree .k-in::before {
-    font-family: FontAwesome;
-    margin-right: 0.5em;
+.k-plugins-tree .k-sprite::before {
     font-size: 12px;
     line-height: 12px;
     vertical-align: middle;
-    content: '\f1e6'
 }
 
 .k-plugins-tree.k-treeview .k-item {
     padding-left: 0;
 }
 
+.k-plugin-fade {
+    opacity: 0.50;
+}
+
+.k-plugin-error {
+    color: #b22;
+}
+
 .k-plugin-handles a {
     text-decoration: underline;
     cursor: pointer;
+}
+
+.k-plugin-errors {
+    list-style-type: disc;
+    margin-left: 1em;
+}
+
+.k-plugin-overview button {
+    margin-right: 0.5em;
+}
+
+.k-install-plugin-error, .k-plugin-errors li {
+    color: #b22;
+    margin: 0.4em;
 }

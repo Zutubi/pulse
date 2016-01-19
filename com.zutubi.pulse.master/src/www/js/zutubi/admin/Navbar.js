@@ -209,6 +209,7 @@
 
             Widget.fn.init.call(this, element, options);
 
+            that.isAdmin = options.isAdmin;
             that.createAllowed = [];
             if (options.projectCreateAllowed)
             {
@@ -228,7 +229,6 @@
         },
 
         events: [
-            ADD,
             SCOPE_SELECTED,
             ITEM_SELECTED
         ],
@@ -241,12 +241,11 @@
 
             that.list = $('<div class="k-navlist"></div>');
             that.element.append(that.list);
-
             that.list.append(that.itemTemplate({cls: '', content: '<a href="' + window.baseUrl + '/admin/">:: pulse admin ::</a>'}));
 
             that.scopeCrumbItem = $(that.itemTemplate({cls: '', content: ''}));
             that.scopeCrumb = that.scopeCrumbItem.kendoZaScopeCrumb({
-                isAdmin: that.options.isAdmin
+                isAdmin: that.isAdmin
             }).data("kendoZaScopeCrumb");
             that.scopeCrumb.bind(SELECT, function(e)
             {
@@ -299,7 +298,8 @@
         _updateAddButton: function()
         {
             var that = this,
-                scope = that.scopeCrumb.selected;
+                scope = that.scopeCrumb.selected,
+                title;
 
             if (that.addButton)
             {
@@ -310,9 +310,18 @@
                 that.addButton = that.addButtonElement = null;
             }
 
-            if (that.createAllowed.indexOf(scope) >= 0)
+            if (that.createAllowed.indexOf(scope) >= 0 || scope === "plugins" && that.isAdmin)
             {
-                that.addButtonElement = $('<button class="k-primary"><span class="fa fa-plus-circle"></span> add new ' + scope.substring(0, scope.length - 1) + '</button>');
+                if (scope === "plugins")
+                {
+                    title = 'install plugin';
+                }
+                else
+                {
+                    title = 'add new ' + scope.substring(0, scope.length - 1);
+                }
+
+                that.addButtonElement = $('<button class="k-primary"><span class="fa fa-plus-circle"></span> ' + title + '</button>');
                 that.addButtonItem.append(that.addButtonElement);
                 that.addButton = that.addButtonElement.kendoButton().data("kendoButton");
                 that.addButton.bind("click", jQuery.proxy(that._addClicked, that));

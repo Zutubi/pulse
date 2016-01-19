@@ -105,7 +105,7 @@ if (window.Zutubi.admin === undefined)
 
             if (!app.pluginsPanel)
             {
-                app.pluginsPanel = new Zutubi.admin.PluginsPanel("#config-view");
+                app.pluginsPanel = new Zutubi.admin.PluginsPanel("#config-view", app.isAdmin);
             }
 
             app.pluginsPanel.setId(id);
@@ -274,7 +274,14 @@ if (window.Zutubi.admin === undefined)
 
             navbar.bind("add", function(e)
             {
-                _showAddWizard(e.scope);
+                if (e.scope === "plugins")
+                {
+                    app.pluginsPanel.showInstallWindow();
+                }
+                else
+                {
+                    _showAddWizard(e.scope);
+                }
             });
 
             return navbar;
@@ -336,6 +343,7 @@ if (window.Zutubi.admin === undefined)
 
             init: function(isAdmin, projectCreateAllowed, agentCreateAllowed)
             {
+                app.isAdmin = isAdmin;
                 app.notificationWidget = _createNotificationWidget();
                 Zutubi.core.registerFeedbackHandler(app.notificationWidget);
                 app.router = _createRouter();

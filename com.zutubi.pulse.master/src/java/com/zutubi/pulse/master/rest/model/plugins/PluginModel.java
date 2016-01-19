@@ -69,7 +69,7 @@ public class PluginModel
     public List<PluginHandleModel> getRequirements()
     {
         List<PluginDependency> requiredPlugins = plugin.getRequiredPlugins();
-        if (requiredPlugins.isEmpty())
+        if (requiredPlugins == null || requiredPlugins.isEmpty())
         {
             return null;
         }
@@ -89,7 +89,7 @@ public class PluginModel
     public List<PluginHandleModel> getDependents()
     {
         List<Plugin> dependentPlugins = plugin.getDependentPlugins();
-        if (dependentPlugins.isEmpty())
+        if (dependentPlugins == null || dependentPlugins.isEmpty())
         {
             return null;
         }
