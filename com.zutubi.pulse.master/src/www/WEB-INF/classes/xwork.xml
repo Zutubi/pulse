@@ -465,30 +465,6 @@
             </result>
         </action>
 
-        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MakeDirectoryAction">
-            <interceptor-ref name="ajaxSideEffectStack"/>
-            <result name="success" type="flexjson">
-                <param name="deep">true</param>
-                <param name="location">result</param>
-            </result>
-            <result name="error" type="flexjson">
-                <param name="deep">true</param>
-                <param name="location">result</param>
-            </result>
-        </action>
-
-        <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RemoveDirectoryAction">
-            <interceptor-ref name="ajaxSideEffectStack"/>
-            <result name="success" type="flexjson">
-                <param name="deep">true</param>
-                <param name="location">result</param>
-            </result>
-            <result name="error" type="flexjson">
-                <param name="deep">true</param>
-                <param name="location">result</param>
-            </result>
-        </action>
-
         <action name="customiseBuildColumns" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseBuildColumnsAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>
@@ -555,11 +531,6 @@
         <action name="saveArtifactsFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveArtifactsFilterAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
-        </action>
-
-        <action name="getHome" class="com.zutubi.pulse.master.xwork.actions.ajax.GetHomeDirectoryAction">
-            <interceptor-ref name="ajaxStack"/>
-            <result name="success" type="flexjson">data</result>
         </action>
 
         <action name="getBuildStatus" class="com.zutubi.pulse.master.xwork.actions.ajax.GetBuildStatusAction">

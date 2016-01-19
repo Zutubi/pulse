@@ -2,19 +2,11 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
-import com.zutubi.pulse.master.tove.freemarker.BaseNameMethod;
-import com.zutubi.pulse.master.tove.freemarker.GetTextMethod;
-import com.zutubi.pulse.master.tove.freemarker.ValidIdMethod;
 import com.zutubi.pulse.master.tove.model.ActionLink;
-import com.zutubi.pulse.master.tove.model.Form;
-import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
@@ -30,17 +22,11 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
-import freemarker.core.DelegateBuiltin;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.*;
 
 import static com.google.common.collect.Collections2.transform;
@@ -470,43 +456,6 @@ public class ToveUtils
             value = key;
         }
         return value;
-    }
-
-    public static Map<String, Object> populateContext(Class clazz, Map<String, Object> context)
-    {
-        Messages messages = Messages.getInstance(clazz);
-        context.put("i18nText", new GetTextMethod(messages));
-        context.put("baseName", new BaseNameMethod());
-        context.put("validId", new ValidIdMethod());
-
-        // validation support:
-        OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        context.put("actionErrors", stack.findValue("actionErrors"));
-        context.put("fieldErrors", stack.findValue("fieldErrors"));
-        context.put("isWindows", ""+SystemUtils.IS_WINDOWS);
-
-        context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
-        context.put("sessionToken", SessionTokenManager.getToken());
-
-        // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
-        DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
-        DelegateBuiltin.conditionalRegistration("baseName", "baseName");
-        DelegateBuiltin.conditionalRegistration("id", "validId");
-        return context;
-    }
-
-    public static void renderForm(Form form, Class i18nClazz, Writer writer, freemarker.template.Configuration configuration) throws IOException, TemplateException
-    {
-        renderForm(new HashMap<String, Object>(), form, i18nClazz, writer, configuration);    
-    }
-
-    public static void renderForm(Map<String, Object> context, Form form, Class i18nClazz, Writer writer, freemarker.template.Configuration configuration) throws TemplateException, IOException
-    {
-        populateContext(i18nClazz, context);
-        context.put("form", form);
-        freemarker.template.Configuration config = FreemarkerConfigurationFactoryBean.addClassTemplateLoader(i18nClazz, configuration);
-        Template template = config.getTemplate("tove/xhtml/form.ftl");
-        template.process(context, writer);
     }
 
     public static String getStatusIcon(BuildResult result)

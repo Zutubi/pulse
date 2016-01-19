@@ -1,6 +1,5 @@
 // dependency: ext/package.js
 // dependency: ./FSTreeLoader.js
-// dependency: ./LocalFileSystemBrowser.js
 // dependency: ./PulseFileSystemBrowser.js
 // dependency: ./WorkingCopyFileSystemBrowser.js
 
