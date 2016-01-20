@@ -36,8 +36,6 @@
     </p>
     <ul style="list-style: circle; width: 720px">
         <li>Template decoration of forms (showing what is inherited/overridden and from where).</li>
-        <li>Field actions (e.g. browsing for files).</li>
-        <li>Plugin administration.</li>
         <li>Styling, polish, testing, ...</li>
     </ul>
     <p>
