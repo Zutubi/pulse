@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.rest.wizards.ConfigurationWizard;
 import com.zutubi.pulse.master.rest.wizards.DefaultWizard;
+import com.zutubi.pulse.master.rest.wizards.WizardContext;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -240,7 +241,7 @@ public class WizardController
         boolean templated = isTemplate == null ? false : Boolean.valueOf(isTemplate.toString());
 
         ConfigurationWizard wizard = buildWizard(itemType);
-        MutableRecord record = wizard.buildRecord(itemType, scope, null, (TemplateRecord) templateParentRecord, null, !templated, body);
+        MutableRecord record = wizard.buildRecord(itemType, new WizardContext(scope, null, (TemplateRecord) templateParentRecord, null, !templated, body));
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if (templated)
@@ -260,10 +261,8 @@ public class WizardController
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ConfigurationWizard wizard = buildWizard(context.getPostableType());
         boolean concrete = templateOwnerPath == null || configurationTemplateManager.isConcrete(templateOwnerPath);
-        MutableRecord record = wizard.buildRecord(context.getPostableType(), configPath, context.getBaseName(), null, templateOwnerPath, concrete, body);
+        MutableRecord record = wizard.buildRecord(context.getPostableType(), new WizardContext(configPath, context.getBaseName(), null, templateOwnerPath, concrete, body));
 
         return configurationTemplateManager.insertRecord(configPath, record);
     }
-
-
 }

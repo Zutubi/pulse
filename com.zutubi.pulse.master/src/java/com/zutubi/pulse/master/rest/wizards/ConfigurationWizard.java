@@ -1,14 +1,10 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.TemplateRecord;
-
-import java.util.Map;
 
 /**
  * Wizards present a custom API for creating new instances of a configuration type.  To customise
@@ -22,5 +18,5 @@ import java.util.Map;
 public interface ConfigurationWizard
 {
     WizardModel buildModel(CompositeType type, FormContext context) throws TypeException;
-    MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException;
+    MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException;
 }

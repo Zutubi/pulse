@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.rest.model.WizardTypeModel;
@@ -12,10 +11,8 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,11 +50,11 @@ public class BuildHookConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
-        MutableRecord hookRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
+        MutableRecord hookRecord = wizardModelBuilder.buildAndValidateRecord(type, "", wizardContext);
         CompositeType taskType = wizardModelBuilder.getCompositeType(BuildHookTaskConfiguration.class);
-        hookRecord.put(KEY_TASK, wizardModelBuilder.buildAndValidateRecord(taskType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_TASK));
+        hookRecord.put(KEY_TASK, wizardModelBuilder.buildAndValidateRecord(taskType, KEY_TASK, wizardContext));
         return hookRecord;
     }
 

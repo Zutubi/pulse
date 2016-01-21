@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
@@ -26,7 +25,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.List;
 import java.util.Map;
@@ -56,13 +54,13 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
-        MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
+        MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, "", wizardContext);
         CompositeType scmType = wizardModelBuilder.getCompositeType(ScmConfiguration.class);
-        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_SCM));
+        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, KEY_SCM, wizardContext));
         CompositeType typeType = wizardModelBuilder.getCompositeType(TypeConfiguration.class);
-        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(typeType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_TYPE));
+        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(typeType, KEY_TYPE, wizardContext));
         return projectRecord;
     }
 

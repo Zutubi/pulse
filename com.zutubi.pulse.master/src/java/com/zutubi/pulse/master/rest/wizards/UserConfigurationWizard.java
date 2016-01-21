@@ -1,15 +1,11 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.TemplateRecord;
-
-import java.util.Map;
 
 /**
  * Customised interface for creating users that handles password confirmation and creation of a
@@ -28,13 +24,13 @@ public class UserConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
-        CompositeType actualType = wizardModelBuilder.typeCheck(models, "", UserConfigurationCreator.class);
-        MutableRecord record = wizardModelBuilder.buildRecord(templateParentRecord, templateOwnerPath, actualType, models.get(""));
-        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildAndValidateCreatorInstance(actualType, parentPath, baseName, record);
+        CompositeType actualType = wizardModelBuilder.typeCheck(wizardContext.getModels(), "", UserConfigurationCreator.class);
+        MutableRecord record = wizardModelBuilder.buildRecord(wizardContext.getTemplateParentRecord(), wizardContext.getTemplateOwnerPath(), actualType, wizardContext.getModels().get(""));
+        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildAndValidateCreatorInstance(actualType, wizardContext.getParentPath(), wizardContext.getBaseName(), record);
         UserConfiguration userConfiguration = creator.create();
-        return type.unstantiate(userConfiguration, templateOwnerPath);
+        return type.unstantiate(userConfiguration, wizardContext.getTemplateOwnerPath());
     }
 
     public void setWizardModelBuilder(WizardModelBuilder wizardModelBuilder)

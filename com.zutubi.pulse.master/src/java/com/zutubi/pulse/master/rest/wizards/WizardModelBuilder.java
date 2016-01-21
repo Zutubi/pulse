@@ -153,16 +153,17 @@ public class WizardModelBuilder
         return record;
     }
 
-    public MutableRecord buildAndValidateRecord(CompositeType type, String parentPath, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models, String key) throws TypeException
+    public MutableRecord buildAndValidateRecord(CompositeType type, String key, WizardContext context) throws TypeException
     {
-        CompositeType actualType = typeCheck(models, key, type);
-        if (templateParentRecord != null && StringUtils.stringSet(key))
+        CompositeType actualType = typeCheck(context.getModels(), key, type);
+        TemplateRecord templateParentRecord = null;
+        if (context.getTemplateParentRecord() != null && StringUtils.stringSet(key))
         {
-            templateParentRecord = (TemplateRecord) templateParentRecord.get(key);
+            templateParentRecord = (TemplateRecord) context.getTemplateParentRecord().get(key);
         }
 
-        MutableRecord record = buildRecord(templateParentRecord, templateOwnerPath, actualType, models.get(key));
-        Configuration instance = configurationTemplateManager.validate(parentPath, null, record, concrete, false);
+        MutableRecord record = buildRecord(templateParentRecord, context.getTemplateOwnerPath(), actualType, context.getModels().get(key));
+        Configuration instance = configurationTemplateManager.validate(context.getParentPath(), null, record, context.isConcrete(), false);
         if (!instance.isValid())
         {
             throw new ValidationException(instance, key);

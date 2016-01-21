@@ -1,14 +1,10 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.TemplateRecord;
-
-import java.util.Map;
 
 /**
  * The default wizard implementation presents a single step for the type.
@@ -26,9 +22,9 @@ public class DefaultWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
-        return wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
+        return wizardModelBuilder.buildAndValidateRecord(type, "", wizardContext);
     }
 
     public void setWizardModelBuilder(WizardModelBuilder wizardModelBuilder)

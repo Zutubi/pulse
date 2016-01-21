@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.rest.wizards;
 import com.google.common.collect.Sets;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.TemplateInfo;
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.rest.model.WizardTypeModel;
@@ -17,11 +16,9 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A wizard that adds a step to configure a condition when the user adds a project build subscripton.
@@ -97,13 +94,13 @@ public class SubscriptionConfigurationWizard implements ConfigurationWizard
     }
 
     @Override
-    public MutableRecord buildRecord(CompositeType type, String parentPath, String baseName, TemplateRecord templateParentRecord, String templateOwnerPath, boolean concrete, Map<String, CompositeModel> models) throws TypeException
+    public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
-        MutableRecord subscriptionRecord = wizardModelBuilder.buildAndValidateRecord(type, parentPath, templateParentRecord, templateOwnerPath, concrete, models, "");
-        if (models.containsKey(KEY_CONDITION))
+        MutableRecord subscriptionRecord = wizardModelBuilder.buildAndValidateRecord(type, "", wizardContext);
+        if (wizardContext.getModels().containsKey(KEY_CONDITION))
         {
             CompositeType conditionType = wizardModelBuilder.getCompositeType(SubscriptionConditionConfiguration.class);
-            subscriptionRecord.put(KEY_CONDITION, wizardModelBuilder.buildAndValidateRecord(conditionType, parentPath, templateParentRecord, templateOwnerPath, concrete, models, KEY_CONDITION));
+            subscriptionRecord.put(KEY_CONDITION, wizardModelBuilder.buildAndValidateRecord(conditionType, KEY_CONDITION, wizardContext));
         }
         return subscriptionRecord;
     }
