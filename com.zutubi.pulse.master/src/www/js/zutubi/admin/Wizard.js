@@ -43,6 +43,7 @@
             {
                 return {
                     label: type.label,
+                    help: type.help,
                     symbolicName: type.type.symbolicName,
                     form: type.type.form,
                     checkType: type.type.checkType,
@@ -252,7 +253,10 @@
         options: {
             name: "ZaWizard",
             template: '<ul class="k-wizard-step-index"></ul>' +
-                      '<div class="k-wizard-type-select">Select type: <input></div>' +
+                      '<div class="k-wizard-type-select">' +
+                          'Select type: <input>' +
+                          '<div class="k-wizard-type-help"></div>' +
+                      '</div>' +
                       '<div class="k-wizard-form"></div>' +
                       '<div class="k-wizard-check">' +
                           '<p>click <em>check</em> below to test your configuration</p>' +
@@ -286,6 +290,7 @@
             that.typeSelectDropDown = that.typeSelectWrapper.children("input").kendoDropDownList({
                 change: jQuery.proxy(that._typeSelected, that)
             }).data("kendoDropDownList");
+            that.typeSelectHelp = that.typeSelectWrapper.children(".k-wizard-type-help");
 
             that.formWrapper = that.element.find(".k-wizard-form");
             that.checkWrapper = that.element.find(".k-wizard-check");
@@ -535,6 +540,16 @@
 
             step.selectedTypeIndex = index;
             this.typeSelectDropDown.value(step.types[index].label);
+            if (type.help)
+            {
+                that.typeSelectHelp.html(kendo.htmlEncode(type.help));
+                that.typeSelectHelp.show();
+            }
+            else
+            {
+                that.typeSelectHelp.empty();
+                that.typeSelectHelp.hide();
+            }
 
             if (stepIndex !== 0)
             {

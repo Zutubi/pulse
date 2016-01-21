@@ -10,6 +10,7 @@ public class WizardTypeModel
 {
     private CompositeTypeModel type;
     private String label;
+    private String help;
     private WizardTypeFilter filter;
 
     public WizardTypeModel(CompositeTypeModel type, String label)
@@ -26,6 +27,16 @@ public class WizardTypeModel
     public String getLabel()
     {
         return label;
+    }
+
+    public String getHelp()
+    {
+        return help;
+    }
+
+    public void setHelp(String help)
+    {
+        this.help = help;
     }
 
     public WizardTypeFilter getFilter()

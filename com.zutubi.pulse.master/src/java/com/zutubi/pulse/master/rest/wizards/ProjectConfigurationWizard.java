@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest.wizards;
 
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
 import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -38,7 +39,9 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     private static final String PROPERTY_STAGES = "stages";
     private static final String PROPERTY_TRIGGERS = "triggers";
 
-    private  static final String KEY_SCM = "scm";
+    private static final String TYPE_GIT = "zutubi.gitConfig";
+
+    private static final String KEY_SCM = "scm";
     private static final String KEY_TYPE = "type";
     private static final String KEY_DEFAULTS = "defaults";
 
@@ -51,8 +54,17 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     {
         WizardModel model = new WizardModel();
         model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
-        model.appendStep(wizardModelBuilder.buildStepForClass(KEY_SCM, ScmConfiguration.class, context));
-        model.appendStep(wizardModelBuilder.buildStepForClass(KEY_TYPE, TypeConfiguration.class, context));
+        TypedWizardStepModel scmStep = wizardModelBuilder.buildStepForClass(KEY_SCM, ScmConfiguration.class, context);
+        // Git is a plugin, so not always available, but a nicer default than whatever is alphabetically first!
+        if (scmStep.hasType(TYPE_GIT))
+        {
+            scmStep.setDefaultType(TYPE_GIT);
+        }
+
+        model.appendStep(scmStep);
+        TypedWizardStepModel projectTypeStep = wizardModelBuilder.buildStepForClass(KEY_TYPE, TypeConfiguration.class, context);
+        projectTypeStep.setDefaultType(typeRegistry.getType(MultiRecipeTypeConfiguration.class).getSymbolicName());
+        model.appendStep(projectTypeStep);
         model.appendStep(wizardModelBuilder.buildStepForClass(KEY_DEFAULTS, ProjectDefaultsConfiguration.class, context));
         return model;
     }
@@ -90,26 +102,30 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
             addTrigger(projectType, projectRecord, DependentBuildTriggerConfiguration.class, DEPENDENCY_TRIGGER, context);
         }
 
-        if (defaults.isAddDefaultRecipe())
+        CompositeType multiRecipeType = typeRegistry.getType(MultiRecipeTypeConfiguration.class);
+        if (multiRecipeType.getSymbolicName().equals(typeRecord.getSymbolicName()) && defaults.isAddDefaultRecipe())
         {
-            String recipeName = defaults.getRecipeName();
-            if (!StringUtils.stringSet(recipeName))
-            {
-                recipeName = DEFAULT_RECIPE;
-            }
-
-            typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
-
             MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
             if (recipesRecord == null)
             {
-                recipesRecord = ((CollectionType) typeRegistry.getType(MultiRecipeTypeConfiguration.class).getPropertyType(PROPERTY_RECIPES)).createNewRecord(true);
+                recipesRecord = ((CollectionType) multiRecipeType.getPropertyType(PROPERTY_RECIPES)).createNewRecord(true);
                 typeRecord.put(PROPERTY_RECIPES, recipesRecord);
             }
 
-            MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-            recipeRecord.put(PROPERTY_NAME, recipeName);
-            recipesRecord.put(recipeName, recipeRecord);
+            if (recipesRecord.size() == 0)
+            {
+                String recipeName = defaults.getRecipeName();
+                if (!StringUtils.stringSet(recipeName))
+                {
+                    recipeName = DEFAULT_RECIPE;
+                }
+
+                typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
+
+                MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+                recipeRecord.put(PROPERTY_NAME, recipeName);
+                recipesRecord.put(recipeName, recipeRecord);
+            }
         }
 
         if (defaults.isAddDefaultStage())

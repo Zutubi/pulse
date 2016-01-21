@@ -45,7 +45,12 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     private static final HashFunction VALIDATION_CACHE_HASH_FUNCTION = Hashing.goodFastHash(32);
 
     @TextArea(rows = 30, cols = 72)
-    private String pulseFileString;
+    private String pulseFileString = "<?xml version=\"1.0\"?>\n" +
+            "<project default-recipe=\"default\">\n" +
+            "    <recipe name=\"default\">\n" +
+            "    </recipe>\n" +
+            "</project>\n";
+
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 

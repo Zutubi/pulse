@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A wizard step to configure a defined type.  If the type is concrete, a common case, there is
@@ -19,6 +20,19 @@ public class TypedWizardStepModel extends WizardStepModel
     public TypedWizardStepModel(String key, String label)
     {
         super(label, key);
+    }
+
+    public boolean hasType(String symbolicName)
+    {
+        for (WizardTypeModel type: types)
+        {
+            if (Objects.equals(type.getType().getSymbolicName(), symbolicName))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<WizardTypeModel> getTypes()

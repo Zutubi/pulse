@@ -413,6 +413,13 @@ input.k-state-disabled, input.k-state-disabled:hover {
     padding-bottom: 0.6em;
 }
 
+.k-wizard-type-help {
+    margin: 0.5em 0.5em 0 5.8em;
+    opacity: 0.9;
+    font-size: 0.85em;
+    font-style: italic;
+}
+
 .k-wizard-check {
     margin-top: 0.5em;
     padding-top: 0.5em;

@@ -15,10 +15,10 @@ public class ProjectDefaultsConfiguration extends AbstractConfiguration
     private boolean addScmTrigger = true;
     private boolean addDependenciesTrigger = true;
     @ControllingCheckbox(checkedFields = {"recipeName", "addDefaultStage"})
-    private boolean addDefaultRecipe;
+    private boolean addDefaultRecipe = true;
     private String recipeName = "default";
     @ControllingCheckbox(checkedFields = {"stageName"})
-    private boolean addDefaultStage;
+    private boolean addDefaultStage = true;
     private String stageName = "default";
 
     public boolean isAddScmTrigger()

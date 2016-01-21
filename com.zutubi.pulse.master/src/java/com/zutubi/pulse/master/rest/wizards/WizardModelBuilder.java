@@ -30,6 +30,9 @@ import java.util.Map;
  */
 public class WizardModelBuilder
 {
+    private static final String KEY_WIZARD_LABEL = "wizard.label";
+    private static final String KEY_WIZARD_HELP = "wizard.help";
+
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigModelBuilder configModelBuilder;
@@ -57,8 +60,13 @@ public class WizardModelBuilder
         for (CompositeType stepType : types)
         {
             messages = Messages.getInstance(stepType.getClazz());
-            String labelKey = messages.isKeyDefined("wizard.label") ? "wizard.label" : "label";
-            step.addType(new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context), messages.format(labelKey)));
+            String labelKey = messages.isKeyDefined(KEY_WIZARD_LABEL) ? "wizard.label" : "label";
+            WizardTypeModel typeModel = new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context), messages.format(labelKey));
+            step.addType(typeModel);
+            if (messages.isKeyDefined(KEY_WIZARD_HELP))
+            {
+                typeModel.setHelp(messages.format(KEY_WIZARD_HELP));
+            }
         }
         return step;
     }
