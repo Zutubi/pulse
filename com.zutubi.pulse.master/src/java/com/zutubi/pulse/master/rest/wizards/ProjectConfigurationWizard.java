@@ -1,22 +1,16 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.google.common.base.Function;
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
-import com.zutubi.pulse.core.plugins.CommandExtensionManager;
-import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.rest.model.WizardModel;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
@@ -24,13 +18,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.Record;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
+import com.zutubi.util.StringUtils;
 
 /**
  * Custom wizard for creating projects.  Adds the essentials (SCM, type) and optionally defaults
@@ -38,10 +26,25 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class ProjectConfigurationWizard implements ConfigurationWizard
 {
+    public static final String DEPENDENCY_TRIGGER = "dependency trigger";
+    public static final String SCM_TRIGGER = "scm trigger";
+    public static final String DEFAULT_STAGE = "default";
+    public static final String DEFAULT_RECIPE = "default";
+    public static final String DEFAULT_COMMAND = "build";
+
+    private static final String PROPERTY_DEFAULT_RECIPE = "defaultRecipe";
+    private static final String PROPERTY_NAME = "name";
+    private static final String PROPERTY_RECIPES = "recipes";
+    private static final String PROPERTY_STAGES = "stages";
+    private static final String PROPERTY_TRIGGERS = "triggers";
+
     private  static final String KEY_SCM = "scm";
     private static final String KEY_TYPE = "type";
+    private static final String KEY_DEFAULTS = "defaults";
 
     private WizardModelBuilder wizardModelBuilder;
+    private TypeRegistry typeRegistry;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     @Override
     public WizardModel buildModel(CompositeType type, FormContext context) throws TypeException
@@ -50,6 +53,7 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
         model.appendStep(wizardModelBuilder.buildStepForType("", type, context));
         model.appendStep(wizardModelBuilder.buildStepForClass(KEY_SCM, ScmConfiguration.class, context));
         model.appendStep(wizardModelBuilder.buildStepForClass(KEY_TYPE, TypeConfiguration.class, context));
+        model.appendStep(wizardModelBuilder.buildStepForClass(KEY_DEFAULTS, ProjectDefaultsConfiguration.class, context));
         return model;
     }
 
@@ -60,135 +64,79 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
         CompositeType scmType = wizardModelBuilder.getCompositeType(ScmConfiguration.class);
         projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, KEY_SCM, wizardContext));
         CompositeType typeType = wizardModelBuilder.getCompositeType(TypeConfiguration.class);
-        projectRecord.put(KEY_TYPE, wizardModelBuilder.buildAndValidateRecord(typeType, KEY_TYPE, wizardContext));
+        MutableRecord typeRecord = wizardModelBuilder.buildAndValidateRecord(typeType, KEY_TYPE, wizardContext);
+        projectRecord.put(KEY_TYPE, typeRecord);
+
+        if (wizardContext.getModels().containsKey(KEY_DEFAULTS))
+        {
+            CompositeType defaultsType = typeRegistry.getType(ProjectDefaultsConfiguration.class);
+            MutableRecord defaultsRecord = wizardModelBuilder.buildRecord(wizardContext.getTemplateParentRecord(), wizardContext.getTemplateOwnerPath(), defaultsType, wizardContext.getModels().get(KEY_DEFAULTS));
+            ProjectDefaultsConfiguration defaults = (ProjectDefaultsConfiguration) wizardModelBuilder.buildAndValidateCreatorInstance(defaultsType, wizardContext.getParentPath(), wizardContext.getBaseName(), defaultsRecord);
+            applyDefaults(type, projectRecord, typeRecord, defaults, wizardContext);
+        }
+
         return projectRecord;
     }
 
-
-    // FIXME kendo default project init
-
-    public static final String DEPENDENCY_TRIGGER = "dependency trigger";
-    public static final String SCM_TRIGGER = "scm trigger";
-    public static final String DEFAULT_STAGE = "default";
-    public static final String DEFAULT_RECIPE = "default";
-    public static final String DEFAULT_COMMAND = "build";
-
-    private static final String PROPERTY_COMMANDS = "commands";
-    private static final String PROPERTY_DEFAULT_RECIPE = "defaultRecipe";
-    private static final String PROPERTY_NAME = "name";
-    private static final String PROPERTY_PRIMARY_TYPE = "primaryType";
-    private static final String PROPERTY_PROJECT_REQUIREMENTS = "requirements";
-    private static final String PROPERTY_RECIPES = "recipes";
-    private static final String PROPERTY_SCM = "scm";
-    private static final String PROPERTY_STAGES = "stages";
-    private static final String PROPERTY_TRIGGERS = "triggers";
-    private static final String PROPERTY_TYPE = KEY_TYPE;
-
-    private ConfigurationProvider configurationProvider;
-    private ConfigurationTemplateManager configurationTemplateManager;
-    private ConfigurationReferenceManager configurationReferenceManager;
-    private TypeRegistry typeRegistry;
-
-    private CommandExtensionManager commandExtensionManager;
-    private String templateParentPath = null;
-    private CompositeType projectType;
-
-    public void confit()
+    private void applyDefaults(CompositeType projectType, MutableRecord projectRecord, MutableRecord typeRecord, ProjectDefaultsConfiguration defaults, WizardContext context)
     {
-        MutableRecord record = null;
-        ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
-        if (templateParentProject.getStages().size() == 0 &&
-                configurationTemplateManager.findAncestorPath(PathUtils.getPath(templateParentPath, PROPERTY_STAGES, DEFAULT_STAGE)) == null)
+        if (defaults.isAddScmTrigger())
         {
-            // Add a default stage to our new project.
-            CollectionType stagesType = (CollectionType) projectType.getProperty(PROPERTY_STAGES).getType();
-            CompositeType stageType = (CompositeType) stagesType.getTargetType();
-            MutableRecord stagesRecord = stagesType.createNewRecord(true);
-            MutableRecord stageRecord = stageType.createNewRecord(true);
-            stageRecord.put(PROPERTY_NAME, DEFAULT_STAGE);
-            stagesRecord.put(DEFAULT_STAGE, stageRecord);
-            record.put(PROPERTY_STAGES, stagesRecord);
+            addTrigger(projectType, projectRecord, ScmBuildTriggerConfiguration.class, SCM_TRIGGER, context);
         }
 
-        ensureTrigger(record, templateParentProject, ScmBuildTriggerConfiguration.class, SCM_TRIGGER);
-        ensureTrigger(record, templateParentProject, DependentBuildTriggerConfiguration.class, DEPENDENCY_TRIGGER);
-    }
-
-    private void addDefaultResourceRequirements(MutableRecord projectRecord, CompositeType commandType)
-    {
-        Object existingRequirements = projectRecord.get(PROPERTY_PROJECT_REQUIREMENTS);
-        if (existingRequirements == null || ((Record) existingRequirements).size() == 0)
+        if (defaults.isAddDependenciesTrigger())
         {
-            @SuppressWarnings("unchecked")
-            List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
-            List<ResourceRequirementConfiguration> configurations = newArrayList(transform(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
-            {
-                public ResourceRequirementConfiguration apply(ResourceRequirement resourceRequirement)
-                {
-                    return new ResourceRequirementConfiguration(resourceRequirement);
-                }
-            }));
+            addTrigger(projectType, projectRecord, DependentBuildTriggerConfiguration.class, DEPENDENCY_TRIGGER, context);
+        }
 
-            try
+        if (defaults.isAddDefaultRecipe())
+        {
+            String recipeName = defaults.getRecipeName();
+            if (!StringUtils.stringSet(recipeName))
             {
-                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations, null));
+                recipeName = DEFAULT_RECIPE;
             }
-            catch (TypeException e)
+
+            typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
+
+            MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
+            if (recipesRecord == null)
             {
-                // We can continue without these defaults.
-                //LOG.severe(e);
+                recipesRecord = ((CollectionType) typeRegistry.getType(MultiRecipeTypeConfiguration.class).getPropertyType(PROPERTY_RECIPES)).createNewRecord(true);
+                typeRecord.put(PROPERTY_RECIPES, recipesRecord);
             }
+
+            MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+            recipeRecord.put(PROPERTY_NAME, recipeName);
+            recipesRecord.put(recipeName, recipeRecord);
         }
-    }
 
-    private MutableRecord createSingleCommandType(ProjectConfiguration templateParentProject)
-    {
-        MutableRecord commandDataRecord = null;//commandState.getDataRecord();
-        String recipeName = DEFAULT_RECIPE;
-
-        if (templateParentProject.getType() == null)
+        if (defaults.isAddDefaultStage())
         {
-//            SimpleInstantiator instantiator = new SimpleInstantiator(templateParentPath, configurationReferenceManager, configurationTemplateManager);
-//            try
-//            {
-//                CommandConfiguration commandConfig = (CommandConfiguration) instantiator.instantiate(commandState.getType(), commandDataRecord);
-//                commandConfig.initialiseSingleCommandProject(templateParentProject.getPostProcessors());
-//                commandDataRecord = commandState.getType().unstantiate(commandConfig, null);
-//            }
-//            catch (TypeException e)
-//            {
-//                // This is not fatal, we just won't get any extra initialisation.
-//                //LOG.severe(e);
-//            }
+            String stageName = defaults.getStageName();
+            if (!StringUtils.stringSet(stageName))
+            {
+                stageName = DEFAULT_STAGE;
+            }
+
+            MutableRecord stagesRecord = (MutableRecord) typeRecord.get(PROPERTY_STAGES);
+            if (stagesRecord == null)
+            {
+                stagesRecord = ((CollectionType) projectType.getPropertyType(PROPERTY_STAGES)).createNewRecord(true);
+                projectRecord.put(PROPERTY_STAGES, stagesRecord);
+            }
+
+            MutableRecord stageRecord = typeRegistry.getType(BuildStageConfiguration.class).createNewRecord(true);
+            stageRecord.put(PROPERTY_NAME, stageName);
+            stagesRecord.put(stageName, stageRecord);
         }
-        else
-        {
-            MultiRecipeTypeConfiguration parentType = (MultiRecipeTypeConfiguration) templateParentProject.getType();
-            recipeName = parentType.getRecipes().keySet().iterator().next();
-        }
-
-        MutableRecord typeRecord = createMultiRecipeType();
-        typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
-
-        MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-        recipeRecord.put(PROPERTY_NAME, recipeName);
-        MutableRecord commandsRecord = (MutableRecord) recipeRecord.get(PROPERTY_COMMANDS);
-//        Record commandRenderRecord = commandState.getRenderRecord();
-//        commandsRecord.put((String) commandRenderRecord.get(PROPERTY_NAME), commandDataRecord);
-
-        MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
-        recipesRecord.put(recipeName, recipeRecord);
-        return typeRecord;
     }
 
-    private MutableRecord createMultiRecipeType()
+    private <T extends TriggerConfiguration> void addTrigger(CompositeType projectType, MutableRecord record, Class<T> triggerType, String name, WizardContext context)
     {
-        return typeRegistry.getType(MultiRecipeTypeConfiguration.class).createNewRecord(true);
-    }
-
-    private <T extends TriggerConfiguration> void ensureTrigger(MutableRecord record, ProjectConfiguration project, Class<T> triggerType, String name)
-    {
-        if (!hasTrigger(project, triggerType, name) && configurationTemplateManager.findAncestorPath(PathUtils.getPath(templateParentPath, PROPERTY_TRIGGERS, name)) == null)
+        String templateParentPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, (String) context.getTemplateParentRecord().get(PROPERTY_NAME));
+        if (configurationTemplateManager.findAncestorPath(PathUtils.getPath(templateParentPath, PROPERTY_TRIGGERS, name)) == null)
         {
             CollectionType triggersType = (CollectionType) projectType.getProperty(PROPERTY_TRIGGERS).getType();
             if (!record.containsKey(PROPERTY_TRIGGERS))
@@ -206,18 +154,36 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
         }
     }
 
-    private <T extends TriggerConfiguration> boolean hasTrigger(ProjectConfiguration project, Class<T> triggerType, String triggerName)
+
+    // FIXME kendo adding default resource reqs for command
+
+
+    private static final String PROPERTY_PROJECT_REQUIREMENTS = "requirements";
+    private void addDefaultResourceRequirements(MutableRecord projectRecord, CompositeType commandType)
     {
-        @SuppressWarnings("unchecked")
-        Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) project.getExtensions().get(PROPERTY_TRIGGERS);
-        for (TriggerConfiguration trigger : triggers.values())
-        {
-            if (trigger.getClass() == triggerType || triggerName.equals(trigger.getName()))
-            {
-                return true;
-            }
-        }
-        return false;
+//        Object existingRequirements = projectRecord.get(PROPERTY_PROJECT_REQUIREMENTS);
+//        if (existingRequirements == null || ((Record) existingRequirements).size() == 0)
+//        {
+//            @SuppressWarnings("unchecked")
+//            List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
+//            List<ResourceRequirementConfiguration> configurations = newArrayList(transform(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
+//            {
+//                public ResourceRequirementConfiguration apply(ResourceRequirement resourceRequirement)
+//                {
+//                    return new ResourceRequirementConfiguration(resourceRequirement);
+//                }
+//            }));
+//
+//            try
+//            {
+//                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations, null));
+//            }
+//            catch (TypeException e)
+//            {
+//                // We can continue without these defaults.
+//                //LOG.severe(e);
+//            }
+//        }
     }
 
     public void setWizardModelBuilder(WizardModelBuilder wizardModelBuilder)
@@ -228,5 +194,10 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

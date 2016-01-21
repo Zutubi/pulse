@@ -23,6 +23,6 @@ public class NoopScmConfiguration extends ScmConfiguration
     @Override
     public String getSummary()
     {
-        return "";
+        return "-";
     }
 }

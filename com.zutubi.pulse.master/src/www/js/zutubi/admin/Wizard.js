@@ -175,6 +175,61 @@
             {
                 return type.label;
             });
+        },
+
+        requiresConfig: function(typesByKey)
+        {
+            var validTypes = this.validTypeLabels(typesByKey),
+                formStructure,
+                i;
+
+            if (validTypes.length === 0)
+            {
+                return false;
+            }
+            else if (validTypes.length === 1)
+            {
+                formStructure = this.types[this.indexOfTypeLabel(validTypes[0])].form;
+                for (i = 0; i < formStructure.fields.length; i++)
+                {
+                    if (!formStructure.fields[i].parameters.hasOwnProperty(PARAMETER_IGNORE))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        },
+
+        ignoredFieldNames: function()
+        {
+            var formStructure = this.types[this.selectedTypeIndex].form;
+
+            return jQuery.map(jQuery.grep(formStructure.fields, function(field)
+            {
+                return field.parameters.hasOwnProperty(PARAMETER_IGNORE);
+            }), function(field)
+            {
+                return field.name;
+            });
+        },
+
+        filteredForm: function()
+        {
+            var formStructure = this.types[this.selectedTypeIndex].form;
+
+            var ignoreFieldNames = this.ignoredFieldNames();
+            return jQuery.extend({}, formStructure, {
+                fields: jQuery.grep(formStructure.fields, function(field)
+                {
+                    return ignoreFieldNames.indexOf(field.name) < 0;
+                })
+            });
         }
     };
 
@@ -254,7 +309,10 @@
 
         _renderStepIndex: function()
         {
-            var i = 0;
+            var typesByKey = this._typesByKey(),
+                i,
+                step,
+                stepElement;
 
             this.stepIndexElement.empty();
             if (this.steps.length === 1)
@@ -265,7 +323,14 @@
             {
                 for (i = 0; i < this.steps.length; i++)
                 {
-                    this.stepIndexElement.append(this.stepIndexTemplate(this.steps[i]));
+                    step = this.steps[i];
+                    stepElement = $(this.stepIndexTemplate(step));
+                    this.stepIndexElement.append(stepElement);
+
+                    if (!step.requiresConfig(typesByKey))
+                    {
+                        stepElement.hide();
+                    }
                 }
             }
         },
@@ -293,20 +358,29 @@
             return result;
         },
 
+        _indexOfStepWithKey: function(key)
+        {
+            var stepIndex = -1;
+
+            jQuery.each(this.steps, function (index, step)
+            {
+                if (step.key === key)
+                {
+                    stepIndex = index;
+                    return false;
+                }
+            });
+
+            return stepIndex;
+        },
+
         showValidationErrors: function(details, stepIndex)
         {
             var that = this;
 
             if (stepIndex === -1)
             {
-                jQuery.each(that.steps, function (index, step)
-                {
-                    if (step.key === details.key)
-                    {
-                        stepIndex = index;
-                        return false;
-                    }
-                });
+                stepIndex = that._indexOfStepWithKey(details.key);
             }
 
             if (stepIndex === -1)
@@ -366,28 +440,45 @@
             return types;
         },
 
-        _showStepAtIndex: function(index)
+        _showStepAtIndex: function(index, back)
         {
             var that = this,
                 step = that.steps[index],
-                items = that.stepIndexElement.children("li"),
+                items,
+                typesByKey,
                 validTypeLabels;
 
             this._stashValuesAndCleanupForm();
 
+            this.currentStepIndex = index;
+
+            this._renderStepIndex();
+            items = that.stepIndexElement.children("li");
             items.removeClass("active");
             items.eq(index).addClass("active");
 
-            this.currentStepIndex = index;
-            validTypeLabels = step.validTypeLabels(that._typesByKey());
-            if (validTypeLabels.length > 0)
+            typesByKey = that._typesByKey();
+
+            if (step.key === "defaults" && this.steps[this._indexOfStepWithKey("")].types[0].symbolicName === "zutubi.projectConfig")
             {
+                // This is a pure hack to detect one special case.  If we have more special
+                // cases it would be worth generalising.
+                this._filterProjectDefaultsStep(step);
+            }
+
+            if (step.requiresConfig(typesByKey))
+            {
+                validTypeLabels = step.validTypeLabels(typesByKey);
                 if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0) {
                     step.selectedTypeIndex = step.indexOfTypeLabel(validTypeLabels[0]);
                 }
 
                 this._updateTypeSelect(validTypeLabels);
                 this._showTypeAtIndex(step.selectedTypeIndex);
+            }
+            else if (back)
+            {
+                this._back();
             }
             else
             {
@@ -466,7 +557,7 @@
             that.form = that.formWrapper.kendoZaForm({
                 parentPath: that.options.path,
                 symbolicName: type.symbolicName,
-                structure: that._filterFields(type.form),
+                structure: step.filteredForm(),
                 markRequired: that._shouldMarkRequired(),
                 values: step.valuesByType[index],
                 submits: submits,
@@ -502,28 +593,6 @@
             that.type = type;
         },
 
-        _ignoredFieldNames: function(formStructure)
-        {
-            return jQuery.map(jQuery.grep(formStructure.fields, function(field)
-            {
-                return field.parameters.hasOwnProperty(PARAMETER_IGNORE);
-            }), function(field)
-            {
-                return field.name;
-            });
-        },
-
-        _filterFields: function(formStructure)
-        {
-            var ignoreFieldNames = this._ignoredFieldNames(formStructure);
-            return jQuery.extend({}, formStructure, {
-                fields: jQuery.grep(formStructure.fields, function(field)
-                {
-                    return ignoreFieldNames.indexOf(field.name) < 0;
-                })
-            });
-        },
-
         _formSubmitted: function(e)
         {
             var submit = e.value,
@@ -552,7 +621,7 @@
         {
             if (this.currentStepIndex > 0)
             {
-                this._showStepAtIndex(this.currentStepIndex - 1);
+                this._showStepAtIndex(this.currentStepIndex - 1, true);
             }
         },
 
@@ -575,14 +644,14 @@
             }
         },
 
-        _findNestedComposite: function(parent, key)
+        _findNested: function(parent, key)
         {
             var i, nested;
 
             for (i = 0; i < parent.nested.length; i++)
             {
                 nested = parent.nested[i];
-                if (nested.key === key && nested.kind === "composite")
+                if (nested.key === key)
                 {
                     return nested;
                 }
@@ -595,6 +664,8 @@
         {
             var i, step, stepParent;
 
+            this.parentTemplate = parent;
+
             for (i = 0; i < this.steps.length; i++)
             {
                 step = this.steps[i];
@@ -604,7 +675,7 @@
                 }
                 else
                 {
-                    stepParent = this._findNestedComposite(parent, step.key);
+                    stepParent = this._findNested(parent, step.key);
                     if (stepParent)
                     {
                         step.applyDefaults(stepParent);
@@ -629,7 +700,7 @@
 
                 Zutubi.core.ajax({
                     type: "GET",
-                    url: "/api/config/" + Zutubi.config.encodePath(Zutubi.config.parentPath(that.options.path) + "/" + step.getValue().properties.parentTemplate) + "?depth=1",
+                    url: "/api/config/" + Zutubi.config.encodePath(Zutubi.config.parentPath(that.options.path) + "/" + step.getValue().properties.parentTemplate) + "?depth=2",
                     success: function (data)
                     {
                         that._mask(false);
@@ -655,7 +726,7 @@
                     type: "POST",
                     url: "/api/action/validate/" + Zutubi.config.encodePath(that.options.path),
                     data: {
-                        ignoredFields: that._ignoredFieldNames(step.types[step.selectedTypeIndex].form),
+                        ignoredFields: step.ignoredFieldNames(),
                         composite: step.getValue(),
                         concrete: that._shouldMarkRequired()
                     },
@@ -704,6 +775,100 @@
         _checkClicked: function()
         {
             Zutubi.config.checkConfig(this.options.path, this.type, this.form, this.checkForm);
+        },
+
+        // From here down lies project wizard specific hacks.
+
+        _hasTriggerOfType: function(project, symbolicName)
+        {
+            var triggers = this._findNested(project, "triggers"),
+                i;
+
+            if (triggers && triggers.nested)
+            {
+                triggers = triggers.nested;
+                for (i = 0; i < triggers.length; i++)
+                {
+                    if (triggers[i].type.symbolicName === symbolicName)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        },
+
+        _ignoreFieldNamed: function(form, fieldName)
+        {
+            var i,
+                field;
+
+            for (i = 0; i < form.fields.length; i++)
+            {
+                field = form.fields[i];
+                if (field.name === fieldName)
+                {
+                    if (field.parameters)
+                    {
+                        field.parameters = {};
+                    }
+
+                    field.parameters[PARAMETER_IGNORE] = true;
+                }
+            }
+        },
+
+        _filterProjectDefaultsStep: function(step)
+        {
+            var parentProject = this.parentTemplate,
+                form = step.types[0].form,
+                ignoreDefaultRecipe = true,
+                projectType,
+                typeStep,
+                recipes,
+                stages;
+
+            if (this._hasTriggerOfType(parentProject, "zutubi.scmTriggerConfig"))
+            {
+                this._ignoreFieldNamed(form, "addScmTrigger");
+            }
+
+            if (this._hasTriggerOfType(parentProject, "zutubi.dependentBuildTriggerConfig"))
+            {
+                this._ignoreFieldNamed(form, "addDependenciesTrigger");
+            }
+
+            projectType = this._findNested(parentProject, "type");
+            if (projectType && projectType.type.symbolicName === "zutubi.multiRecipeTypeConfig")
+            {
+                recipes = this._findNested(projectType, "recipes");
+                if (!recipes || recipes.length === 0)
+                {
+                    ignoreDefaultRecipe = false;
+                }
+            }
+            else
+            {
+                typeStep = this.steps[this._indexOfStepWithKey("type")];
+                if (typeStep.getValue().type.symbolicName === "zutubi.multiRecipeTypeConfig")
+                {
+                    ignoreDefaultRecipe = false;
+                }
+            }
+
+            if (ignoreDefaultRecipe)
+            {
+                this._ignoreFieldNamed(form, "addDefaultRecipe");
+                this._ignoreFieldNamed(form, "recipeName");
+            }
+
+            stages = this._findNested(parentProject, "stages");
+            if (stages && stages.nested && stages.nested.length > 0)
+            {
+                this._ignoreFieldNamed(form, "addDefaultStage");
+                this._ignoreFieldNamed(form, "stageName");
+            }
         }
     });
 

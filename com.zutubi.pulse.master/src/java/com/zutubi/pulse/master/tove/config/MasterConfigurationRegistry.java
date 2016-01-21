@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.pulse.master.cleanup.config.AbstractCleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
+import com.zutubi.pulse.master.rest.wizards.ProjectDefaultsConfiguration;
 import com.zutubi.pulse.master.rest.wizards.UserConfigurationCreator;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
@@ -174,6 +175,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             // define the root level scope.
             TemplatedMapType projectCollection = new TemplatedMapType(projectConfig, typeRegistry);
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
+            registerConfigurationType(ProjectDefaultsConfiguration.class);
 
             // register cleanup configuration.  This will eventually be handled as an extension point
             registerProjectMapExtension(EXTENSION_PROJECT_CLEANUP, AbstractCleanupConfiguration.class);

@@ -118,7 +118,7 @@
                 value = composite.properties[property];
             }
 
-            if (value === null || typeof value === "undefined" || (typeof value === "string" && value === ""))
+            if (value === null || typeof value === "undefined" || (typeof value === "string" && value === "" && defaultValue))
             {
                 value = defaultValue;
             }
