@@ -136,16 +136,19 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
                 stageName = DEFAULT_STAGE;
             }
 
-            MutableRecord stagesRecord = (MutableRecord) typeRecord.get(PROPERTY_STAGES);
+            MutableRecord stagesRecord = (MutableRecord) projectRecord.get(PROPERTY_STAGES);
             if (stagesRecord == null)
             {
                 stagesRecord = ((CollectionType) projectType.getPropertyType(PROPERTY_STAGES)).createNewRecord(true);
                 projectRecord.put(PROPERTY_STAGES, stagesRecord);
             }
 
-            MutableRecord stageRecord = typeRegistry.getType(BuildStageConfiguration.class).createNewRecord(true);
-            stageRecord.put(PROPERTY_NAME, stageName);
-            stagesRecord.put(stageName, stageRecord);
+            if (stagesRecord.size() == 0)
+            {
+                MutableRecord stageRecord = typeRegistry.getType(BuildStageConfiguration.class).createNewRecord(true);
+                stageRecord.put(PROPERTY_NAME, stageName);
+                stagesRecord.put(stageName, stageRecord);
+            }
         }
     }
 

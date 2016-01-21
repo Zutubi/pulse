@@ -91,6 +91,7 @@
             if (i < this.types.length)
             {
                 this.types = [type];
+                this.selectedTypeIndex = 0;
                 fields = type.form.fields;
                 for (i = 0; i < fields.length; i++)
                 {

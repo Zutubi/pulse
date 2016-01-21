@@ -165,9 +165,16 @@ public class WizardModelBuilder
     {
         CompositeType actualType = typeCheck(context.getModels(), key, type);
         TemplateRecord templateParentRecord = null;
-        if (context.getTemplateParentRecord() != null && StringUtils.stringSet(key))
+        if (context.getTemplateParentRecord() != null)
         {
-            templateParentRecord = (TemplateRecord) context.getTemplateParentRecord().get(key);
+            if (StringUtils.stringSet(key))
+            {
+                templateParentRecord = (TemplateRecord) context.getTemplateParentRecord().get(key);
+            }
+            else
+            {
+                templateParentRecord = context.getTemplateParentRecord();
+            }
         }
 
         MutableRecord record = buildRecord(templateParentRecord, context.getTemplateOwnerPath(), actualType, context.getModels().get(key));

@@ -235,7 +235,7 @@ if (window.Zutubi.admin === undefined)
                 success: function(delta)
                 {
                     app.navbar.applyDelta(delta);
-                    app.router.navigate("/config/" + Zutubi.config.encodePath(delta.addedPaths[0]), false);
+                    app.router.navigate("/hierarchy/" + Zutubi.config.encodePath(delta.addedPaths[0]), false);
                 }
             });
 

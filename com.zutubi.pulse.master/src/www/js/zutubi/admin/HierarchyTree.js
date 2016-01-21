@@ -210,10 +210,7 @@
 
         setScope: function(scope)
         {
-            if (this.scope !== scope)
-            {
-                this._setScope(scope);
-            }
+            this._setScope(scope);
         },
 
         _setScope: function (scope)

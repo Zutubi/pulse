@@ -43,7 +43,11 @@ public class CompositeTypeModel extends TypeModel
                     simplePropertyDefaults = new HashMap<>();
                     for (String key: simpleKeySet)
                     {
-                        simplePropertyDefaults.put(key, defaults.get(key));
+                        TypeProperty property = type.getProperty(key);
+                        if (property != null)
+                        {
+                            simplePropertyDefaults.put(key, property.getType().toXmlRpc(null, defaults.get(key)));
+                        }
                     }
                 }
             }
