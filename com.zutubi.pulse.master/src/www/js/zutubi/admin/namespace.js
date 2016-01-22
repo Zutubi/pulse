@@ -387,6 +387,11 @@ if (window.Zutubi.admin === undefined)
             {
                 // Note this only captures added projects/agents.
                 return app.addedPath;
+            },
+
+            clearLastAddedPath: function()
+            {
+                delete app.addedPath;
             }
         };
     }(jQuery));

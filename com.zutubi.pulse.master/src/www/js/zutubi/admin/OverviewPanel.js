@@ -136,7 +136,7 @@
                     child = instance.nested[i];
                     if (!child.deeplyValid)
                     {
-                        this._collectErrors(result, child, Zutubi.config.appendPath(path, child.key))
+                        this._collectErrors(result, child, Zutubi.config.appendPath(path, child.key));
                     }
                 }
             }

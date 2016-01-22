@@ -44,7 +44,7 @@
 
         options: {
             title: "",
-            message: "Continue?",
+            messageHTML: "Continue?",
             buttons: [{
                 label: "ok",
                 spriteCssClass: "fa fa-check-circle",

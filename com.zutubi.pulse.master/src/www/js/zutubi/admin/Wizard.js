@@ -223,9 +223,9 @@
 
         filteredForm: function()
         {
-            var formStructure = this.types[this.selectedTypeIndex].form;
+            var formStructure = this.types[this.selectedTypeIndex].form,
+                ignoreFieldNames = this.ignoredFieldNames();
 
-            var ignoreFieldNames = this.ignoredFieldNames();
             return jQuery.extend({}, formStructure, {
                 fields: jQuery.grep(formStructure.fields, function(field)
                 {

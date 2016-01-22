@@ -9,7 +9,7 @@
         CLICK = "click" + ns;
 
     Zutubi.admin.ProjectOverviewPanel = OverviewPanel.extend({
-        init: function (options)
+        init: function(options)
         {
             var that = this,
                 project = options.project;
@@ -146,7 +146,21 @@
         {
             var tableEl,
                 i,
-                recipe;
+                recipe,
+                commands;
+
+            if (this.options.project.concrete && recipes.length === 1)
+            {
+                commands = this.getNested(recipes[0], "commands");
+                if (!commands || !commands.nested || commands.nested.length === 0)
+                {
+                    if (Zutubi.admin.lastAddedPath() === "projects/" + this.options.project.properties.name)
+                    {
+                        Zutubi.admin.clearLastAddedPath();
+                        this._promptForCommands(recipes[0]);
+                    }
+                }
+            }
 
             tableEl = this._addSubtable(cellEl);
             for (i = 0; i < recipes.length; i++)
@@ -161,18 +175,22 @@
             var commands = this.getNested(recipe, "commands"),
                 plural = "";
 
-            if (commands && commands.nested.length > 0)
+            if (commands && commands.nested && commands.nested.length > 0)
             {
                 if (commands.nested.length > 1)
                 {
                     plural = "s";
                 }
 
-                cellEl.append("" + commands.nested.length + " command" + plural + " :: [" + this._collectNames(commands.nested) + "]");
+                cellEl.append(String(commands.nested.length) + " command" + plural + " :: [" + this._collectNames(commands.nested) + "]");
+            }
+            else if(this.options.project.concrete)
+            {
+                this._addSuggestedConfigLink(cellEl, "recipe has no commands defined, click to configure", "type/recipes/" + recipe.properties.name);
             }
             else
             {
-                this._addSuggestedConfigLink(cellEl, "recipe has no commands defined, click to configure", "type/recipes/" + recipe.properties.name);
+                cellEl.append('<span class="k-understated">no commands configured</span>');
             }
         },
 
@@ -197,6 +215,36 @@
             }
 
             return result;
+        },
+
+        _promptForCommands: function(recipe)
+        {
+            // A little special case of workflow for adding a new concrete built-in project, that
+            // guides the user to create commands.
+            var pw = new Zutubi.core.PromptWindow({
+                title: "configure commands",
+                messageHTML: "You have added a new concrete project with a default empty recipe, would you like to add some commands to the recipe now?",
+                buttons: [{
+                    label: "configure recipe",
+                    spriteCssClass: "fa fa-check-circle",
+                    value: true
+                }, {
+                    label: "no, thanks",
+                    spriteCssClass: "fa fa-times-circle",
+                    value: false
+                }],
+
+                select: jQuery.proxy(this._commandPromptSelect, this, recipe)
+            });
+            pw.show();
+        },
+
+        _commandPromptSelect: function(recipe, ok)
+        {
+            if (ok)
+            {
+                this._editClicked("type/recipes/" + recipe.properties.name);
+            }
         },
 
         _addStagesSummary: function(cellEl)
