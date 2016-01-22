@@ -839,6 +839,8 @@
         {
             var parentProject = this.parentTemplate,
                 form = step.types[0].form,
+                values = step.valuesByType[0],
+                concrete = this.steps[0].getValue().properties.isTemplate === false,
                 ignoreDefaultRecipe = true,
                 projectType,
                 typeStep,
@@ -878,12 +880,20 @@
                 this._ignoreFieldNamed(form, "addDefaultRecipe");
                 this._ignoreFieldNamed(form, "recipeName");
             }
+            else
+            {
+                values.addDefaultRecipe = concrete;
+            }
 
             stages = this._findNested(parentProject, "stages");
             if (stages && stages.nested && stages.nested.length > 0)
             {
                 this._ignoreFieldNamed(form, "addDefaultStage");
                 this._ignoreFieldNamed(form, "stageName");
+            }
+            else
+            {
+                values.addDefaultStage = concrete;
             }
         }
     });
