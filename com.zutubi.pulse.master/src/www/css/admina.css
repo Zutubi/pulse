@@ -89,6 +89,15 @@ body {
     font-weight: bold;
 }
 
+/* Hierarchy tree */
+
+.k-hierarchy-selector .k-sprite::before {
+    font-size: 10px;
+    line-height: 16px;
+    width: 10px;
+    vertical-align: middle;
+}
+
 /* Plugins Tree */
 
 .k-plugins-tree {
@@ -130,4 +139,58 @@ body {
 .k-install-plugin-error, .k-plugin-errors li {
     color: #b22;
     margin: 0.4em;
+}
+
+/* Overview Panel */
+
+.k-overview-panel h1 .fa {
+    vertical-align: middle;
+    margin: 0 0.4em;
+}
+
+.k-overview-validation-header {
+    color: #b22;
+    font-weight: bold;
+    margin: 1em 0.5em 0;
+}
+
+ul.k-overview-validation-errors {
+    color: #b22;
+    list-style-type: disc;
+    margin: 0.5em 2em 1em;
+}
+
+.k-overview-validation-errors li {
+    margin: 0.4em 0;
+    font-weight: bold;
+}
+
+.k-overview-validation-errors li a {
+    cursor: pointer;
+}
+
+.k-overview-error::before, .k-overview-suggestion::before {
+    font-family: FontAwesome;
+    margin-right: 0.4em;
+}
+
+.k-overview-error, .k-overview-suggestion {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.k-overview-error::before {
+    content: '\f12a';
+}
+
+.k-overview-error {
+    color: #b22;
+}
+
+.k-overview-suggestion::before {
+    content: '\f129';
+}
+
+.k-overview-suggestion {
+    color: #1b376c;
 }

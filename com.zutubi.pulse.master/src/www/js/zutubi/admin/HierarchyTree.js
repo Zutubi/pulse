@@ -234,6 +234,19 @@
                 schema: {
                     model: {
                         children: "nested"
+                    },
+                    parse: function parseItems(items)
+                    {
+                        return jQuery.map(items, function(item)
+                        {
+                            item.spriteCssClass = item.concrete ? "fa fa-circle" : "fa fa-circle-thin";
+                            if (item.nested)
+                            {
+                                parseItems(item.nested);
+                            }
+                            return item;
+                        });
+
                     }
                 }
             });

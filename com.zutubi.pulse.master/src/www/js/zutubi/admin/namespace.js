@@ -235,7 +235,8 @@ if (window.Zutubi.admin === undefined)
                 success: function(delta)
                 {
                     app.navbar.applyDelta(delta);
-                    app.router.navigate("/hierarchy/" + Zutubi.config.encodePath(delta.addedPaths[0]), false);
+                    app.addedPath = delta.addedPaths[0];
+                    app.router.navigate("/hierarchy/" + Zutubi.config.encodePath(app.addedPath), false);
                 }
             });
 
@@ -380,6 +381,12 @@ if (window.Zutubi.admin === undefined)
             labelCompare: function(a1, a2)
             {
                 return a1.label.localeCompare(a2.label);
+            },
+
+            lastAddedPath: function()
+            {
+                // Note this only captures added projects/agents.
+                return app.addedPath;
             }
         };
     }(jQuery));

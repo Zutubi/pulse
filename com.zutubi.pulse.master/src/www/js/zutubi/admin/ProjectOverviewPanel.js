@@ -4,7 +4,9 @@
 
 (function($)
 {
-    var OverviewPanel = Zutubi.admin.OverviewPanel;
+    var OverviewPanel = Zutubi.admin.OverviewPanel,
+        ns = ".kendoZaOverviewPanel",
+        CLICK = "click" + ns;
 
     Zutubi.admin.ProjectOverviewPanel = OverviewPanel.extend({
         init: function (options)
@@ -14,7 +16,7 @@
 
             options = jQuery.extend({
                 scope: "projects",
-                name: project.properties.name
+                item: project
             }, that.options, options);
 
             that.scmTemplate = kendo.template(that.options.scmTemplate);
@@ -27,11 +29,49 @@
             scmTemplate: '<strong>#: type #</strong> :: #: summary #'
         },
 
+        destroy: function()
+        {
+            this.view.element.find(".k-overview-error").off(ns);
+            this.view.element.find(".k-overview-suggestion").off(ns);
+            OverviewPanel.fn.destroy.call(this);
+        },
+
+        showValidationErrors: function(instance)
+        {
+            var errors = instance.validationErrors;
+
+            // We override this to filter out errors that we render already in the summary table.
+            if (errors && errors.hasOwnProperty(""))
+            {
+                errors[""] = jQuery.grep(errors[""], function(error)
+                {
+                    return error.indexOf("must be configured to complete this project") < 0;
+                });
+            }
+
+            OverviewPanel.fn.showValidationErrors.call(this, instance);
+        },
+
         _addSummary: function(tableEl)
         {
             this._addRow(tableEl, "scm", "scm", this._addScmSummary);
+            this._addRow(tableEl, "type", "recipes", this._addRecipesSummary);
             this._addRow(tableEl, "stages", "build stages", this._addStagesSummary);
             this._addRow(tableEl, "dependencies", "dependencies", this._addDependenciesSummary);
+        },
+
+        _addMissingConfigLink: function(cellEl, property)
+        {
+            var anchor = $('<a class="k-overview-error">required ' + property + ' configuration is missing, click to configure</a>');
+            cellEl.append(anchor);
+            anchor.on(CLICK, jQuery.proxy(this._editClicked, this, property));
+        },
+
+        _addSuggestedConfigLink: function(parentEl, text, path)
+        {
+            var anchor = $('<a class="k-overview-suggestion">' + kendo.htmlEncode(text) + '</a>');
+            parentEl.append(anchor);
+            anchor.on(CLICK, jQuery.proxy(this._editClicked, this, path));
         },
 
         _addScmSummary: function(cellEl)
@@ -48,10 +88,115 @@
                 }
                 cellEl.append(summary);
             }
+            else if (this.options.project.concrete)
+            {
+                this._addMissingConfigLink(cellEl, "scm");
+            }
             else
             {
                 cellEl.append('<span class="k-understated">not configured</span>');
             }
+        },
+
+        _addRecipesSummary: function(cellEl)
+        {
+            var type = this.getNested(this.options.project, "type"),
+                symbolicName,
+                recipes;
+
+            if (type)
+            {
+                symbolicName = type.type.symbolicName;
+                if (symbolicName === "zutubi.multiRecipeTypeConfig")
+                {
+                    recipes = this.getNested(type, "recipes");
+                    if (recipes && recipes.nested && recipes.nested.length > 0)
+                    {
+                        this._addMultiRecipeSummary(recipes.nested, cellEl);
+                    }
+                    else if (this.options.project.concrete)
+                    {
+                        this._addSuggestedConfigLink(cellEl, "built-in type with no recipes defined, click to configure", "type/recipes");
+                    }
+                    else
+                    {
+                        cellEl.append('<span class="k-understated">built-in project type :: no recipes configured</span>');
+                    }
+                }
+                else if (symbolicName === "zutubi.customTypeConfig")
+                {
+                    cellEl.append("custom XML file");
+                }
+                else if (symbolicName === "zutubi.versionedTypeConfig")
+                {
+                    cellEl.append("versioned XML file :: " + kendo.htmlEncode(type.properties.pulseFileName || "[default]"));
+                }
+            }
+            else if (this.options.project.concrete)
+            {
+                this._addMissingConfigLink(cellEl, "type");
+            }
+            else
+            {
+                cellEl.append('<span class="k-understated">project type not configured</span>');
+            }
+        },
+
+        _addMultiRecipeSummary: function(recipes, cellEl)
+        {
+            var tableEl,
+                i,
+                recipe;
+
+            tableEl = this._addSubtable(cellEl);
+            for (i = 0; i < recipes.length; i++)
+            {
+                recipe = recipes[i];
+                this._addRow(tableEl, "type/recipes/" + recipe.properties.name, recipe.properties.name, jQuery.proxy(this._addRecipeSummary, this, recipe));
+            }
+        },
+
+        _addRecipeSummary: function(recipe, cellEl)
+        {
+            var commands = this.getNested(recipe, "commands"),
+                plural = "";
+
+            if (commands && commands.nested.length > 0)
+            {
+                if (commands.nested.length > 1)
+                {
+                    plural = "s";
+                }
+
+                cellEl.append("" + commands.nested.length + " command" + plural + " :: [" + this._collectNames(commands.nested) + "]");
+            }
+            else
+            {
+                this._addSuggestedConfigLink(cellEl, "recipe has no commands defined, click to configure", "type/recipes/" + recipe.properties.name);
+            }
+        },
+
+        _collectNames: function(collection)
+        {
+            var result = "",
+                i;
+
+            for (i = 0; i < Math.min(collection.length, 4); i++)
+            {
+                if (result)
+                {
+                    result += ", ";
+                }
+
+                result += kendo.htmlEncode(collection[i].properties.name);
+            }
+
+            if (collection.length > 4)
+            {
+                result += ", ...";
+            }
+
+            return result;
         },
 
         _addStagesSummary: function(cellEl)
@@ -69,6 +214,10 @@
                     stage = stages.nested[i];
                     this._addRow(tableEl, "stages/" + stage.properties.name, stage.properties.name, this._getStageSummary(stage));
                 }
+            }
+            else if (this.options.project.concrete)
+            {
+                this._addSuggestedConfigLink(cellEl, "no build stages defined, click to configure", "stages");
             }
             else
             {

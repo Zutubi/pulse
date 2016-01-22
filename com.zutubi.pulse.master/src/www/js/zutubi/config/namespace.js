@@ -70,6 +70,18 @@ if (window.Zutubi.config === undefined)
                 return null;
             },
 
+            appendPath: function(path, element)
+            {
+                if (path)
+                {
+                    return path + "/" + element;
+                }
+                else
+                {
+                    return element;
+                }
+            },
+
             baseName: function(path)
             {
                 var i = path.lastIndexOf("/");

@@ -14,7 +14,7 @@
 
             options = jQuery.extend({
                 scope: "agents",
-                name: agent.properties.name
+                item: agent
             }, that.options, options);
 
             OverviewPanel.fn.init.call(this, options);
