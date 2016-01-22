@@ -28,7 +28,7 @@ public class UserConfigurationWizard implements ConfigurationWizard
     {
         CompositeType actualType = wizardModelBuilder.typeCheck(wizardContext.getModels(), "", UserConfigurationCreator.class);
         MutableRecord record = wizardModelBuilder.buildRecord(wizardContext.getTemplateParentRecord(), wizardContext.getTemplateOwnerPath(), actualType, wizardContext.getModels().get(""));
-        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildAndValidateCreatorInstance(actualType, wizardContext.getParentPath(), wizardContext.getBaseName(), record);
+        UserConfigurationCreator creator = (UserConfigurationCreator) wizardModelBuilder.buildAndValidateTransientInstance(actualType, wizardContext.getParentPath(), wizardContext.getBaseName(), record);
         UserConfiguration userConfiguration = creator.create();
         return type.unstantiate(userConfiguration, wizardContext.getTemplateOwnerPath());
     }

@@ -90,6 +90,11 @@ public class CommandExtensionManager extends AbstractExtensionManager
         return info;
     }
 
+    public Set<Class<? extends CommandConfiguration>> getCommandClasses()
+    {
+        return typeToInfoMap.keySet();
+    }
+
     public List<ResourceRequirement> getDefaultResourceRequirements(Class<? extends CommandConfiguration> commandType)
     {
         CommandInfo info = typeToInfoMap.get(commandType);

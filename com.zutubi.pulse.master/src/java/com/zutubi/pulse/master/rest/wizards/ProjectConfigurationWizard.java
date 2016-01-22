@@ -83,7 +83,7 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
         {
             CompositeType defaultsType = typeRegistry.getType(ProjectDefaultsConfiguration.class);
             MutableRecord defaultsRecord = wizardModelBuilder.buildRecord(wizardContext.getTemplateParentRecord(), wizardContext.getTemplateOwnerPath(), defaultsType, wizardContext.getModels().get(KEY_DEFAULTS));
-            ProjectDefaultsConfiguration defaults = (ProjectDefaultsConfiguration) wizardModelBuilder.buildAndValidateCreatorInstance(defaultsType, wizardContext.getParentPath(), wizardContext.getBaseName(), defaultsRecord);
+            ProjectDefaultsConfiguration defaults = (ProjectDefaultsConfiguration) wizardModelBuilder.buildAndValidateTransientInstance(defaultsType, wizardContext.getParentPath(), wizardContext.getBaseName(), defaultsRecord);
             applyDefaults(type, projectRecord, typeRecord, defaults, wizardContext);
         }
 
@@ -171,38 +171,6 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
             triggerRecord.put(PROPERTY_NAME, name);
             triggersRecord.put(name, triggerRecord);
         }
-    }
-
-
-    // FIXME kendo adding default resource reqs for command
-
-
-    private static final String PROPERTY_PROJECT_REQUIREMENTS = "requirements";
-    private void addDefaultResourceRequirements(MutableRecord projectRecord, CompositeType commandType)
-    {
-//        Object existingRequirements = projectRecord.get(PROPERTY_PROJECT_REQUIREMENTS);
-//        if (existingRequirements == null || ((Record) existingRequirements).size() == 0)
-//        {
-//            @SuppressWarnings("unchecked")
-//            List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
-//            List<ResourceRequirementConfiguration> configurations = newArrayList(transform(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
-//            {
-//                public ResourceRequirementConfiguration apply(ResourceRequirement resourceRequirement)
-//                {
-//                    return new ResourceRequirementConfiguration(resourceRequirement);
-//                }
-//            }));
-//
-//            try
-//            {
-//                projectRecord.put(PROPERTY_PROJECT_REQUIREMENTS, projectType.getProperty(PROPERTY_PROJECT_REQUIREMENTS).getType().unstantiate(configurations, null));
-//            }
-//            catch (TypeException e)
-//            {
-//                // We can continue without these defaults.
-//                //LOG.severe(e);
-//            }
-//        }
     }
 
     public void setWizardModelBuilder(WizardModelBuilder wizardModelBuilder)

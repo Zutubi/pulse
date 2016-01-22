@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.tove.config.docs.TypeDocs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,6 +16,8 @@ public class CustomWizardStepModel extends WizardStepModel
     private FormModel form;
     private Map<String, Object> formDefaults;
     private TypeDocs docs;
+    private WizardTypeFilter filter;
+    private Map<String, Object> parameters;
 
     public CustomWizardStepModel(String label, String key, FormModel form)
     {
@@ -45,5 +48,30 @@ public class CustomWizardStepModel extends WizardStepModel
     public void setDocs(TypeDocs docs)
     {
         this.docs = docs;
+    }
+
+    public WizardTypeFilter getFilter()
+    {
+        return filter;
+    }
+
+    public void setFilter(WizardTypeFilter filter)
+    {
+        this.filter = filter;
+    }
+
+    public Map<String, Object> getParameters()
+    {
+        return parameters;
+    }
+
+    public void addParameter(String name, Object value)
+    {
+        if (parameters == null)
+        {
+            parameters = new HashMap<>();
+        }
+
+        parameters.put(name, value);
     }
 }

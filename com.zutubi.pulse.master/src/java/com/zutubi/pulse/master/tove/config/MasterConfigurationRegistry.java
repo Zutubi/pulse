@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.pulse.master.cleanup.config.AbstractCleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
+import com.zutubi.pulse.master.rest.wizards.CommandResourceConfiguration;
 import com.zutubi.pulse.master.rest.wizards.ProjectDefaultsConfiguration;
 import com.zutubi.pulse.master.rest.wizards.UserConfigurationCreator;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
@@ -133,6 +134,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
             registerConfigurationType(DependenciesConfiguration.class);
+            registerConfigurationType(CommandResourceConfiguration.class);
 
             // scm configuration - registration of extensions occurs via plugins.
             registerConfigurationType(PollableScmConfiguration.class);

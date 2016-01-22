@@ -186,7 +186,7 @@ public class WizardModelBuilder
         return record;
     }
 
-    public Configuration buildAndValidateCreatorInstance(CompositeType type, String parentPath, String baseName, MutableRecord record) throws TypeException
+    public Configuration buildAndValidateTransientInstance(CompositeType type, String parentPath, String baseName, MutableRecord record) throws TypeException
     {
         SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationReferenceManager, configurationTemplateManager);
         Configuration instance = (Configuration) instantiator.instantiate(type, record);

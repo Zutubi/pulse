@@ -30,10 +30,12 @@
                 label: "",
                 form: config.form,
                 docs: config.docs,
-                simpleProperties: []
+                simpleProperties: [],
+                filter: config.filter
             }];
 
             this.valuesByType = [config.formDefaults];
+            this.parameters = config.parameters;
         }
         else if(config.kind === "typed")
         {
@@ -380,6 +382,19 @@
             return stepIndex;
         },
 
+        getStepWithKey: function(key)
+        {
+            var index = this._indexOfStepWithKey(key);
+            if (index >= 0)
+            {
+                return this.steps[index];
+            }
+            else
+            {
+                return null;
+            }
+        },
+
         showValidationErrors: function(details, stepIndex)
         {
             var that = this;
@@ -572,6 +587,7 @@
 
             that.form = that.formWrapper.kendoZaForm({
                 parentPath: that.options.path,
+                parentWizard: that,
                 symbolicName: type.symbolicName,
                 structure: step.filteredForm(),
                 markRequired: that._shouldMarkRequired(),
