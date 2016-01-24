@@ -34,7 +34,7 @@
                         id: 'invalid-' + toHtmlName(project),
                         children: {
                             tag: 'a',
-                            href: window.baseUrl + '/admin/projects/' + encodeURIComponent(project) + '/',
+                            href: window.baseUrl + '/admin/hierarchy/projects/' + encodeURIComponent(project) + '/',
                             html: Ext.util.Format.htmlEncode(project)
                         }
                     });
