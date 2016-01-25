@@ -30,11 +30,8 @@ public abstract class AbstractFileLogger implements OutputLogger
     private final char[] decodedOutput;
     private final CharBuffer decodeBuffer;
     
-    private boolean needsMarker = true;
-    private boolean inLineEnding = false;
-    // This is the last line ending character within a chunk, or the last character of the chunk
-    // (when between chunks).
-    private char lastEndingChar = '\0';
+    private boolean isStartOfLine = true;
+    private boolean lastWasCarriageReturn = false;
 
     protected PrintWriter writer;
 
@@ -89,68 +86,66 @@ public abstract class AbstractFileLogger implements OutputLogger
             {
                 result = outputDecoder.decode(inBuffer, decodeBuffer, true);
                 writeDecoded(marker);
-                
             }
             while (result == CoderResult.OVERFLOW);
         }
     }
 
+    // Marker is needed at start and between line ending and next non-line-ending.
+    // Line end is needed after any line terminating character is seen:
+    //   - But if've just seen \r then discard a \n.
     private void writeDecoded(String marker)
     {
         final int length = decodeBuffer.position();
         for (int i = 0; i < length; i++)
         {
             char c = decodedOutput[i];
-            boolean isLineEndChar = c == '\r' || c == '\n';
-            
-            if (inLineEnding)
+            boolean isCarriageReturn = c == '\r';
+
+            if (c == '\n')
+            {
+                if (!lastWasCarriageReturn)
+                {
+                    writer.println();
+                    isStartOfLine = true;
+                }
+            }
+            else if (isCarriageReturn)
             {
                 writer.println();
-                needsMarker = true;
-                inLineEnding = isLineEndChar && c == lastEndingChar;
-            }
-            else if (isLineEndChar)
-            {
-                inLineEnding = true;
-            }
-
-            if (!isLineEndChar)
-            {
-                inLineEnding = false;
-                if (needsMarker)
-                {
-                    writer.print(marker);
-                    needsMarker = false;
-                }
-                
-                writer.print(c);
+                isStartOfLine = true;
             }
             else
             {
-                lastEndingChar = c;
+                if (isStartOfLine)
+                {
+                    writer.print(marker);
+                    isStartOfLine = false;
+                }
+
+                writer.print(c);
             }
+
+            lastWasCarriageReturn = isCarriageReturn;
         }
 
-        if (length > 0)
-        {
-            lastEndingChar = decodedOutput[length - 1];
-        }
-        
         writer.flush();
         decodeBuffer.clear();
     }
 
     protected void completeOutput()
     {
-        if ((inLineEnding || (lastEndingChar != '\r' && lastEndingChar != '\n')) && writer != null)
+        if (writer != null)
         {
-            writer.println();
+            if (!isStartOfLine)
+            {
+                writer.println();
+            }
             writer.flush();
         }
 
-        needsMarker = true;
-        inLineEnding = false;
-        lastEndingChar = '\0';
+        isStartOfLine = true;
+        lastWasCarriageReturn = false;
     }
 
     public void close()

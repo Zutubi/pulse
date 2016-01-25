@@ -1,7 +1,13 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.Files;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class TailTest extends BaseIOTestCase
 {
@@ -30,6 +36,35 @@ public class TailTest extends BaseIOTestCase
     public void testZeroLengthFile() throws IOException
     {
         singleFileHelper(0, 10);
+    }
+
+    public void testNoNewlinesInFile() throws IOException
+    {
+        File f = createRandomFile();
+        Files.append("abcdef", f, Charset.defaultCharset());
+
+        Tail tail = new Tail(10, f);
+        assertEquals("abcdef", tail.getTail());
+    }
+
+    public void testNoNewlineAtEndOfFileUnderMaxLines() throws IOException
+    {
+        File f = createRandomFile();
+        String lines = StringUtils.join(SystemUtils.LINE_SEPARATOR, Arrays.asList("1", "2", "3"));
+        Files.append(lines, f, Charset.defaultCharset());
+
+        Tail tail = new Tail(4, f);
+        assertEquals(lines, tail.getTail());
+    }
+
+    public void testNoNewlineAtEndOfFileOverMaxLines() throws IOException
+    {
+        File f = createRandomFile();
+        String lines = StringUtils.join(SystemUtils.LINE_SEPARATOR, Arrays.asList("1", "2", "3", "4", "5"));
+        Files.append(lines, f, Charset.defaultCharset());
+
+        Tail tail = new Tail(4, f);
+        assertEquals(StringUtils.join(SystemUtils.LINE_SEPARATOR, Arrays.asList("2", "3", "4", "5")), tail.getTail());
     }
 
     public void testLineLengthFourUnderEstimate() throws IOException

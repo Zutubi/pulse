@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.build.log;
 
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -9,6 +11,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
@@ -20,6 +24,8 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     private static final String LINE_ENDING_UNIX = "\n";
     private static final String LINE_ENDING_WINDOWS = "\r\n";
     private static final String LINE_ENDING_MAC = "\r";
+
+    private static final String PATTERN_MARKER = "[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9].*: ";
 
     private File tmpDir;
     private File logFile;
@@ -75,9 +81,9 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     private void newlineOnBoundaryHelper(String lineEnding) throws IOException
     {
         logger.log(("line 1" + lineEnding + "line 2" + lineEnding).getBytes());
+        assertLines(2, true);
         logger.log(("line 3" + lineEnding + "line 4").getBytes());
-
-        assertLines(4);
+        assertLines(4, false);
     }
 
     public void testNewlineStraddlesBoundary() throws IOException
@@ -85,7 +91,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         logger.log(("line 1\r").getBytes());
         logger.log("\nline 2".getBytes());
 
-        assertLines(2);
+        assertLines(2, false);
     }
 
     public void testLineNotSplitUnix() throws IOException
@@ -109,7 +115,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         logger.log(("line 1" + lineEnding + "lin").getBytes());
         logger.log(("e 2" + lineEnding + "line 3").getBytes());
 
-        assertLines(3);
+        assertLines(3, false);
     }
 
     public void testNewlineAtStartOfOutputUnix() throws IOException
@@ -222,19 +228,21 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         }
     }
 
-    private void assertLines(int count) throws IOException
+    private void assertLines(int count, boolean newlineTerminator) throws IOException
     {
-        BufferedReader reader = null;
-        try
+        List<String> lines = new ArrayList<String>(count);
+        for (int i = 1; i <= count; i++)
         {
-            reader = new BufferedReader(new FileReader(logFile));
-            readLines(count, reader);
-            assertNull(reader.readLine());
+            lines.add("line " + i);
         }
-        finally
+        String expected = StringUtils.join(SystemUtils.LINE_SEPARATOR, lines);
+        if (newlineTerminator)
         {
-            IOUtils.close(reader);
+            expected += SystemUtils.LINE_SEPARATOR;
         }
+        String contents = Files.asCharSource(logFile, Charset.defaultCharset()).read();
+        contents = contents.replaceAll(PATTERN_MARKER, "");
+        assertEquals(expected, contents);
     }
 
     private void readLines(int count, BufferedReader reader) throws IOException
@@ -247,6 +255,6 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
 
     private void assertLineContent(String line, String content)
     {
-        assertThat(line, matchesRegex("[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9] [0-9][0-9]?:[0-9][0-9]:[0-9][0-9].*: " + Pattern.quote(content)));
+        assertThat(line, matchesRegex(PATTERN_MARKER + Pattern.quote(content)));
     }
 }
