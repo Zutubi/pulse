@@ -325,6 +325,18 @@ Ext.form.Checkbox.prototype.onResize = function()
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 };
 
+Ext.form.ComboBox.prototype.isDirty = function()
+{
+    if (this.editable && !this.disabled)
+    {
+        return this.startValue !== this.getRawValue();
+    }
+    else
+    {
+        return Ext.form.ComboBox.superclass.isDirty.apply(this, arguments);
+    }
+};
+
 Zutubi.TailSettingsWindow = function(config)
 {
     Zutubi.TailSettingsWindow.superclass.constructor.call(this, config);

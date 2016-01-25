@@ -66,7 +66,7 @@
     var combo = new Ext.form.ComboBox(fc);
     ${form.name}.add(combo);
     combo.on('select', updateButtons);
-    combo.on('keyup', function() { combo.setValue(combo.getRawValue()); });
+    combo.on('keyup', updateButtons);
 }());
 
 <#include "/tove/xhtml/controlfooter.ftl" />
