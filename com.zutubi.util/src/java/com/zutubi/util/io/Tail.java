@@ -102,9 +102,9 @@ public class Tail
             long lastSeek = raf.length();
             List<String> accumulatedLines = new LinkedList<String>();
             boolean lastChunkStartedWithLF = false;
+            boolean noTerminatingNewline = false;
 
-            // Grab one more line than we need, as the first line in
-            // accumulatedLines is partial and will be discarded.
+            // Grab one more line than we need, as the first line in accumulatedLines is partial and will be discarded.
             while (lastSeek > 0 && accumulatedLines.size() <= maxLines)
             {
                 long seek = Math.max(0, lastSeek - CHUNK_SIZE);
@@ -118,7 +118,10 @@ public class Tail
                 }
 
                 List<String> extractedLines = extractLines(buffer, chunkLength);
-                addLines(accumulatedLines, extractedLines);
+                if (addLines(accumulatedLines, extractedLines))
+                {
+                    noTerminatingNewline = true;
+                }
 
                 lastSeek = seek;
                 lastChunkStartedWithLF = buffer[0] == '\n';
@@ -129,7 +132,12 @@ public class Tail
                 accumulatedLines = accumulatedLines.subList(accumulatedLines.size() - maxLines, accumulatedLines.size());
             }
 
-            return new Pair<Integer, String>(accumulatedLines.size(), StringUtils.join("\n", accumulatedLines) + "\n");
+            String tail = StringUtils.join("\n", accumulatedLines);
+            if (!noTerminatingNewline)
+            {
+                tail += "\n";
+            }
+            return new Pair<Integer, String>(accumulatedLines.size(), tail);
         }
         finally
         {
@@ -137,19 +145,31 @@ public class Tail
         }
     }
 
-    private void addLines(List<String> accumulatedLines, List<String> extractedLines)
+    private boolean addLines(List<String> accumulatedLines, List<String> extractedLines)
     {
+        boolean noTerminatingNewline = false;
         if (extractedLines.size() > 0)
         {
             if (accumulatedLines.size() > 0)
             {
                 // Join the last extracted line with the first accumulated.
                 accumulatedLines.set(0, extractedLines.get(extractedLines.size() - 1) + accumulatedLines.get(0));
+                extractedLines = extractedLines.subList(0, extractedLines.size() - 1);
             }
-            
-            extractedLines = extractedLines.subList(0, extractedLines.size() - 1);
+            else if (extractedLines.get(extractedLines.size() - 1).length() == 0)
+            {
+                // Don't count an empty line at the end of the file (i.e. file that ends in newline).
+                extractedLines = extractedLines.subList(0, extractedLines.size() - 1);
+            }
+            else
+            {
+                noTerminatingNewline = true;
+            }
+
             accumulatedLines.addAll(0, extractedLines);
         }
+
+        return noTerminatingNewline;
     }
 
     private void read(RandomAccessFile raf, byte[] buffer, int length) throws IOException
