@@ -89,6 +89,33 @@ body {
     font-weight: bold;
 }
 
+/* View switch button */
+
+.k-view-switch {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.k-button.k-left {
+    text-align: left;
+}
+
+.k-button.k-right {
+    text-align: right;
+}
+
+.k-view-switch .k-button {
+    box-sizing: border-box;
+    width: 100%;
+    border-width: 0 0 1px 0;
+    padding: 4px 7px;
+    margin-bottom: 0.25em;
+}
+
+.k-view-switch span.fa {
+    margin: 0 0.3em;
+}
+
 /* Hierarchy tree */
 
 .k-hierarchy-selector .k-sprite::before {

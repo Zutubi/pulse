@@ -45,7 +45,7 @@
 
             that.view = new kendo.View(
                 '<div id="#= id #" class="k-overview-panel">' +
-                    '<h1><span class="fa k-overview-icon"></span> <a class="k-summary-edit">#: name # <span class="fa fa-pencil"></span></a></h1>' +
+                    '<h1><span class="fa k-overview-icon"></span> <a class="k-summary-edit">#: name #</a></h1>' +
                     '<table id="#= id #-summary"></table>' +
                 '</div>', {
                     wrap: false,

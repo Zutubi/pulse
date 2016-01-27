@@ -248,9 +248,16 @@ if (window.Zutubi.admin === undefined)
             var navbar = $("#navbar").kendoZaNavbar(options).data("kendoZaNavbar");
             navbar.bind("scope-selected", function(e)
             {
+                var path;
                 if (e.scope === "projects" || e.scope === "agents")
                 {
-                    app.router.navigate("/hierarchy/" + e.scope);
+                    path = e.scope;
+                    if (app.configPanel && app.configPanel.getRootPath().indexOf(path) === 0)
+                    {
+                        path = app.configPanel.getRootPath();
+                    }
+
+                    Zutubi.admin.openHierarchyPath(path);
                 }
                 else if (e.scope === "plugins")
                 {
@@ -358,6 +365,11 @@ if (window.Zutubi.admin === undefined)
             start: function()
             {
                 app.router.start();
+            },
+
+            openHierarchyPath: function(newPath)
+            {
+                app.router.navigate("/hierarchy/" + Zutubi.config.encodePath(newPath), false);
             },
 
             openConfigPath: function(newPath)

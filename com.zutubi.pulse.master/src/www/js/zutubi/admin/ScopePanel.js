@@ -21,7 +21,9 @@
             that.view = new kendo.View(
                 '<div class="k-outer-split" style="height: 100%; width: 100%">' +
                     '<div>' +
-                        '<div class="k-hierarchy-tree k-pane-content">' +
+                        '<div class="k-pane-content">' +
+                            '<div class="k-view-switch"><button class="k-right">configuration <span class="fa fa-angle-right"></span></button></div>' +
+                            '<div class="k-hierarchy-tree"></div>' +
                         '</div>' +
                     '</div>' +
                     '<div>' +
@@ -44,6 +46,9 @@
                 ]
             });
 
+            that.configButton = that.view.element.find(".k-view-switch button").kendoButton({
+                click: jQuery.proxy(this._openConfig, this)
+            });
             that.hierarchySelector = that.view.element.find(".k-hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
             that.contentEl = that.view.element.find(".k-center-pane-content");
             that.contextPanel = that.view.element.find(".k-right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
@@ -85,6 +90,17 @@
             {
                 this.name = null;
             }
+        },
+
+        _openConfig: function(name)
+        {
+            var item = this.getItem();
+            if (!item)
+            {
+                item = this.hierarchySelector.getRootName();
+            }
+
+            Zutubi.admin.openConfigPath(this.scope + "/" + item);
         },
 
         _selectItem: function(name)
