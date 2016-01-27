@@ -532,12 +532,6 @@ div.k-wizard-window {
     cursor: move;
 }
 
-/* Buttons */
-
-.k-button .fa {
-    line-height: 14px;
-}
-
 /* Delete Window */
 
 .k-cleanup-tasks {
