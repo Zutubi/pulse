@@ -14,6 +14,7 @@
 {
     var Observable = kendo.Observable,
         DELTA ='delta',
+        NAVIGATE = 'navigate',
         PATHSELECT = 'pathselect';
 
     Zutubi.admin.ConfigPanel = Observable.extend({
@@ -68,6 +69,7 @@
 
         events: [
             DELTA,
+            NAVIGATE,
             PATHSELECT
         ],
 
@@ -261,6 +263,11 @@
                 that.applyDelta(e.delta);
                 that._clearContent();
                 that._showComposite(e.delta.models[that.path]);
+            });
+
+            that.contentPanel.bind("navigate", function(e)
+            {
+                that.trigger(NAVIGATE, e);
             });
 
             if (that.contentPanel.collapsedCollectionPanel)

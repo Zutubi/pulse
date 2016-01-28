@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
 // dependency: ./Table.js
+// dependency: ./TemplateIcon.js
 
 (function($)
 {
@@ -8,6 +9,7 @@
         CANCELLED = "cancelled",
         APPLIED = "applied",
         SAVED = "saved",
+        NAVIGATE = "navigate",
         ns = ".kendoCompositePanel",
         CLICK = "click" + ns;
 
@@ -25,6 +27,7 @@
 
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-composite-panel">' +
+                    '<span class="k-template-icon-wrapper" style="display: none"></span>' +
                     '<button class="k-composite-help-button"></button>' +
                     '<h1>#: label #</h1>' +
                     '<div style="display:none" class="k-state-wrapper">' +
@@ -51,6 +54,11 @@
                 });
 
             that.view.render(options.container);
+
+            if (composite.templateOwner)
+            {
+                that._renderTemplateIcon();
+            }
 
             if (composite.state && composite.state.fields)
             {
@@ -128,13 +136,19 @@
         events: [
             CANCELLED,
             APPLIED,
-            SAVED
+            SAVED,
+            NAVIGATE
         ],
 
         destroy: function()
         {
             // FIXME moar destruction?
             $("#composite-upwrapper").find("a").off(ns);
+            if (this.templateIcon)
+            {
+                this.templateIcon.destroy();
+                this.templateIcon = null;
+            }
             this.view.destroy();
         },
 
@@ -154,6 +168,39 @@
             }
 
             return false;
+        },
+
+        _renderTemplateIcon: function()
+        {
+            var that = this,
+                composite = that.options.composite,
+                templateIconWrapperEl = that.view.element.find(".k-template-icon-wrapper");
+
+            templateIconWrapperEl.show();
+            if (composite.templateOwner === composite.templateOriginator)
+            {
+                that.templateIcon = templateIconWrapperEl.kendoZaTemplateIcon({
+                    spriteCssClass: "fa fa-arrow-circle-left",
+                    items: [{
+                        text: "first defined at this level of the hierarchy"
+                    }]
+                }).data("kendoZaTemplateIcon");
+            }
+            else
+            {
+                that.templateIcon = templateIconWrapperEl.kendoZaTemplateIcon({
+                    spriteCssClass: "fa fa-arrow-circle-up",
+                    items: [{
+                        text: "inherited from " + kendo.htmlEncode(composite.templateOriginator),
+                        action: "navigate",
+                        owner: composite.templateOriginator
+                    }],
+                    select: function(e)
+                    {
+                        that.trigger(NAVIGATE, {owner: e.item.owner})
+                    }
+                }).data("kendoZaTemplateIcon");
+            }
         },
 
         _submitClicked: function(e)

@@ -80,6 +80,10 @@ if (window.Zutubi.admin === undefined)
                 {
                     app.navbar.applyDelta(e.delta);
                 });
+                app.configPanel.bind("navigate", function(e)
+                {
+                    Zutubi.admin.hierarchyNavigate(e.owner);
+                });
                 app.configPanel.bind("pathselect", function(e)
                 {
                     app.router.navigate("/config/" + Zutubi.config.encodePath(e.path), true);
@@ -271,13 +275,7 @@ if (window.Zutubi.admin === undefined)
 
             navbar.bind("item-selected", function(e)
             {
-                var rootPath = app.configPanel.getRootPath(),
-                    configPath = app.configPanel.getConfigPath();
-
-                rootPath = Zutubi.config.subPath(rootPath, 0, 1) + "/" + e.name;
-                app.router.navigate(Zutubi.config.encodePath("/config/" + rootPath + "/" + configPath), true);
-                // Lazy setPaths will take care of choosing the longest valid config path.
-                app.configPanel.setPaths(rootPath, configPath, true);
+                Zutubi.admin.hierarchyNavigate(e.name);
             });
 
             navbar.bind("add", function(e)
@@ -375,6 +373,17 @@ if (window.Zutubi.admin === undefined)
             openConfigPath: function(newPath)
             {
                 app.router.navigate("/config/" + Zutubi.config.encodePath(newPath), false);
+            },
+
+            hierarchyNavigate: function(newOwner)
+            {
+                var rootPath = app.configPanel.getRootPath(),
+                    configPath = app.configPanel.getConfigPath();
+
+                rootPath = Zutubi.config.subPath(rootPath, 0, 1) + "/" + newOwner;
+                app.router.navigate(Zutubi.config.encodePath("/config/" + rootPath + "/" + configPath), true);
+                // Lazy setPaths will take care of choosing the longest valid config path.
+                app.configPanel.setPaths(rootPath, configPath, true);
             },
 
             replaceConfigPath: function(newPath)

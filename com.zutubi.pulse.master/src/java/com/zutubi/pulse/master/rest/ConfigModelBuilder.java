@@ -135,9 +135,8 @@ public class ConfigModelBuilder
     private ConfigModel createCollectionModel(String path, CollectionType type, String label, Record record, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
-        boolean concrete = configurationTemplateManager.isConcrete(path);
         boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
-        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label, concrete, deeplyValid);
+        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label, deeplyValid);
         if (isFieldSelected(filters, "table"))
         {
             model.setTable(tableModelBuilder.createTable(type));
@@ -185,6 +184,8 @@ public class ConfigModelBuilder
             }
         }
 
+        templateDecorateModel(path, record, model);
+
         return model;
     }
 
@@ -219,22 +220,23 @@ public class ConfigModelBuilder
     private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
+        TypeSelectionModel model = new TypeSelectionModel(baseName, label);
+
         String closestExistingPath = path;
-        boolean concrete = configurationTemplateManager.isConcrete(closestExistingPath);
         if (configurationTemplateManager.isPersistent(path))
         {
             while (!configurationTemplateManager.pathExists(closestExistingPath))
             {
                 closestExistingPath = PathUtils.getParentPath(closestExistingPath);
             }
+
+            String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(closestExistingPath);
+            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(closestExistingPath), PathUtils.getSuffix(templateOwnerPath, 1), null);
         }
         else
         {
             closestExistingPath = null;
-            concrete = true;
         }
-
-        TypeSelectionModel model = new TypeSelectionModel(baseName, label, concrete);
 
         if (isFieldSelected(filters, "type"))
         {
@@ -289,7 +291,7 @@ public class ConfigModelBuilder
         String baseName = PathUtils.getBaseName(path);
         Configuration instance = configurationTemplateManager.getInstance(path);
         boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
-        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, instance.isConcrete(), deeplyValid);
+        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, deeplyValid);
         if (isFieldSelected(filters, "properties"))
         {
             model.setProperties(getProperties(configurationTemplateManager.getTemplateOwnerPath(path), type, record));
@@ -310,7 +312,7 @@ public class ConfigModelBuilder
             model.setType(buildCompositeTypeModel(type, new FormContext(instance)));
             if (record instanceof TemplateRecord)
             {
-                decorateForm(model.getType().getForm(), type, (TemplateRecord) record);
+                templateDecorateForm(model.getType().getForm(), type, (TemplateRecord) record);
             }
         }
 
@@ -333,6 +335,7 @@ public class ConfigModelBuilder
             }
         }
 
+        templateDecorateModel(path, record, model);
         return model;
     }
 
@@ -497,7 +500,22 @@ public class ConfigModelBuilder
         return typeModel;
     }
 
-    private void decorateForm(FormModel form, CompositeType type, TemplateRecord record)
+    private void templateDecorateModel(String path, Record record, ConfigModel model)
+    {
+        if (record instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) record;
+            TemplateRecord originator = templateRecord;
+            while (originator.getParent() != null)
+            {
+                originator = originator.getParent();
+            }
+
+            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(path), templateRecord.getOwner(), originator.getOwner());
+        }
+    }
+
+    private void templateDecorateForm(FormModel form, CompositeType type, TemplateRecord record)
     {
         // FIXME kendo does not add empty options to selects, do we need that?
         TemplateRecord parentRecord = record.getParent();
@@ -523,7 +541,8 @@ public class ConfigModelBuilder
                         {
                             field.addParameter("inheritedFrom", ownerId);
                         }
-                    } else if (parentRecord != null)
+                    }
+                    else if (parentRecord != null)
                     {
                         // Check for override
                         String parentOwnerId = parentRecord.getOwner(fieldName);

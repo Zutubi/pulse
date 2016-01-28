@@ -102,11 +102,11 @@
 
             popup = that.popupEl.kendoPopup({
                 anchor: that.element.closest(".k-navitem"),
-                origin: "top left",
-                position: "bottom left",
+                origin: "bottom left",
+                position: "top left",
                 animation: {
                     open: {
-                        effects: "slideIn:up"
+                        effects: "slideIn:down"
                     }
                 }
             }).data("kendoPopup");
@@ -115,7 +115,7 @@
             return popup;
         },
 
-        _popupClicked: function(e)
+        _onPopupClicked: function(e)
         {
             var that = this,
                 target = kendo.eventTarget(e),
@@ -162,8 +162,8 @@
 
             popup = that.popupEl.kendoPopup({
                 anchor: that.element.closest(".k-navitem"),
-                origin: "top left",
-                position: "bottom left",
+                origin: "bottom left",
+                position: "top left",
                 animation: {
                     open: {
                         effects: "slideIn:up"

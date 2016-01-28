@@ -19,6 +19,7 @@
 // dependency: ./ResourceBrowserWindow.js
 // dependency: ./ScopePanel.js
 // dependency: ./Table.js
+// dependency: ./TemplateIcon.js
 // dependency: ./TypeSelectPanel.js
 // dependency: ./Wizard.js
 // dependency: ./WizardWindow.js

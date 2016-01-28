@@ -139,12 +139,32 @@
 /* Composites */
 
 .k-composite-panel {
-    padding: 8px 16px;
+    padding: 8px;
 }
 
 .k-composite-panel h1 {
     line-height: 36px;
     margin-bottom: 8px;
+}
+
+.k-template-icon-wrapper {
+    display: inline-block;
+    float: left;
+    line-height: 36px;
+    margin-right: 8px;
+}
+
+.k-template-icon {
+    padding: 4px;
+}
+
+.k-template-icon.k-template-active {
+    color: #fff;
+    background-color: #8ebc00;
+}
+
+.k-template-popup.k-selector-popup {
+    border-top: solid 1px #ddd;
 }
 
 .k-composite-help-button {
@@ -178,7 +198,7 @@
 /* FIXME kendo some duplication with above */
 
 .k-collection-panel {
-    padding: 8px 16px;
+    padding: 8px;
 }
 
 .k-collection-panel h1 {

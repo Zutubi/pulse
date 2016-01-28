@@ -58,12 +58,12 @@ body {
 }
 
 .k-selector-popup, .k-hierarchy-popup {
-    margin-top: 4px;
     border-top: none;
 }
 
 .k-selector-popup li {
-    padding: 0 12px;
+    padding: 8px 12px;
+    line-height: 1.2em;
     cursor: pointer;
 }
 

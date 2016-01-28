@@ -21,21 +21,23 @@ public abstract class ConfigModel
     private final String key;
     private final String label;
     private boolean concrete;
+    private String templateOwner;
+    private String templateOriginator;
     private final boolean deeplyValid;
     private String iconClass;
     private List<ConfigModel> nested;
 
     protected ConfigModel()
     {
-        this(null, null, null, true, true);
+        this(null, null, null, true);
     }
 
-    protected ConfigModel(String handle, String key, String label, boolean concrete, boolean deeplyValid)
+    protected ConfigModel(String handle, String key, String label, boolean deeplyValid)
     {
         this.handle = handle;
         this.key = key;
         this.label = label;
-        this.concrete = concrete;
+        this.concrete = true;
         this.deeplyValid = deeplyValid;
     }
 
@@ -52,11 +54,6 @@ public abstract class ConfigModel
     public String getLabel()
     {
         return label;
-    }
-
-    public boolean isConcrete()
-    {
-        return concrete;
     }
 
     public boolean isDeeplyValid()
@@ -82,5 +79,27 @@ public abstract class ConfigModel
     public void setNested(List<ConfigModel> nested)
     {
         this.nested = nested;
+    }
+
+    public boolean isConcrete()
+    {
+        return concrete;
+    }
+
+    public String getTemplateOwner()
+    {
+        return templateOwner;
+    }
+
+    public String getTemplateOriginator()
+    {
+        return templateOriginator;
+    }
+
+    public void decorateWithTemplateDetails(boolean concrete, String templateOwner, String templateOriginator)
+    {
+        this.concrete = concrete;
+        this.templateOwner = templateOwner;
+        this.templateOriginator = templateOriginator;
     }
 }

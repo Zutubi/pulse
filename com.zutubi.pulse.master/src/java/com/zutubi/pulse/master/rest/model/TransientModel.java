@@ -17,7 +17,7 @@ public class TransientModel extends ConfigModel
 
     public TransientModel(String key, String label)
     {
-        super(null, key, label, true, true);
+        super(null, key, label, true);
     }
 
     public CompositeTypeModel getType()
