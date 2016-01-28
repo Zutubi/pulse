@@ -505,13 +505,9 @@ public class ConfigModelBuilder
         if (record instanceof TemplateRecord)
         {
             TemplateRecord templateRecord = (TemplateRecord) record;
-            TemplateRecord originator = templateRecord;
-            while (originator.getParent() != null)
-            {
-                originator = originator.getParent();
-            }
+            String templateOriginator = getTemplateOriginator(templateRecord);
 
-            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(path), templateRecord.getOwner(), originator.getOwner());
+            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(path), templateRecord.getOwner(), templateOriginator);
         }
     }
 
@@ -519,6 +515,7 @@ public class ConfigModelBuilder
     {
         // FIXME kendo does not add empty options to selects, do we need that?
         TemplateRecord parentRecord = record.getParent();
+        String templateOriginatorId = getTemplateOriginator(record);
 
         for (FieldModel field : form.getFields())
         {
@@ -537,7 +534,8 @@ public class ConfigModelBuilder
                         {
                             // This field should be read-only.
                             field.addParameter("noOverride", Boolean.toString(true));
-                        } else
+                        }
+                        else if (!ownerId.equals(templateOriginatorId))
                         {
                             field.addParameter("inheritedFrom", ownerId);
                         }
@@ -555,6 +553,16 @@ public class ConfigModelBuilder
                 }
             }
         }
+    }
+
+    private String getTemplateOriginator(TemplateRecord templateRecord)
+    {
+        TemplateRecord originator = templateRecord;
+        while (originator.getParent() != null)
+        {
+            originator = originator.getParent();
+        }
+        return originator.getOwner();
     }
 
     private boolean fieldHasAnnotation(CompositeType type, String fieldName, Class<? extends Annotation> annotationClass)

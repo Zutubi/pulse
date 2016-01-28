@@ -12,7 +12,7 @@
         DATA_ITEM = "item" + ns,
         CLASS_ACTIVE = "k-template-active";
 
-    Zutubi.admin.TemplateIcon = Widget.extend({
+    Zutubi.config.TemplateIcon = Widget.extend({
         init: function(element, options)
         {
             var that = this;
@@ -82,7 +82,7 @@
                     position: "top left",
                     animation: {
                         open: {
-                            effects: "slideIn:up"
+                            effects: "slideIn:down"
                         }
                     }
                 }).data("kendoPopup");
@@ -154,5 +154,5 @@
         }
     });
 
-    ui.plugin(Zutubi.admin.TemplateIcon);
+    ui.plugin(Zutubi.config.TemplateIcon);
 }(jQuery));

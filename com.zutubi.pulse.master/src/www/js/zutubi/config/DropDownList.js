@@ -15,13 +15,13 @@
                     dataSource: that._fixEmpty(structure.list, structure.listValue),
                     dataTextField: structure.listText,
                     dataValueField: structure.listValue,
-                    dataBound: jQuery.proxy(that._adjustWidth, that)
+                    dataBound: jQuery.proxy(that._adjustWidth, that),
+                    structure: structure
                 };
 
             // FIXME kendo this is clunky, should we just wrap the kendo widget?
             // It affects combobox and controllingdropdownlist too.
             that.parentForm = options.parentForm;
-            that.structure = structure;
 
             DropDownList.fn.init.call(this, element, kendoOptions);
         },
@@ -48,7 +48,7 @@
 
         getFieldName: function()
         {
-            return this.structure.name;
+            return this.options.structure.name;
         },
 
         bindValue: function(value)

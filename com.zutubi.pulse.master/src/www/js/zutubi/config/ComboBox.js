@@ -14,7 +14,7 @@
                 formOptions = options.parentForm.options,
                 kendoOptions;
 
-            if (options.structure.lazy)
+            if (structure.lazy)
             {
                 kendoOptions = {
                     autoBind: false,
@@ -46,7 +46,8 @@
                                 });
                             }
                         }
-                    }
+                    },
+                    structure: structure
                 };
             }
             else
@@ -54,12 +55,12 @@
                 kendoOptions = {
                     dataSource: structure.list,
                     dataTextField: structure.listText,
-                    dataValueField: structure.listValue
+                    dataValueField: structure.listValue,
+                    structure: structure
                 };
             }
 
             that.parentForm = options.parentForm;
-            that.structure = structure;
 
             ComboBox.fn.init.call(this, element, kendoOptions);
         },
@@ -70,7 +71,7 @@
 
         getFieldName: function()
         {
-            return this.structure.name;
+            return this.options.structure.name;
         },
 
         bindValue: function(value)

@@ -7,6 +7,7 @@
 // dependency: ./ItemPicker.js
 // dependency: ./PasswordField.js
 // dependency: ./StringList.js
+// dependency: ./TemplateIcon.js
 // dependency: ./TextArea.js
 // dependency: ./TextField.js
 
@@ -25,6 +26,7 @@
         CREATED = "created",
         BUTTON_CLICKED = "buttonClicked",
         ENTER_PRESSED = "enterPressed",
+        NAVIGATE = "navigate",
         DEFAULT_SUBMITS = ["apply", "reset"],
         FIELD_TYPES = {
             checkbox: "kendoZaCheckbox",
@@ -53,7 +55,8 @@
             ACTION,
             CREATED,
             BUTTON_CLICKED,
-            ENTER_PRESSED
+            ENTER_PRESSED,
+            NAVIGATE
         ],
 
         options: {
@@ -62,6 +65,7 @@
             template: '<form name="#: id #" id="#: id #"><table class="k-form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr>' +
+                               '<td id="#: id #-decorations" class="k-field-decorations-cell"></td>' +
                                '<th><label id="#: id #-label" for="#: id #">#: label #</label></th>' +
                                '<td><span id="#: id #-wrap" class="k-field-wrapper"></span></td>' +
                                '<td id="#: id #-actions" class="k-field-action-cell"></td>' +
@@ -141,6 +145,17 @@
             that.element = null;
         },
 
+        _fieldParameter: function(fieldOptions, name)
+        {
+            var parameters = fieldOptions.parameters;
+            if (parameters && typeof parameters[name] !== "undefined")
+            {
+                return parameters[name];
+            }
+
+            return null;
+        },
+
         _appendField: function(fieldOptions)
         {
             var rowElement, fieldElement, fieldType, field;
@@ -191,13 +206,77 @@
                     this.fields.push(field);
                 }
 
+                this._addFieldDecorations(field, fieldOptions, rowElement.find(".k-field-decorations-cell"));
+
                 if (!this.options.readOnly)
                 {
-                    this._addFieldActions(field, fieldOptions, rowElement.find("td").last());
+                    this._addFieldActions(field, fieldOptions, rowElement.find(".k-field-action-cell"));
                 }
 
                 this._addFieldScripts(field, fieldOptions);
                 this._addFieldDocs(fieldOptions.name, fieldElement);
+            }
+        },
+
+        _addFieldDecorations: function(field, fieldOptions, decorationsElement)
+        {
+            var inheritedFrom = this._fieldParameter(fieldOptions, "inheritedFrom"),
+                overriddenOwner,
+                el,
+                icon;
+
+            if (inheritedFrom)
+            {
+                el = $('<span></span>').appendTo(decorationsElement);
+                icon = el.kendoZaTemplateIcon({
+                    spriteCssClass: "fa fa-arrow-circle-up",
+                    items: [{
+                        text: "inherits value defined in " + kendo.htmlEncode(inheritedFrom),
+                        action: "navigate",
+                        owner: inheritedFrom
+                    }]
+                }).data("kendoZaTemplateIcon");
+            }
+            else
+            {
+                overriddenOwner = this._fieldParameter(fieldOptions, "overriddenOwner");
+                if (overriddenOwner)
+                {
+                    el = $('<span></span>').appendTo(decorationsElement);
+                    icon = el.kendoZaTemplateIcon({
+                        spriteCssClass: "fa fa-arrow-circle-right",
+                        items: [{
+                            text: "overrides value defined in " + kendo.htmlEncode(overriddenOwner),
+                            action: "navigate",
+                            owner: overriddenOwner
+                        }, {
+                            text: "revert to inherited value",
+                            action: "revert",
+                            field: field
+                        }]
+                    }).data("kendoZaTemplateIcon");
+                }
+            }
+
+            if (icon)
+            {
+                icon.bind("select", jQuery.proxy(this._decorationSelect, this));
+            }
+        },
+
+        _decorationSelect: function(e)
+        {
+            var action = e.item.action,
+                field;
+            if (action === "navigate")
+            {
+                this.trigger(NAVIGATE, {owner: e.item.owner});
+            }
+            else if (action === "revert")
+            {
+                field = e.item.field;
+                field.bindValue(field.options.structure.parameters.overriddenValue);
+                this.updateButtons();
             }
         },
 

@@ -339,9 +339,16 @@ table.k-form {
     width: 1%;
     white-space: nowrap;
     text-align: right;
+    font-weight: normal;
+}
+
+.k-form th, .k-form td.k-field-decorations-cell {
     vertical-align: top;
     padding-top: 0.7em;
-    font-weight: normal;
+}
+
+.k-form td.k-field-decorations-cell {
+    padding-left: 0;
 }
 
 .k-form td.k-submit {

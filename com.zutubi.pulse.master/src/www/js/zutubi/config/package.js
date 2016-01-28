@@ -16,6 +16,7 @@
 // dependency: ./ItemPicker.js
 // dependency: ./PasswordField.js
 // dependency: ./StringList.js
+// dependency: ./TemplateIcon.js
 // dependency: ./TextArea.js
 // dependency: ./TextField.js
 // dependency: ./WorkflowWindow.js

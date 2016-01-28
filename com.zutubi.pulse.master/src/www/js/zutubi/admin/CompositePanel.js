@@ -1,7 +1,6 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
 // dependency: ./Table.js
-// dependency: ./TemplateIcon.js
 
 (function($)
 {
@@ -94,6 +93,7 @@
             }
 
             that.form.bind("buttonClicked", jQuery.proxy(that._submitClicked, that));
+            that.form.bind("navigate", function(e) { that.trigger(NAVIGATE, e); });
 
             if (writable && composite.type.checkType)
             {

@@ -43,7 +43,7 @@
             if (!form.options.readOnly)
             {
                 value = this.getValue();
-                structure = this.structure;
+                structure = this.options.structure;
                 enable = jQuery.inArray(value, structure.enableSet) !== -1;
                 fieldNames = structure.dependentFields;
 
