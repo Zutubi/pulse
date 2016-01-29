@@ -1,5 +1,4 @@
 // dependency: ./namespace.js
-// dependency: zutubi/config/package.js
 
 (function($)
 {
@@ -28,10 +27,12 @@
             REORDER
         ],
 
-        _create: function () {
+        _create: function ()
+        {
             var that = this,
-                columns = that._formatColumns(),
-                data = that._formatData();
+                templateDecorate = that._needsTemplateDecoration(),
+                columns = that._formatColumns(templateDecorate),
+                data = that._formatData(templateDecorate);
 
             that.template = kendo.template(that.options.template);
             that.element.html(that.template(that.options));
@@ -47,7 +48,7 @@
                 scrollable: false
             }).data("kendoGrid");
 
-            that._addActionMenus();
+            that._addDecorationsAndMenus();
 
             if (that.options.allowSorting)
             {
@@ -67,19 +68,46 @@
 
                         grid.dataSource.remove(dataItem);
                         grid.dataSource.insert(e.newIndex, dataItem);
-                        that._addActionMenus();
+                        that._addDecorationsAndMenus();
                         that.trigger(REORDER, {item: dataItem, oldIndex: e.oldIndex, newIndex: e.newIndex});
                     }
                 });
             }
         },
 
-        _formatColumns: function()
+        _needsTemplateDecoration: function()
+        {
+            var options = this.options,
+                items = options.items,
+                i;
+
+            if (options.templateOriginator)
+            {
+                for (i = 0; i < items.length; i++)
+                {
+                    if (items[i].templateOriginator !== options.templateOriginator)
+                    {
+                        return true;
+                    }
+                }
+            }
+        },
+
+        _formatColumns: function(templateDecorated)
         {
             var originalColumns = this.options.structure.columns,
                 columns = [],
                 column,
                 i;
+
+            if (templateDecorated)
+            {
+                columns.push({
+                    title: "",
+                    template: '<span class="k-template-decoration"></span>',
+                    width: 36
+                });
+            }
 
             for (i = 0; i < originalColumns.length; i++)
             {
@@ -96,7 +124,7 @@
             return columns;
         },
 
-        _formatData: function()
+        _formatData: function(templateDecorate)
         {
             var items = this.options.items,
                 data = [],
@@ -104,13 +132,13 @@
 
             for (i = 0; i < items.length; i++)
             {
-                data.push(this._formatItem(items[i]));
+                data.push(this._formatItem(items[i], templateDecorate));
             }
 
             return data;
         },
 
-        _formatItem: function(item)
+        _formatItem: function(item, templateDecorate)
         {
             var columns = this.options.structure.columns,
                 i,
@@ -125,6 +153,12 @@
                 })
             };
 
+            if (templateDecorate)
+            {
+                row.templateOriginator = item.templateOriginator;
+                row.templateOwner = item.templateOwner;
+            }
+
             for (i = 0; i < columns.length; i++)
             {
                 column = columns[i];
@@ -134,18 +168,37 @@
             return row;
         },
 
-        _addActionMenus: function()
+        _addDecorationsAndMenus: function()
         {
             var that = this,
                 i = 0,
                 item;
 
+            that.grid.table.find(".k-template-decoration").each(function(index, el)
+            {
+                item = that.grid.dataSource.at(i);
+                that._addTemplateDecoration(item, el);
+                i++;
+            });
+
+            i = 0;
             that.grid.table.find(".k-collection-menu").each(function(index, el)
             {
                 item = that.grid.dataSource.at(i);
                 that._addActionMenu(item, el, i);
                 i++;
             });
+        },
+
+        _addTemplateDecoration: function(item, el)
+        {
+            if (item.templateOriginator !== this.options.templateOriginator)
+            {
+                $(el).kendoZaComplexTemplateIcon({
+                    model: item,
+                    panel: this.options.panel
+                });
+            }
         },
 
         _addActionMenu: function(item, el, row)
@@ -219,7 +272,7 @@
                 {
                     dataSource.insert(index, this._formatItem(data));
                 }
-                this._addActionMenus();
+                this._addDecorationsAndMenus();
             }
         }
     });

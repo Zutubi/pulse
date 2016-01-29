@@ -1,5 +1,4 @@
 // dependency: ./namespace.js
-// dependency: zutubi/config/package.js
 // dependency: ./Table.js
 
 (function($)
@@ -56,7 +55,10 @@
 
             if (composite.templateOwner)
             {
-                that._renderTemplateIcon();
+                that.templateIcon = that.view.element.find(".k-template-icon-wrapper").kendoZaComplexTemplateIcon({
+                    model: composite,
+                    panel: that
+                }).data("kendoZaComplexTemplateIcon");
             }
 
             if (composite.state && composite.state.fields)
@@ -168,39 +170,6 @@
             }
 
             return false;
-        },
-
-        _renderTemplateIcon: function()
-        {
-            var that = this,
-                composite = that.options.composite,
-                templateIconWrapperEl = that.view.element.find(".k-template-icon-wrapper");
-
-            templateIconWrapperEl.show();
-            if (composite.templateOwner === composite.templateOriginator)
-            {
-                that.templateIcon = templateIconWrapperEl.kendoZaTemplateIcon({
-                    spriteCssClass: "fa fa-arrow-circle-left",
-                    items: [{
-                        text: "first defined at this level of the hierarchy"
-                    }]
-                }).data("kendoZaTemplateIcon");
-            }
-            else
-            {
-                that.templateIcon = templateIconWrapperEl.kendoZaTemplateIcon({
-                    spriteCssClass: "fa fa-arrow-circle-up",
-                    items: [{
-                        text: "inherited from " + kendo.htmlEncode(composite.templateOriginator),
-                        action: "navigate",
-                        owner: composite.templateOriginator
-                    }],
-                    select: function(e)
-                    {
-                        that.trigger(NAVIGATE, {owner: e.item.owner})
-                    }
-                }).data("kendoZaTemplateIcon");
-            }
         },
 
         _submitClicked: function(e)

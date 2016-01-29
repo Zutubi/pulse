@@ -3,6 +3,7 @@
 // dependency: ./Button.js
 // dependency: ./Checkbox.js
 // dependency: ./ComboBox.js
+// dependency: ./ComplexTemplateIcon.js
 // dependency: ./ControllingCheckbox.js
 // dependency: ./ControllingDropDownList.js
 // dependency: ./CreateDirWindow.js

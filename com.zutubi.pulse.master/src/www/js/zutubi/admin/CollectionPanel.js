@@ -24,6 +24,7 @@
 
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-collection-panel">' +
+                    '<span class="k-template-icon-wrapper" style="display: none"></span>' +
                     '<button id="#: id #-add" class="k-collection-add"><span class="k-sprite"></span> add</button>' +
                     '<h1>#: label #</h1>' +
                     '<div style="display:none" class="k-state-wrapper">' +
@@ -43,6 +44,14 @@
                 });
 
             that.view.render(options.container);
+
+            if (collection.templateOwner)
+            {
+                that.templateIcon = that.view.element.find(".k-template-icon-wrapper").kendoZaComplexTemplateIcon({
+                    model: collection,
+                    panel: that
+                }).data("kendoZaComplexTemplateIcon");
+            }
 
             that.addElement = $("#collection-add");
             if (createAllowed)
@@ -69,6 +78,9 @@
             that.table = $("#collection-table").kendoZaTable({
                 structure: collection.table,
                 items: collection.nested,
+                templateOriginator: collection.templateOriginator,
+                templateOwner: collection.templateOwner,
+                panel: that,
                 allowSorting: collection.type.ordered && writeAllowed
             }).data("kendoZaTable");
 

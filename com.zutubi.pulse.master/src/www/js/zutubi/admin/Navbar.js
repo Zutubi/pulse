@@ -166,7 +166,7 @@
                 position: "top left",
                 animation: {
                     open: {
-                        effects: "slideIn:up"
+                        effects: "slideIn:down"
                     }
                 }
             }).data("kendoPopup");

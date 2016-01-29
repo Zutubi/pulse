@@ -304,6 +304,11 @@
             {
                 that.applyDelta(e.delta);
             });
+
+            panel.bind("navigate", function(e)
+            {
+                that.trigger(NAVIGATE, e);
+            });
         },
 
         _showTypeSelection: function(data)
