@@ -34,7 +34,7 @@
                     }],
                     select: function(e)
                     {
-                        panel.trigger("navigate", {owner: e.item.owner})
+                        panel.trigger("navigate", {owner: e.item.owner});
                     }
                 };
             }
