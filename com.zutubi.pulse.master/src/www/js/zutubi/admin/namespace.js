@@ -378,10 +378,12 @@ if (window.Zutubi.admin === undefined)
             hierarchyNavigate: function(newOwner)
             {
                 var rootPath = app.configPanel.getRootPath(),
-                    configPath = app.configPanel.getConfigPath();
+                    configPath = app.configPanel.getConfigPath(),
+                    scope = Zutubi.config.subPath(rootPath, 0, 1);
 
-                rootPath = Zutubi.config.subPath(rootPath, 0, 1) + "/" + newOwner;
+                rootPath = scope + "/" + newOwner;
                 app.router.navigate(Zutubi.config.encodePath("/config/" + rootPath + "/" + configPath), true);
+                app.navbar.selectScope(scope, newOwner);
                 // Lazy setPaths will take care of choosing the longest valid config path.
                 app.configPanel.setPaths(rootPath, configPath, true);
             },
