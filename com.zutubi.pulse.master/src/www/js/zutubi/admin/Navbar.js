@@ -111,7 +111,7 @@
                 }
             }).data("kendoPopup");
 
-            that.popupEl.on("click", jQuery.proxy(that._popupClicked, that));
+            that.popupEl.on("click", jQuery.proxy(that._onPopupClicked, that));
             return popup;
         },
 

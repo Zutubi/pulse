@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -177,19 +178,22 @@ public class ConfigController
         else
         {
             CollectionModel collectionModel = (CollectionModel) config;
-            if (collectionModel.getNested() == null)
+            if (collectionModel.getNested() == null || collectionModel.getNested().isEmpty())
             {
-                throw new IllegalArgumentException("Collection does not have nested records, nothing to save");
+                // Clears any defined order.
+                configurationTemplateManager.setOrder(configPath, Collections.<String>emptyList());
             }
-
-            configurationTemplateManager.setOrder(configPath, Lists.newArrayList(Iterables.transform(collectionModel.getNested(), new Function<ConfigModel, String>()
+            else
             {
-                @Override
-                public String apply(ConfigModel input)
+                configurationTemplateManager.setOrder(configPath, Lists.newArrayList(Iterables.transform(collectionModel.getNested(), new Function<ConfigModel, String>()
                 {
-                    return input.getKey();
-                }
-            })));
+                    @Override
+                    public String apply(ConfigModel input)
+                    {
+                        return input.getKey();
+                    }
+                })));
+            }
 
             ConfigDeltaModel delta = new ConfigDeltaModel();
             Record newRecord = configurationTemplateManager.getRecord(configPath);

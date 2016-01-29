@@ -17,6 +17,9 @@ public class CollectionModel extends ConfigModel
     private List<String> allowedActions;
     private List<HiddenItemModel> hiddenItems;
     private StateModel state;
+    private List<String> declaredOrder;
+    private String orderTemplateOwner;
+    private String orderOverriddenOwner;
 
     public CollectionModel()
     {
@@ -85,5 +88,31 @@ public class CollectionModel extends ConfigModel
     public void setState(StateModel state)
     {
         this.state = state;
+    }
+
+    public List<String> getDeclaredOrder()
+    {
+        return declaredOrder;
+    }
+
+    public void setDeclaredOrder(List<String> declaredOrder)
+    {
+        this.declaredOrder = declaredOrder;
+    }
+
+    public String getOrderTemplateOwner()
+    {
+        return orderTemplateOwner;
+    }
+
+    public String getOrderOverriddenOwner()
+    {
+        return orderOverriddenOwner;
+    }
+
+    public void decorateWithOrderTemplateDetails(String orderTemplateOwner, String orderOverriddenOwner)
+    {
+        this.orderTemplateOwner = orderTemplateOwner;
+        this.orderOverriddenOwner = orderOverriddenOwner;
     }
 }

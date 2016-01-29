@@ -7,6 +7,7 @@
     var Observable = kendo.Observable,
         ACTION = "action",
         ADD = "add",
+        NAVIGATE = "navigate",
         REORDERED = "reordered";
 
     Zutubi.admin.CollectionPanel = Observable.extend({
@@ -15,8 +16,10 @@
             var that = this,
                 collection = options.collection,
                 createAllowed = jQuery.inArray("create", collection.allowedActions) !== -1,
-                writeAllowed = (jQuery.inArray("write", collection.allowedActions) !== -1),
-                el;
+                writeAllowed = this._isWriteAllowed(collection),
+                actionsEl,
+                el,
+                message;
 
             that.options = options;
 
@@ -25,7 +28,8 @@
             that.view = new kendo.View(
                 '<div id="#: id #" class="k-collection-panel">' +
                     '<span class="k-template-icon-wrapper" style="display: none"></span>' +
-                    '<button id="#: id #-add" class="k-collection-add"><span class="k-sprite"></span> add</button>' +
+                    '<span class="k-collection-actions">' +
+                    '</span>' +
                     '<h1>#: label #</h1>' +
                     '<div style="display:none" class="k-state-wrapper">' +
                     '</div>' +
@@ -53,15 +57,26 @@
                 }).data("kendoZaComplexTemplateIcon");
             }
 
-            that.addElement = $("#collection-add");
+            actionsEl = that.view.element.find(".k-collection-actions");
+            if (collection.type.ordered)
+            {
+                that._renderDeclaredOrder(collection);
+
+                message = "ordered collection";
+                if (writeAllowed)
+                {
+                    message += ", drag and drop rows to reorder";
+                }
+
+                el = $('<span class="k-collection-ordered-indicator fa fa-list-ol"></span>').appendTo(actionsEl);
+                el.kendoTooltip({ content: message});
+            }
+
             if (createAllowed)
             {
-                that.addButton = that.addElement.kendoButton({spriteCssClass: "fa fa-plus-circle"}).data("kendoButton");
+                el = $('<button><span class="k-sprite"></span> add</button>').appendTo(actionsEl);
+                that.addButton = el.kendoButton({spriteCssClass: "fa fa-plus-circle"}).data("kendoButton");
                 that.addButton.bind("click", jQuery.proxy(that._addClicked, that));
-            }
-            else
-            {
-                that.addElement.hide();
             }
 
             if (collection.state && collection.state.fields)
@@ -75,21 +90,7 @@
                 el.show();
             }
 
-            that.table = $("#collection-table").kendoZaTable({
-                structure: collection.table,
-                items: collection.nested,
-                templateOriginator: collection.templateOriginator,
-                templateOwner: collection.templateOwner,
-                panel: that,
-                allowSorting: collection.type.ordered && writeAllowed
-            }).data("kendoZaTable");
-
-            that.table.bind(ACTION, function(e)
-            {
-                that.trigger(ACTION, {path: that.options.path + "/" + e.key, action: e.action});
-            });
-
-            that.table.bind("reorder", jQuery.proxy(that._reordered, that));
+            that._renderTable(collection);
 
             if (collection.hiddenItems && collection.hiddenItems.length > 0)
             {
@@ -100,6 +101,7 @@
         events: [
             ACTION,
             ADD,
+            NAVIGATE,
             REORDERED
         ],
 
@@ -107,11 +109,118 @@
         {
             // FIXME moar destruction?
             this.view.destroy();
+            kendo.destroy(this.view.element);
         },
 
         updateItem: function(key, data)
         {
             this.table.updateItem(key, data);
+        },
+
+        _isWriteAllowed: function(collection)
+        {
+            return jQuery.inArray("write", collection.allowedActions) !== -1;
+        },
+
+        _renderDeclaredOrder: function(collection)
+        {
+            var el,
+                writeAllowed = this._isWriteAllowed(collection),
+                items,
+                templateIcon;
+
+            this.view.element.find(".k-collection-declared-order").remove();
+            if (collection.declaredOrder)
+            {
+                el = $('<span class="k-collection-declared-order"></span>').prependTo(this.view.element.find(".k-collection-actions"));
+                if (collection.orderOverriddenOwner)
+                {
+                    items = [{
+                        text: "overrides order defined in " + kendo.htmlEncode(collection.orderOverriddenOwner),
+                        action: "navigate",
+                        owner: collection.orderOverriddenOwner
+                    }];
+
+                    if (writeAllowed)
+                    {
+                        items.push({
+                            text: "revert to inherited order",
+                            action: "clear"
+                        });
+                    }
+
+                    templateIcon = el.kendoZaTemplateIcon({
+                        spriteCssClass: "fa fa-arrow-circle-right",
+                        items: items
+                    }).data("kendoZaTemplateIcon");
+                }
+                else if (collection.orderTemplateOwner !== collection.templateOwner)
+                {
+                    templateIcon = el.kendoZaTemplateIcon({
+                        spriteCssClass: "fa fa-arrow-circle-up",
+                        items: [{
+                            text: "inherits order defined in " + kendo.htmlEncode(collection.orderTemplateOwner),
+                            action: "navigate",
+                            owner: collection.orderTemplateOwner
+                        }]
+                    }).data("kendoZaTemplateIcon");
+                }
+                else
+                {
+                    templateIcon = el.kendoZaTemplateIcon({
+                        spriteCssClass: "fa fa-arrow-circle-left",
+                        items: [{
+                            text: "explicit order defined" + (writeAllowed ? ", revert to natural order" : ""),
+                            action: writeAllowed ? "clear" : ""
+                        }]
+                    }).data("kendoZaTemplateIcon");
+                }
+
+                templateIcon.bind("select", jQuery.proxy(this._orderAction, this));
+            }
+        },
+
+        _orderAction: function(e)
+        {
+            var action = e.item.action;
+
+            if (action === "clear")
+            {
+                this._setOrder([]);
+            }
+            else
+            {
+                this.trigger(NAVIGATE, {owner: e.item.owner});
+            }
+        },
+
+        _renderTable: function(collection)
+        {
+            var that = this,
+                el = $("#collection-table");
+
+            if (that.table)
+            {
+                that.table.destroy();
+                el.empty();
+            }
+
+            el = $('<div></div>').appendTo(el);
+            that.table = el.kendoZaTable({
+                structure: collection.table,
+                items: collection.nested,
+                templateOriginator: collection.templateOriginator,
+                templateOwner: collection.templateOwner,
+                panel: that,
+                allowSorting: collection.type.ordered && this._isWriteAllowed(collection)
+            }).data("kendoZaTable");
+
+            that.table.bind(ACTION, function(e)
+            {
+                that.trigger(ACTION, {path: that.options.path + "/" + e.key, action: e.action});
+            });
+
+            that.table.bind("reorder", jQuery.proxy(that._reordered, that));
         },
 
         _addClicked: function(e)
@@ -156,7 +265,12 @@
             $("#collection-hidden-wrapper").show();
         },
 
-        _reordered: function(order)
+        _reordered: function()
+        {
+            this._setOrder(this.table.getOrder());
+        },
+
+        _setOrder: function(order)
         {
             var that = this;
 
@@ -166,7 +280,7 @@
                 url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=-1",
                 data: {
                     kind: "collection",
-                    nested: jQuery.map(that.table.getOrder(), function(key)
+                    nested: jQuery.map(order, function(key)
                     {
                         return {
                             kind: "composite",
@@ -174,9 +288,29 @@
                         };
                     })
                 },
-                success: function (data)
+                success: function (delta)
                 {
-                    that.trigger(REORDERED, {delta: data});
+                    var collection,
+                        newOrder;
+                    if (delta.updatedPaths && delta.updatedPaths.length > 0)
+                    {
+                        collection = delta.models[delta.updatedPaths[0]];
+                        that.options.collection = collection;
+
+                        that._renderDeclaredOrder(collection);
+
+                        newOrder = jQuery.map(collection.nested, function(item)
+                        {
+                            return item.key;
+                        });
+
+                        if (!Zutubi.core.arraysEqual(newOrder, that.table.getOrder()))
+                        {
+                            that._renderTable(collection);
+                        }
+                    }
+
+                    that.trigger(REORDERED, {delta: delta});
                 },
                 error: function (jqXHR)
                 {

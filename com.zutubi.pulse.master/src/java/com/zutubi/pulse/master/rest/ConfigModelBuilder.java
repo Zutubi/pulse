@@ -184,6 +184,27 @@ public class ConfigModelBuilder
             }
         }
 
+        if (type.isOrdered() && isFieldSelected(filters, "order"))
+        {
+            List<String> declaredOrder = CollectionType.getDeclaredOrder(record);
+            if (declaredOrder.size() > 0)
+            {
+                model.setDeclaredOrder(declaredOrder);
+                if (record instanceof TemplateRecord)
+                {
+                    TemplateRecord templateRecord = (TemplateRecord) record;
+                    String orderTemplateOwner = templateRecord.getMetaOwner(CollectionType.ORDER_KEY);
+                    String orderOverriddenOwner = null;
+                    if (orderTemplateOwner.equals(templateRecord.getOwner()) && templateRecord.getParent() != null)
+                    {
+                        orderOverriddenOwner = templateRecord.getParent().getMetaOwner(CollectionType.ORDER_KEY);
+                    }
+
+                    model.decorateWithOrderTemplateDetails(orderTemplateOwner, orderOverriddenOwner);
+                }
+            }
+        }
+
         templateDecorateModel(path, record, model);
 
         return model;

@@ -53,10 +53,10 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         String order = record.getMeta(ORDER_KEY);
         if(order == null || order.length() == 0)
         {
-            return new LinkedList<String>();
+            return new ArrayList<>();
         }
 
-        return new LinkedList<String>(WebUtils.splitAndDecode(SEPARATOR, order));
+        return new ArrayList<>(WebUtils.splitAndDecode(SEPARATOR, order));
     }
 
     public List<String> getOrder(Record record)
@@ -79,7 +79,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         }
 
         // Add remaining keys (i.e. those not represented in the order)
-        List<String> remaining = new LinkedList<String>(keySet);
+        List<String> remaining = new ArrayList<>(keySet);
         remaining.removeAll(order);
         Collections.sort(remaining, getKeyComparator(record));
         order.addAll(remaining);

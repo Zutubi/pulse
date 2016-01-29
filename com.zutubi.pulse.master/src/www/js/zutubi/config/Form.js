@@ -509,26 +509,6 @@
             return value === null || value === "";
         },
 
-        _arraysEqual: function(a1, a2)
-        {
-            var i;
-
-            if (a1.length !== a2.length)
-            {
-                return false;
-            }
-
-            for (i = 0; i < a1.length; i++)
-            {
-                if (a1[i] !== a2[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-
         _valuesEqual: function(v1, v2)
         {
             if (this._isEmptyValue(v1))
@@ -538,7 +518,7 @@
 
             if (Array.isArray(v1))
             {
-                return Array.isArray(v2) && this._arraysEqual(v1, v2);
+                return Array.isArray(v2) && this.Zutubi.core.arraysEqual(v1, v2);
             }
 
             return String(v1) === String(v2);

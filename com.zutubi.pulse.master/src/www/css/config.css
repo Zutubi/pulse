@@ -206,8 +206,12 @@
     margin-bottom: 8px;
 }
 
-.k-collection-add {
+.k-collection-actions {
     float: right;
+}
+
+.k-collection-ordered-indicator {
+    margin: 0 1.4em 0 0.2em;
 }
 
 .k-collection-table td {
