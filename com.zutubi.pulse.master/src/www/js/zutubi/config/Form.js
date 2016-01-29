@@ -221,8 +221,10 @@
         _addFieldDecorations: function(field, fieldOptions, decorationsElement)
         {
             var inheritedFrom = this._fieldParameter(fieldOptions, "inheritedFrom"),
+                readOnly = this.options.readOnly,
                 overriddenOwner,
                 el,
+                items,
                 icon;
 
             if (inheritedFrom)
@@ -242,18 +244,25 @@
                 overriddenOwner = this._fieldParameter(fieldOptions, "overriddenOwner");
                 if (overriddenOwner)
                 {
-                    el = $('<span></span>').appendTo(decorationsElement);
-                    icon = el.kendoZaTemplateIcon({
-                        spriteCssClass: "fa fa-arrow-circle-right",
-                        items: [{
-                            text: "overrides value defined in " + kendo.htmlEncode(overriddenOwner),
-                            action: "navigate",
-                            owner: overriddenOwner
-                        }, {
+                    items = [{
+                        text: "overrides value defined in " + kendo.htmlEncode(overriddenOwner),
+                        action: "navigate",
+                        owner: overriddenOwner
+                    }];
+
+                    if (!readOnly)
+                    {
+                        items.push({
                             text: "revert to inherited value",
                             action: "revert",
                             field: field
-                        }]
+                        });
+                    }
+
+                    el = $('<span></span>').appendTo(decorationsElement);
+                    icon = el.kendoZaTemplateIcon({
+                        spriteCssClass: "fa fa-arrow-circle-right",
+                        items: items
                     }).data("kendoZaTemplateIcon");
                 }
             }
