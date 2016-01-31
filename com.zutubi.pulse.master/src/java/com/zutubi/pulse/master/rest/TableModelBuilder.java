@@ -21,10 +21,12 @@ import java.util.List;
  */
 public class TableModelBuilder
 {
+    private static final String KEY_TABLE_HEADING = "table.heading";
+
     public TableModel createTable(CollectionType collectionType)
     {
         CompositeType targetType = (CompositeType) collectionType.getCollectionType();
-        TableModel model = new TableModel(ToveUtils.getTableHeading(targetType));
+        TableModel model = new TableModel(getTableHeading(targetType));
 
         Table tableAnnotation = targetType.getAnnotation(Table.class, true);
         List<String> columnNames;
@@ -41,6 +43,20 @@ public class TableModelBuilder
 
         return model;
     }
+
+    private String getTableHeading(CompositeType type)
+    {
+        Messages messages = Messages.getInstance(type.getClazz());
+        if(messages.isKeyDefined(KEY_TABLE_HEADING))
+        {
+            return messages.format(KEY_TABLE_HEADING);
+        }
+        else
+        {
+            return ToveUtils.getPluralLabel(messages);
+        }
+    }
+
 
     private void addColumns(TableModel model, List<String> columnNames, CompositeType targetType)
     {

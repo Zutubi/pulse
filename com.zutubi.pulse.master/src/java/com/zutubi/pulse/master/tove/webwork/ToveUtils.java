@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -10,9 +8,7 @@ import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.annotations.Password;
-import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
@@ -20,17 +16,14 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
-import java.util.*;
-
-import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.Lists.newArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Webwork environment specific tove utility methods.
@@ -38,12 +31,6 @@ import static com.google.common.collect.Lists.newArrayList;
 public class ToveUtils
 {
     public static final String SUPPRESSED_PASSWORD = "[suppressed password]";
-
-    private static final String KEY_LABEL = "label";
-    private static final String KEY_FORM_HEADING = "form.heading";
-    private static final String KEY_TABLE_HEADING = "table.heading";
-
-    private static final Sort.StringComparator STRING_COMPARATOR = new Sort.StringComparator();
 
     public static String getConfigURL(String path, String action, String submitField, String namespace)
     {
@@ -70,140 +57,6 @@ public class ToveUtils
         }
 
         return result;
-    }
-
-    public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        Type type = configurationTemplateManager.getType(path);
-        return getPathListing(path, type, configurationTemplateManager, configurationSecurityManager).size() > 0;
-    }
-
-    public static boolean isLeaf(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        return !isFolder(path, configurationTemplateManager, configurationSecurityManager);
-    }
-
-    // FIXME kendo this can die, it handles collapsed collections
-    public static List<String> getPathListing(String path, Type type, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        List<String> listing = Collections.emptyList();
-
-        if (path.length() == 0)
-        {
-            listing = new ArrayList<>(configurationTemplateManager.getPersistentScopes());
-            Collections.sort(listing, STRING_COMPARATOR);
-            listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
-        }
-        else if (type instanceof MapType)
-        {
-            Record record = configurationTemplateManager.getRecord(path);
-            if (record != null)
-            {
-                listing = new ArrayList<>(((CollectionType) type).getOrder(record));
-                listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
-            }
-        }
-        else if (type instanceof CompositeType)
-        {
-            CompositeType compositeType = (CompositeType) type;
-            String collapsedCollection = getCollapsedCollection(path, compositeType, configurationSecurityManager);
-            if (collapsedCollection == null)
-            {
-                listing = getSortedNestedProperties(path, compositeType, configurationTemplateManager, configurationSecurityManager);
-            }
-            else
-            {
-                Type collapsedType = compositeType.getPropertyType(collapsedCollection);
-                listing = getPathListing(PathUtils.getPath(path, collapsedCollection), collapsedType, configurationTemplateManager, configurationSecurityManager);
-            }
-        }
-
-        return listing;
-    }
-
-    private static List<String> getSortedNestedProperties(final String path, final CompositeType type, final ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        List<String> result = new LinkedList<>();
-        List<String> nestedProperties = type.getNestedPropertyNames();
-        nestedProperties = configurationSecurityManager.filterPaths(path, nestedProperties, AccessManager.ACTION_VIEW);
-
-        // First process the order defined in @Listing (if any)
-        Listing annotation = type.getAnnotation(Listing.class, true);
-        if(annotation != null)
-        {
-            String[] definedOrder = annotation.order();
-            for(String property: definedOrder)
-            {
-                if(nestedProperties.remove(property))
-                {
-                    result.add(property);
-                }
-            }
-        }
-
-        // Remaining properties are sorted alphabetically by display name
-        if(nestedProperties.size() > 0)
-        {
-            final Record value = configurationTemplateManager.getRecord(path);
-
-            // Get property/display name pairs
-            List<Pair<String, String>> propertyDisplayPairs = newArrayList(Iterables.transform(nestedProperties, new Function<String, Pair<String, String>>()
-            {
-                public Pair<String, String> apply(String s)
-                {
-                    String propertyPath = PathUtils.getPath(path, s);
-                    ComplexType propertyType = configurationTemplateManager.getType(propertyPath);
-                    return new Pair<>(s, getDisplayName(propertyPath, propertyType, type, (Record) value.get(s)));
-                }
-            }));
-
-            // Sort by display name
-            Collections.sort(propertyDisplayPairs, new Comparator<Pair<String, String>>()
-            {
-                public int compare(Pair<String, String> o1, Pair<String, String> o2)
-                {
-                    return STRING_COMPARATOR.compare(o1.second, o2.second);
-                }
-            });
-
-            // Pull out property names and add to result
-            result.addAll(transform(propertyDisplayPairs, new Function<Pair<String, String>, String>()
-            {
-                public String apply(Pair<String, String> pair)
-                {
-                    return pair.first;
-                }
-            }));
-        }
-
-        return result;
-    }
-
-    public static String getCollapsedCollection(String path, Type type, ConfigurationSecurityManager configurationSecurityManager)
-    {
-        if (type instanceof CompositeType)
-        {
-            CompositeType compositeType = (CompositeType) type;
-            List<String> nestedProperties = compositeType.getNestedPropertyNames();
-            nestedProperties = configurationSecurityManager.filterPaths(path, nestedProperties, AccessManager.ACTION_VIEW);
-
-            if (nestedProperties.size() == 1)
-            {
-                String property = nestedProperties.get(0);
-                Type propertyType = compositeType.getProperty(property).getType();
-                if (propertyType instanceof CollectionType)
-                {
-                    return property;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static boolean isEmbeddedCollection(Type type)
-    {
-        return type instanceof ListType && type.getTargetType() instanceof ComplexType;
     }
 
     public static String getDisplayName(String path, ConfigurationTemplateManager configurationTemplateManager)
@@ -343,40 +196,13 @@ public class ToveUtils
         return ordered;
     }
 
-    public static String getFormHeading(CompositeType type)
-    {
-        Messages messages = Messages.getInstance(type.getClazz());
-        if(messages.isKeyDefined(KEY_FORM_HEADING))
-        {
-            return messages.format(KEY_FORM_HEADING);
-        }
-        else
-        {
-            // Default is just the label.
-            return messages.format(KEY_LABEL);
-        }
-    }
-
-    public static String getTableHeading(CompositeType type)
-    {
-        Messages messages = Messages.getInstance(type.getClazz());
-        if(messages.isKeyDefined(KEY_TABLE_HEADING))
-        {
-            return messages.format(KEY_TABLE_HEADING);
-        }
-        else
-        {
-            return getPluralLabel(messages);
-        }
-    }
-
     public static String getPluralLabel(Type type)
     {
         Messages messages = Messages.getInstance(type.getClazz());
         return getPluralLabel(messages);
     }
 
-    private static String getPluralLabel(Messages messages)
+    public static String getPluralLabel(Messages messages)
     {
         if (messages.isKeyDefined("label.plural"))
         {
