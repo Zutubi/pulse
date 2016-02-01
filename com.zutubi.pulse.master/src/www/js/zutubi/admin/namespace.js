@@ -249,7 +249,7 @@ if (window.Zutubi.admin === undefined)
 
         function _createNavbar(options)
         {
-            var navbar = $("#navbar").kendoZaNavbar(options).data("kendoZaNavbar");
+            var navbar = $("#navbar").kendoZaAdminNavbar(options).data("kendoZaAdminNavbar");
             navbar.bind("scope-selected", function(e)
             {
                 var path;
@@ -354,6 +354,7 @@ if (window.Zutubi.admin === undefined)
                 Zutubi.core.registerFeedbackHandler(app.notificationWidget);
                 app.router = _createRouter();
                 app.navbar = _createNavbar({
+                    section: "administration",
                     isAdmin: isAdmin,
                     projectCreateAllowed: projectCreateAllowed,
                     agentCreateAllowed: agentCreateAllowed
