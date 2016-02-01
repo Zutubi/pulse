@@ -128,8 +128,6 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
     {
         String fieldName = prefix + property.getName();
         TextFieldModel field = new TextFieldModel(fieldName, property.getName());
-        // FIXME kendo not handled on client, needs review with docs?
-        field.addParameter("help", property.getDescription());
         form.addField(field);
         formDefaults.put(fieldName, property.getValue());
         typeDocs.addProperty(createFromUnencodedString(fieldName, property.getName(), property.getDescription()));

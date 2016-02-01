@@ -19,7 +19,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException
     {
         response.addHeader("WWW-Authenticate", "PulseAPI realm=\"Pulse\"");
-        // FIXME kendo: this is hackish, how can we do better?
         response.getOutputStream().print("{type: 'NotAuthorized', message: 'Authentication required'}");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }

@@ -33,9 +33,6 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  * Builds {@link FormModel} instances out of annotated type information.
  *
- * FIXME kendo this replaces FormDescriptorFactory (FormModel replaces FormDescriptor, and Form
- *       dies because we instantiate on the client)
- *
  * FIXME kendo it feels like this belongs in Tove (along with the models) as it is not really
  *       specific to the RESTish API: it just makes a model that is not dependent on the backend
  *       (and thus is suitable to serialise for any purpose).  However, some other models are

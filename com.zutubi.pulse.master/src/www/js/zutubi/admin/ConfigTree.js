@@ -94,7 +94,6 @@
         },
 
         events: [
-            // FIXME kendo: to subscribe to our own select event we need to have this here, is there a better way?
             "dataBound",
             "select",
             PATHSELECT,
