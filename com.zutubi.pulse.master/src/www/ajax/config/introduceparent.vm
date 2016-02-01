@@ -1,7 +1,0 @@
-<div class="config-panel">
-    <h3 class="config-header">introduce template parent #i18n("key=label")</h3>
-    <div class="config-container">
-        $formSource
-    </div>
-    #standardFormEvents("form")
-</div>
