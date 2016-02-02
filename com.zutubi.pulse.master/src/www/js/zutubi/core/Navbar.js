@@ -8,6 +8,12 @@
         CLICK = "click" + ns,
         SELECT = "select";
 
+    // A basic item that can be clicked to navigate (to either a URL, or via a click callback).
+    //
+    // options:
+    //   - model: argument for the template (required unless create() is overridden in a subclass)
+    //     - click: if the model has a click property, this will be invoked when the item is clicked
+    //   - template: override the default template (the default creates a link with a url and content)
     Zutubi.core.NavbarItem = Widget.extend({
         init: function(element, options)
         {
@@ -58,11 +64,27 @@
         }
     });
 
+    // An item that presents a dropdown menu of textual items.  Items can be either plain links or raise select events
+    // on click.  The content of the item can be set in the original model and/or updated to the text of the selected
+    // item.
+    //
+    // options:
+    //   - items: array of item text (will be escaped when creating the menu)
+    //   - urls: optional array of urls corresponding to items (if not provided a select event is raised on item click)
+    //   - model: model passed to template, may define content (HTML) to populate the item
+    //   - updateOnSelect: if true, the content of the item is updated to the text of the selected item on select
+    //   - itemTemplate: template used to create menu items (when no urls are specified)
+    //   - urlItemTemplate: template used to create menu items (when urls are specified)
     Zutubi.core.MenuNavbarItem = Zutubi.core.NavbarItem.extend({
         options: {
             name: "ZaMenuNavbarItem",
-            itemTemplate: '<li>#: text #</li>',
-            urlItemTemplate: '<li><a href="#= url #">#: text #</a></li>'
+            template: '<div class="k-split-container"><a class="k-split-button">#= content #</a><a class="k-split-button-arrow"><span class="fa fa-caret-down"></span></a></div>',
+            model: {
+                content: ''
+            },
+            updateOnSelect: true,
+            itemTemplate: '<li><span class="k-selector-popup-item">#: text #</span></li>',
+            urlItemTemplate: '<li><a class="k-selector-popup-item" href="#= url #">#: text #</a></li>'
         },
 
         events: [
@@ -73,18 +95,17 @@
         {
             var that = this;
 
-            that.outer = $('<div class="k-split-container"></div>');
-            that.mainButton = $('<a class="k-split-button"></a>');
-            that.outer.append(that.mainButton);
-            that.arrowButton = $('<a class="k-split-button-arrow"><span class="fa fa-caret-down"></span></a>');
-            that.outer.append(that.arrowButton);
+            that.itemTemplate = kendo.template(that.options.itemTemplate);
+            that.urlItemTemplate = kendo.template(that.options.urlItemTemplate);
 
-            that.element.append(that.outer);
+            Zutubi.core.NavbarItem.fn.create.call(that);
+
+            that.mainButton = that.innerElement.find(".k-split-button");
+            that.mainButton.on(CLICK, jQuery.proxy(that._clicked, that));
+            that.arrowButton = that.innerElement.find(".k-split-button-arrow");
+            that.arrowButton.on(CLICK, jQuery.proxy(that._clicked, that));
 
             that.popup = that.createPopup();
-
-            that.mainButton.on(CLICK, jQuery.proxy(that._clicked, that));
-            that.arrowButton.on(CLICK, jQuery.proxy(that._clicked, that));
         },
 
         destroy: function()
@@ -104,22 +125,29 @@
                 i,
                 items = that.options.items,
                 urls = that.options.urls,
-                template = kendo.template(urls ? this.options.urlItemTemplate : this.options.itemTemplate),
+                template,
+                url,
+                anchor,
+                side,
                 popup;
 
             that.popupEl = $("<ul class='k-selector-popup'></ul>");
             for (i = 0; i < items.length; i++)
             {
+                url = urls ? urls[i] : '';
+                template = url ? that.urlItemTemplate : that.itemTemplate;
                 that.popupEl.append(template({
                     text: items[i],
-                    url: urls ? (window.baseUrl + urls[i]) : ""
+                    url: url
                 }));
             }
 
+            anchor = that.element.closest(".k-navitem");
+            side = anchor.hasClass("k-navright") ? "right" : "left";
             popup = that.popupEl.kendoPopup({
-                anchor: that.element.closest(".k-navitem"),
-                origin: "bottom left",
-                position: "top left"
+                anchor: anchor,
+                origin: "bottom " + side,
+                position: "top " + side
             }).data("kendoPopup");
 
             if (!urls)
@@ -133,7 +161,10 @@
         select: function(text)
         {
             this.selected = text;
-            this.mainButton.text(text);
+            if (this.options.updateOnSelect)
+            {
+                this.mainButton.text(text);
+            }
         },
 
         _clicked: function(e)
@@ -169,6 +200,11 @@
         }
     });
 
+    // An item that displays a button with icon and text that raises a click event when pressed.
+    //
+    // options:
+    //   - model: required model passed to the template, should define spriteCssClass and title for the default template
+    //   - template: can be set to override the default template
     Zutubi.core.ButtonNavbarItem = Zutubi.core.NavbarItem.extend({
         options: {
             name: "ZaButtonNavbarItem",
@@ -195,6 +231,17 @@
         }
     });
 
+    // A bar for top-level navigation of the UI, which sits right at the top of the screen and has some fixed items at
+    // both left and right ends, plus additional items between based on context.
+    //
+    // options:
+    //   - userName: name of the logged in user (unset if the user is a guest)
+    //   - userCanLogout: set to true if the current user may logout
+    //   - itemTemplate: template used to make elements on which items are instantiated (passed cls)
+    //   - extraItems: optional array of extra item configurations, each of which may contain:
+    //       - type: the item widget name (e.g. ZaMenuNavbarItem)
+    //       - cls: cls to pass to itemTemplate when making the element for the item
+    //       - options: passed to the item initialiser
     Zutubi.core.Navbar = Widget.extend({
         init: function(element, options)
         {
@@ -217,9 +264,39 @@
 
         create: function()
         {
-            var that = this;
+            var that = this,
+                sectionItems = [],
+                sectionUrls = [],
+                userItems = [],
+                userUrls = [];
 
             that.itemTemplate = kendo.template(that.options.itemTemplate);
+
+            if (that.options.userName)
+            {
+                sectionItems.push("dashboard", "my builds");
+                sectionUrls.push("/dashboard/", "/dashboard/my/");
+
+                userItems.push(that.options.userName);
+                userUrls.push("");
+                userItems.push("preferences");
+                userUrls.push("/dashboard/preferences/");
+                if (that.options.userCanLogout)
+                {
+                    userItems.push("logout");
+                    userUrls.push("/logout")
+                }
+            }
+            else
+            {
+                userItems.push("Guest");
+                userUrls.push("");
+                userItems.push("login");
+                userUrls.push("/login!input.action");
+            }
+
+            sectionItems.push("browse", "server", "agents", "administration");
+            sectionUrls.push("/browse/", "/server/", "/agents/", "/admin/");
 
             that.list = $('<div class="k-navlist"></div>');
             that.element.append(that.list);
@@ -229,12 +306,21 @@
                 content: '<span class="fa fa-heartbeat"></span>'
             });
 
+
             that.sectionItem = that._addItemElement().kendoZaMenuNavbarItem({
-                items: ["dashboard", "my builds", "browse", "server", "agents", "administration"],
-                urls: ["/dashboard/", "/dashboard/my/", "/browse/", "/server/", "/agents/", "/admin/"]
+                items: sectionItems,
+                urls: sectionUrls
             }).data("kendoZaMenuNavbarItem");
 
             that._createExtraItems();
+
+            that.userItem = that._addItemElement("k-navright").kendoZaMenuNavbarItem({
+                model: {
+                    content: '<span class="fa fa-user"></span>'
+                },
+                items: userItems,
+                urls: userUrls
+            }).data("kendoZaMenuNavbarItem");
 
             that.helpItem = that._addSimpleItem({
                 url: "#",
@@ -248,7 +334,7 @@
                     popup.focus();
                 },
                 content: '<span class="fa fa-question-circle"></span>'
-            }, 'k-navright');
+            });
         },
 
         _addItemElement: function(cls)

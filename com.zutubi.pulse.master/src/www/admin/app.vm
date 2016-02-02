@@ -39,7 +39,17 @@
 </div>
 
 <script>
-    Zutubi.admin.init($admin, $projectCreateAllowed, $agentCreateAllowed);
+    var userName,
+        canLogout = false;
+
+#if($loggedInUser)
+    userName = '#jss($loggedInUser.name)';
+#end
+#if($canLogout)
+    canLogout = true;
+#end
+
+    Zutubi.admin.init(userName, canLogout, $admin, $projectCreateAllowed, $agentCreateAllowed);
 
     $(document).ready(function()
     {

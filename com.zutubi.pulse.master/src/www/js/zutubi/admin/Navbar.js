@@ -16,6 +16,12 @@
     Zutubi.admin.ScopeCrumb = MenuNavbarItem.extend({
         init: function(element, options)
         {
+            options.items = ["projects", "agents"];
+            if (options.isAdmin)
+            {
+                options.items.push("settings", "users", "groups", "plugins");
+            }
+
             MenuNavbarItem.fn.init.call(this, element, options);
 
             this.select("projects");
@@ -23,50 +29,6 @@
 
         options: {
             name: "ZaScopeCrumb"
-        },
-
-        createPopup: function()
-        {
-            var that = this,
-                i,
-                popup;
-
-            that.scopes = ["projects", "agents"];
-            if (that.options.isAdmin)
-            {
-                that.scopes.push("settings", "users", "groups", "plugins");
-            }
-
-            that.popupEl = $("<ul class='k-selector-popup'></ul>");
-            for (i = 0; i < that.scopes.length; i++)
-            {
-                that.popupEl.append("<li>" + that.scopes[i] + "</li>");
-            }
-
-            popup = that.popupEl.kendoPopup({
-                anchor: that.element.closest(".k-navitem"),
-                origin: "bottom left",
-                position: "top left"
-            }).data("kendoPopup");
-
-            that.popupEl.on("click", jQuery.proxy(that._onPopupClicked, that));
-            return popup;
-        },
-
-        _onPopupClicked: function(e)
-        {
-            var that = this,
-                target = kendo.eventTarget(e),
-                item = $(target).closest("li");
-
-            e.preventDefault();
-
-            if (item)
-            {
-                that.popup.close();
-                that.select(item.text());
-                that.trigger(SELECT, {scope: that.selected});
-            }
         }
     });
 

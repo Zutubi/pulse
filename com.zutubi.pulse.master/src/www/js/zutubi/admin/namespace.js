@@ -347,7 +347,7 @@ if (window.Zutubi.admin === undefined)
                 "status": "heartbeat"
             },
 
-            init: function(isAdmin, projectCreateAllowed, agentCreateAllowed)
+            init: function(userName, canLogout, isAdmin, projectCreateAllowed, agentCreateAllowed)
             {
                 app.isAdmin = isAdmin;
                 app.notificationWidget = _createNotificationWidget();
@@ -355,6 +355,8 @@ if (window.Zutubi.admin === undefined)
                 app.router = _createRouter();
                 app.navbar = _createNavbar({
                     section: "administration",
+                    userName: userName,
+                    userCanLogout: canLogout,
                     isAdmin: isAdmin,
                     projectCreateAllowed: projectCreateAllowed,
                     agentCreateAllowed: agentCreateAllowed

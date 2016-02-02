@@ -95,18 +95,22 @@
     border-top: none;
 }
 
-.k-selector-popup li {
+.k-selector-popup-item {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
     padding: 8px 12px;
     line-height: 1.2em;
     cursor: pointer;
+    color: #787878;
 }
 
 .k-selector-popup a {
-    color: #787878;
     text-decoration: none;
 }
 
-.k-selector-popup li:hover {
+.k-selector-popup-item:hover {
     color: #fff;
     background-color: #8ebc00;
 }
