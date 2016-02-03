@@ -295,7 +295,7 @@
                 userUrls.push("/login!input.action");
             }
 
-            sectionItems.push("browse", "server", "agents", "administration");
+            sectionItems.push("projects", "server", "agents", "administration");
             sectionUrls.push("/browse/", "/server/", "/agents/", "/admin/");
 
             that.list = $('<div class="k-navlist"></div>');

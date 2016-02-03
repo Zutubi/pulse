@@ -1,46 +1,5 @@
 /* Styles for the Zutubi.core JS package. */
 
-.k-property-table th, .k-property-table td {
-    padding: 0.5em;
-    border: solid 1px #eee;
-}
-
-.k-property-table .k-title {
-    font-weight: bold;
-}
-
-.k-property-table th {
-    font-weight: bold;
-    text-align: right;
-}
-
-/* Prompt Window */
-
-.k-dialog-window-content {
-    padding: 0.4em;
-}
-
-.k-dialog-window-content p {
-    margin-bottom: 0.5em;
-}
-
-.k-dialog-window-content ul {
-    margin-left: 1.6em;
-    list-style-type: disc;
-}
-
-.k-dialog-window-content li {
-    margin: 0.4em 0;
-}
-
-.k-dialog-window-actions {
-    text-align: center;
-}
-
-.k-dialog-window-actions .k-button {
-    margin: 0.4em;
-}
-
 /* Navbar */
 
 #navbar {
@@ -115,6 +74,17 @@
     background-color: #8ebc00;
 }
 
+/* Main content area (between nav and footer */
+
+#content {
+    position: fixed;
+    top: 34px;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    overflow: auto;
+}
+
 /* Footer bar */
 
 #footer {
@@ -132,6 +102,50 @@
 
 #footer a {
     text-decoration: none;
+    border: none;
     font-weight: bold;
     color: #aaa;
+}
+
+/* Property Tables */
+
+.k-property-table th, .k-property-table td {
+    padding: 0.5em;
+    border: solid 1px #eee;
+}
+
+.k-property-table .k-title {
+    font-weight: bold;
+}
+
+.k-property-table th {
+    font-weight: bold;
+    text-align: right;
+}
+
+/* Prompt Window */
+
+.k-dialog-window-content {
+    padding: 0.4em;
+}
+
+.k-dialog-window-content p {
+    margin-bottom: 0.5em;
+}
+
+.k-dialog-window-content ul {
+    margin-left: 1.6em;
+    list-style-type: disc;
+}
+
+.k-dialog-window-content li {
+    margin: 0.4em 0;
+}
+
+.k-dialog-window-actions {
+    text-align: center;
+}
+
+.k-dialog-window-actions .k-button {
+    margin: 0.4em;
 }

@@ -104,6 +104,11 @@
                         Ext.QuickTips.init();
 
                           var toolbarConfig = {};
+#if($page.getProperty("page.selectedTab"))
+                          toolbarConfig.section = '$page.getProperty("page.selectedTab")';
+#else
+                          toolbarConfig.section = 'dashboard';
+#end
                           toolbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
 #if($personalBuild)
                           toolbarConfig.personalBuild = true;
@@ -143,64 +148,52 @@
 #else
 #set($helpPage = "Home")
 #end
-                        var toolbar = new Zutubi.PulseHeader(toolbarConfig);
-                        toolbar.render('header');
 
-                        // If there is a tab bar, drop it in to the north div.
-                        var tabbar = Ext.get('tabbar');
+                        $("#navbar").kendoZaNavbar(toolbarConfig);
+
+                        // If there is a tab bar, drop it into place.
+                        var tabbar = Ext.get('tabbar'),
+                                tabbarHeight = 0;
                         if(tabbar)
                         {
-                            var north = Ext.get('north');
+                            var north = Ext.get('tabbar-wrapper');
                             north.appendChild(tabbar);
+                            tabbarHeight = 39;
                         }
 
                         Ext.get('center').setStyle('margin', '16px');
 
-                        viewport = new Ext.Viewport({
+                        viewport = new Ext.Panel({
                             layout: 'border',
+                            id: 'nested-layout',
+                            renderTo: 'content',
+                            height: $(window).height() - 54 - tabbarHeight,
+                            border: false,
                             defaults: {
                                 layout: 'fit',
                                 border: false
                             },
                             items: [{
                                 region: 'north',
-                                contentEl: 'north',
-                                split: false
-                            }, {
-                                region: 'south',
-                                contentEl: 'south',
-                                split: false
+                                contentEl: 'status-area',
+                                id: 'status-component',
+                                split: false,
+                                hidden: true
                             }, {
                                 region: 'center',
-                                layout: 'border',
-                                id: 'nested-layout',
-                                autoScroll: false,
-                                defaults: {
-                                    layout: 'fit',
-                                    border: false
-                                },
-                                items: [{
-                                    region: 'north',
-                                    contentEl: 'status-area',
-                                    id: 'status-component',
-                                    split: false,
-                                    hidden: true
-                                }, {
-                                    region: 'center',
-                                    id: 'nested-center',
-                                    contentEl: 'center',
-                                    split: false,
-                                    autoScroll: true
-                                }, {
-                                    region: 'west',
-                                    id: 'nested-west',
-                                    split: true,
-                                    titlebar: false,
-                                    collapsible: true,
-                                    collapseMode:'mini',
-                                    hideCollapseTool:true,
-                                    hidden: true
-                                }]
+                                id: 'nested-center',
+                                contentEl: 'center',
+                                split: false,
+                                autoScroll: true
+                            }, {
+                                region: 'west',
+                                id: 'nested-west',
+                                split: true,
+                                titlebar: false,
+                                collapsible: true,
+                                collapseMode:'mini',
+                                hideCollapseTool:true,
+                                hidden: true
                             }]
                         });
 
@@ -215,6 +208,12 @@
                         {
                             focusLink.focus();
                         }
+
+                        $(window).resize(function()
+                        {
+                            var w = $(window);
+                            viewport.setSize(w.width(), w.height() - 54 - tabbarHeight);
+                        });
                     }
                 };
             }();
@@ -277,38 +276,26 @@
 	</head>
 
     <body #if($page.getProperty("page.onLoad")) onload="$page.getProperty('page.onLoad')" #end >
-      <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
-      <div id="north">
-          <div id="header"></div>
 
-#if($page.getProperty("page.selectedTab"))
-    #set ($selectedTab = $page.getProperty("page.selectedTab"))
-#end
-          <ul id="nav">
-#if($loggedInUser)
-            <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/">dashboard</a></li>
-#end
-            <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
-            <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end id="tab.queues" href="$base/server/">server</a></li>
-            <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
-            <li class="admin-tab"><a id="tab.administration" href="$base/admin/hierarchy/projects"><span class="fa fa-cog"></span> administration</a></li>
-          </ul>
-          <div class="clear"></div>
+    <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
+
+      <div id="navbar"></div>
+
+      <div id="content">
+          <div id="tabbar-wrapper"></div>
+
+          <div id="status-area" class="x-layout-inactive-content status-message" style="display: none">
+              <span style="float: right"><a class="unadorned" href="#" onclick="hideStatus(); return false;"><img src="$base/images/close.gif" alt="close"/></a></span>
+              <span id="status-message"></span>
+          </div>
+
+          <div id="center">
+              <a id="focus-link" href="#" style="position: absolute; top: -10px; left: -10px"></a>
+              $body
+          </div>
       </div>
 
-      <div id="status-area" class="x-layout-inactive-content status-message" style="display: none">
-          <span style="float: right"><a class="unadorned" href="#" onclick="hideStatus(); return false;"><img src="$base/images/close.gif" alt="close"/></a></span>
-          <span id="status-message"></span>
-      </div>
-
-      <div id="content" class="x-layout-inactive-content"></div>
-
-      <div id="center">
-          <a id="focus-link" href="#" style="position: absolute; top: -10px; left: -10px"></a>          
-          $body
-      </div>
-        
-      <div id="south">
+      <div id="footer">
          <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
          <b>::</b> copyright &copy; 2005-2016 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
          <a href="http://jira.zutubi.com/">report bug/request feature</a>

@@ -12,17 +12,6 @@ body {
     border-top: none;
 }
 
-/* Main content area (between nav and footer */
-
-#content {
-    position: fixed;
-    top: 34px;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    overflow: auto;
-}
-
 .k-nav-error {
     padding: 1em;
     color: #bb2222;
