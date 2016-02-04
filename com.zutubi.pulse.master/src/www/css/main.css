@@ -24,30 +24,35 @@ pre
     padding: 0
 }
 
-/* Kendo Content */
+/* Kendo Content/resets */
 
-#content {
+#content, #menus-window {
     font-family: Verdana, sans-serif;
     font-size: 12px;
 }
 
-#content a:link, #content a:visited
+#content a:link, #content a:visited, #menus-window a:link, #menus-window a:visited
 {
     color: #668;
     text-decoration: none;
 }
 
-#content a:hover
+#content a:hover, #menus-window a:hover
 {
     color: #336;
     border-bottom: solid 2px #336;
 }
 
-#content a
+#content a, #menus-window a
 {
     font-weight: bold;
     text-decoration: none;
     border-bottom: dotted 1px #336;
+}
+
+#content .x-tree-node a
+{
+    font-weight: normal;
 }
 
 /* Tab Bar */
@@ -212,7 +217,7 @@ strong
     font-weight: bold;
 }
 
-#content a.unadorned, #content a.unadorned:hover, #content a.x-tabs-right, #content a.x-tabs-right:hover, #content .x-tree-node a, #content .x-tree-node a:hover
+#content a.unadorned, #content a.unadorned:hover, #menus-window a.unadorned, #menus-window a.unadorned:hover, #content a.x-tabs-right, #content a.x-tabs-right:hover, #content .x-tree-node a, #content .x-tree-node a:hover
 {
     border-bottom: none;
 }
