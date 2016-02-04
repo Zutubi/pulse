@@ -394,3 +394,9 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         });
     }
 }); }
+
+Ext.util.Format.plainToHtml = function(s)
+{
+    return Ext.util.Format.htmlEncode(s).replace(/(\s) /g, '$1&nbsp;').replace(/\r?\n/g, '<br/>');
+};
+
