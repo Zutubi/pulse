@@ -37,6 +37,11 @@
             name: "ZaHierarchyCrumb"
         },
 
+        hasPopup: function()
+        {
+            return true;
+        },
+
         createPopup: function()
         {
             var that = this,
@@ -169,11 +174,6 @@
             }
 
             this._updateAddButton(scope);
-        },
-
-        applyDelta: function(delta)
-        {
-            this.hierarchyCrumb.applyDelta(delta);
         },
 
         _updateAddButton: function()

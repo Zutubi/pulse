@@ -92,7 +92,17 @@
         setPaths: function(rootPath, configPath, lazy)
         {
             var that = this,
-                path = rootPath;
+                path = rootPath,
+                scope = Zutubi.config.subPath(path, 0, 1);
+
+            if (scope === "projects" || scope === "agents")
+            {
+                that.hierarchyButton.show();
+            }
+            else
+            {
+                that.hierarchyButton.hide();
+            }
 
             if (configPath && configPath.length > 0)
             {

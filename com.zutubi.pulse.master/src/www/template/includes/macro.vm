@@ -27,7 +27,7 @@
 ##
 #macro(userTags $user)
     <content tag="personalBuild">true</content>
-    <content tag="selectedTab">dashboard</content>
+    <content tag="selectedTab">my builds</content>
 #end
 
 ##
@@ -294,24 +294,6 @@
         #adminTab("plugins" "$base/admin/plugins/" $selected)
 #end
 #closeTabs()
-#end
-
-##
-## Shows a dashboard tab of the given name with the given action name
-##
-#macro(dashboardTab $name $action $selected)
-    #tabItem("tab.dashboard.$name" $name "${action}" $selected)
-#end
-
-##
-## Shows the tab bar for dashboard pages with the given tab selected.
-##
-#macro(dashboardTabs $selected)
-    #openTabs()
-        #dashboardTab("homepage" "$base/dashboard/home/" $selected)
-        #dashboardTab("my-builds" "$base/dashboard/my/" $selected)
-        #dashboardTab("preferences" "$base/dashboard/preferences/" $selected)
-    #closeTabs()
 #end
 
 ##

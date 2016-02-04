@@ -345,7 +345,7 @@ function triggerBuild(projectName, triggerName, prompt, successCb)
     if (prompt)
     {
         actionWindow = new Zutubi.config.ActionWindow({
-            path: "projects/" + Zutubi.config.encodePath(projectName),
+            path: "projects/" + projectName,
             action: {
                 action: 'trigger',
                 variant: triggerName,

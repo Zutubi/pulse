@@ -1,21 +1,17 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
-<content tag="header.javascript">
-    zutubi/admin/package.js
-</content>
 <html>
 <head>
     <title>#wwtext("name=preferences")</title>
+    <script>
+        $(document).ready(function()
+        {
+            window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
+            window.configPanel.setPaths("users/" + window.userName + "/preferences", "");
+        });
+    </script>
 </head>
 <body>
-    #dashboardTabs("preferences")
-
-    <div id="config-view" style="position: fixed; top: 93px; bottom: 20px; left: 0; right: 0; overflow: auto;"></div>
-
-    <script>
-        window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
-        window.configPanel.setPaths("users/#jss($principle.login)/preferences", "");
-    </script>
 </body>
 </html>

@@ -73,7 +73,7 @@
             ext/package.js
             ext/StatusBar.js
             widget/treegrid/package.js
-            zutubi/core/package.js
+            zutubi/reporting/package.js
             main.js
             zutubi.js
         #end
@@ -103,53 +103,49 @@
                     init: function() {
                         Ext.QuickTips.init();
 
-                          var toolbarConfig = {};
+                        var navbarType = "Navbar";
+                        var navbarConfig = {};
+
 #if($page.getProperty("page.selectedTab"))
-                          toolbarConfig.section = '$page.getProperty("page.selectedTab")';
+                        navbarConfig.section = '$page.getProperty("page.selectedTab")';
 #else
-                          toolbarConfig.section = 'dashboard';
+                        navbarConfig.section = 'dashboard';
 #end
-                          toolbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
-#if($personalBuild)
-                          toolbarConfig.personalBuild = true;
-                          toolbarConfig.projectName = 'my builds';
-                          toolbarConfig.projectUrl = '#jss($urls.dashboardMyBuilds())';
-#if($u_stageName)
-                          toolbarConfig.stageName = '#jss($h_stageName)';
-                          toolbarConfig.stageUrl = '#jss($urls.dashboardMyBuildStageDetails($buildNumber, $u_stageName))';
-#end
-#elseif($u_projectName)
-                          toolbarConfig.personalBuild = false;
-                          toolbarConfig.projectName = '#jss($h_projectName)';
-                          toolbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
-#if($u_stageName)
-                          toolbarConfig.stageName = '#jss($h_stageName)';
-                          toolbarConfig.stageUrl = '#jss($urls.stageDetails($u_projectName, $buildNumber, $u_stageName))';
-#end
-#end
-#if($buildNumber && $buildNumber != "0")
-                          toolbarConfig.buildId = '$buildResult.id';
-#if ($action.viewport)
-                          toolbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
-#end
-#end
-#if($u_agentName)
-                          toolbarConfig.agentName = '#jss($h_agentName)';
-                          toolbarConfig.agentUrl = '#jss($urls.agentStatus($u_agentName))';
-#end
+                        navbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
+
 #if($loggedInUser)
-                          toolbarConfig.userName = Ext.util.Format.htmlEncode('#jss($loggedInUser.config.name)');
-#if($canLogout)
-                          toolbarConfig.userCanLogout = true;
+                        navbarConfig.userName = Ext.util.Format.htmlEncode('#jss($loggedInUser.config.name)');
+    #if($canLogout)
+                        navbarConfig.userCanLogout = true;
+    #end
 #end
+
+#if($personalBuild)
+                        navbarType = "UserNavbar";
+#elseif($u_projectName)
+                        navbarType = "ProjectNavbar";
+                        navbarConfig.projectName = '#jss($h_projectName)';
+                        navbarConfig.projectUrl = '#jss($urls.projectHome($u_projectName))';
+#elseif($u_agentName)
+                        navbarType = "AgentNavbar";
+                        navbarConfig.agentName = '#jss($h_agentName)';
+                        navbarConfig.agentUrl = '#jss($urls.agentStatus($u_agentName))';
 #end
+
+#if($buildNumber && $buildNumber != "0")
+                        navbarConfig.buildId = '$buildResult.id';
+    #if ($action.viewport)
+                        navbarConfig.data = Ext.util.JSON.decode('#json($action.viewport)');
+    #end
+#end
+
 #if($helpPage)
 
 #else
 #set($helpPage = "Home")
 #end
 
-                        $("#navbar").kendoZaNavbar(toolbarConfig);
+                        $("#navbar")["kendoZa" + navbarType](navbarConfig);
 
                         // If there is a tab bar, drop it into place.
                         var tabbar = Ext.get('tabbar'),

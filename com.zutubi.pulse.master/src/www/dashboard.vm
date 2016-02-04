@@ -87,8 +87,6 @@
 #end
 </head>
 <body>
-    #dashboardTabs("homepage")
-
 <div id="dashboard-content" style="padding-bottom: 20px;">
     <table class="columns" width="98%">
         <tr>

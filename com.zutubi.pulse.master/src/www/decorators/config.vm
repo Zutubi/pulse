@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <link href="${base}/css/reset.css?#version()" rel="stylesheet"/>
+
+    <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/admina.css?#version()" rel="stylesheet"/>
+
+    <script>
+        window.baseUrl = "${base}";
+        window.apiPath = "/api";
+
+#if($loggedInUser)
+        window.userName = '#jss($loggedInUser.name)';
+#end
+#if($canLogout)
+        window.canLogout = true;
+#else
+        window.canLogout = false;
+#end
+    </script>
+
+    #javascript()
+        zutubi/admin/package.js
+    #end
+
+    <script>
+        var navbarConfig = {
+            userName: window.userName,
+            userCanLogout: window.canLogout
+        };
+
+#if($page.getProperty("page.selectedTab"))
+        navbarConfig.section = '$page.getProperty("page.selectedTab")';
+#else
+        navbarConfig.section = 'dashboard';
+#end
+
+        $(document).ready(function()
+        {
+            $("#navbar").kendoZaNavbar(navbarConfig);
+        });
+    </script>
+
+    <title>:: pulse :: #if ($title) $title #end</title>
+
+    $head
+</head>
+
+<body>
+    <div id="navbar">
+    </div>
+
+    <div id="content">
+        <div id="notification"></div>
+        <div id="config-view" style="height: 100%; width: 100%">
+        </div>
+    </div>
+
+    <div id="footer">
+        <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+        <b>::</b> copyright &copy; 2005-2016 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+        <a href="http://jira.zutubi.com/">report bug/request feature</a>
+    </div>
+</body>
+</html>

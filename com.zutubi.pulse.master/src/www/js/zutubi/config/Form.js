@@ -518,7 +518,7 @@
 
             if (Array.isArray(v1))
             {
-                return Array.isArray(v2) && this.Zutubi.core.arraysEqual(v1, v2);
+                return Array.isArray(v2) && Zutubi.core.arraysEqual(v1, v2);
             }
 
             return String(v1) === String(v2);

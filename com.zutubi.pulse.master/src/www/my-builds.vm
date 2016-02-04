@@ -1,6 +1,6 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
-<content tag="selectedTab">dashboard</content>
+<content tag="selectedTab">my builds</content>
 <content tag="header.javascript">
     zutubi/pulse/project/dashboard/MyBuildsPanel.js
 </content>
@@ -27,8 +27,6 @@
 #end
 </head>
 <body>
-    #dashboardTabs("my-builds")
-
     <div id="my-builds-loading">
     </div>
 </body>

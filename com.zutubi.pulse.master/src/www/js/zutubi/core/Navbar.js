@@ -6,7 +6,8 @@
         Widget = ui.Widget,
         ns = ".kendoZaNavbar",
         CLICK = "click" + ns,
-        SELECT = "select";
+        SELECT = "select",
+        DATA = "data" + ns;
 
     // A basic item that can be clicked to navigate (to either a URL, or via a click callback).
     //
@@ -68,13 +69,18 @@
     // on click.  The content of the item can be set in the original model and/or updated to the text of the selected
     // item.
     //
+    // You can use this class as a base for other navbar items with popups that are not simple menus by overriding
+    // hasPopup and createPopup as desired.  In that case no items are required, or they can be repurposed.
+    //
     // options:
-    //   - items: array of item text (will be escaped when creating the menu)
-    //   - urls: optional array of urls corresponding to items (if not provided a select event is raised on item click)
+    //   - items: array of items. Each one may be just text (will be escaped when creating the menu), or an object with
+    //            text plus other optional properties:
+    //     - url: url the item links to (if not provided a select event is raised on item click)
+    //     - inactive: if set to true, clicking on the item does nothing (ignored if a url is provided)
     //   - model: model passed to template, may define content (HTML) to populate the item
     //   - updateOnSelect: if true, the content of the item is updated to the text of the selected item on select
-    //   - itemTemplate: template used to create menu items (when no urls are specified)
-    //   - urlItemTemplate: template used to create menu items (when urls are specified)
+    //   - itemTemplate: template used to create menu items (when the item has no URL)
+    //   - urlItemTemplate: template used to create menu items (when the item has a url)
     Zutubi.core.MenuNavbarItem = Zutubi.core.NavbarItem.extend({
         options: {
             name: "ZaMenuNavbarItem",
@@ -101,11 +107,19 @@
             Zutubi.core.NavbarItem.fn.create.call(that);
 
             that.mainButton = that.innerElement.find(".k-split-button");
-            that.mainButton.on(CLICK, jQuery.proxy(that._clicked, that));
             that.arrowButton = that.innerElement.find(".k-split-button-arrow");
-            that.arrowButton.on(CLICK, jQuery.proxy(that._clicked, that));
 
-            that.popup = that.createPopup();
+            if (that.hasPopup())
+            {
+                that.mainButton.on(CLICK, jQuery.proxy(that._clicked, that));
+                that.arrowButton.on(CLICK, jQuery.proxy(that._clicked, that));
+
+                that.popup = that.createPopup();
+            }
+            else
+            {
+                that.arrowButton.hide();
+            }
         },
 
         destroy: function()
@@ -119,14 +133,20 @@
             Zutubi.core.NavbarItem.fn.destroy.call(this);
         },
 
+        hasPopup: function()
+        {
+            return this.options.items && this.options.items.length > 0;
+        },
+
         createPopup: function()
         {
             var that = this,
                 i,
                 items = that.options.items,
-                urls = that.options.urls,
+                item,
+                model,
                 template,
-                url,
+                el,
                 anchor,
                 side,
                 popup;
@@ -134,12 +154,22 @@
             that.popupEl = $("<ul class='k-selector-popup'></ul>");
             for (i = 0; i < items.length; i++)
             {
-                url = urls ? urls[i] : '';
-                template = url ? that.urlItemTemplate : that.itemTemplate;
-                that.popupEl.append(template({
-                    text: items[i],
-                    url: url
-                }));
+                item = items[i];
+                if (typeof item === "string")
+                {
+                    model = {
+                        text: item
+                    }
+                }
+                else
+                {
+                    model = item;
+                }
+
+                template = model.url ? that.urlItemTemplate : that.itemTemplate;
+                el = $(template(model));
+                el.data(DATA, model);
+                that.popupEl.append(el);
             }
 
             anchor = that.element.closest(".k-navitem");
@@ -150,11 +180,7 @@
                 position: "top " + side
             }).data("kendoPopup");
 
-            if (!urls)
-            {
-                that.popupEl.on(CLICK, jQuery.proxy(that._itemClicked, that));
-            }
-
+            that.popupEl.on(CLICK, jQuery.proxy(that._itemClicked, that));
             return popup;
         },
 
@@ -187,15 +213,20 @@
         {
             var that = this,
                 target = kendo.eventTarget(e),
-                item = $(target).closest("li");
+                el = $(target).closest("li"),
+                item;
 
-            e.preventDefault();
-
-            if (item)
+            if (el.length > 0)
             {
-                that.popup.close();
-                that.select(item.text());
-                that.trigger(SELECT, {scope: that.selected});
+                item = el.data(DATA);
+                console.dir(item);
+                if (item && !item.url && !item.inactive)
+                {
+                    e.preventDefault();
+                    that.popup.close();
+                    that.select(item.text);
+                    that.trigger(SELECT, {scope: that.selected});
+                }
             }
         }
     });
@@ -266,37 +297,60 @@
         {
             var that = this,
                 sectionItems = [],
-                sectionUrls = [],
-                userItems = [],
-                userUrls = [];
+                userItems = [];
 
             that.itemTemplate = kendo.template(that.options.itemTemplate);
 
             if (that.options.userName)
             {
-                sectionItems.push("dashboard", "my builds");
-                sectionUrls.push("/dashboard/", "/dashboard/my/");
+                sectionItems.push({
+                    text: "dashboard",
+                    url: "/dashboard/"
+                }, {
+                    text: "my builds",
+                    url: "/dashboard/my/"
+                });
 
-                userItems.push(that.options.userName);
-                userUrls.push("");
-                userItems.push("preferences");
-                userUrls.push("/dashboard/preferences/");
+                userItems.push({
+                    text: that.options.userName,
+                    inactive: true
+                }, {
+                    text: "preferences",
+                    url: "/dashboard/preferences/"
+                });
+
                 if (that.options.userCanLogout)
                 {
-                    userItems.push("logout");
-                    userUrls.push("/logout")
+                    userItems.push({
+                        text: "logout",
+                        url: "/logout"
+                    });
                 }
             }
             else
             {
-                userItems.push("Guest");
-                userUrls.push("");
-                userItems.push("login");
-                userUrls.push("/login!input.action");
+                userItems.push({
+                    text: "Guest",
+                    inactive: true
+                }, {
+                    text: "login",
+                    url: "/login!input.action"
+                });
             }
 
-            sectionItems.push("projects", "server", "agents", "administration");
-            sectionUrls.push("/browse/", "/server/", "/agents/", "/admin/");
+            sectionItems.push({
+                text: "projects",
+                url: "/browse/"
+            }, {
+                text: "server",
+                url: "/server/"
+            }, {
+                text: "agents",
+                url: "/agents/"
+            }, {
+                text: "administration",
+                url: "/admin/"
+            });
 
             that.list = $('<div class="k-navlist"></div>');
             that.element.append(that.list);
@@ -306,20 +360,15 @@
                 content: '<span class="fa fa-heartbeat"></span>'
             });
 
-
             that.sectionItem = that._addItemElement().kendoZaMenuNavbarItem({
-                items: sectionItems,
-                urls: sectionUrls
+                items: sectionItems
             }).data("kendoZaMenuNavbarItem");
-
-            that._createExtraItems();
 
             that.userItem = that._addItemElement("k-navright").kendoZaMenuNavbarItem({
                 model: {
                     content: '<span class="fa fa-user"></span>'
                 },
-                items: userItems,
-                urls: userUrls
+                items: userItems
             }).data("kendoZaMenuNavbarItem");
 
             that.helpItem = that._addSimpleItem({
@@ -335,6 +384,8 @@
                 },
                 content: '<span class="fa fa-question-circle"></span>'
             });
+
+            that._createExtraItems();
         },
 
         _addItemElement: function(cls)

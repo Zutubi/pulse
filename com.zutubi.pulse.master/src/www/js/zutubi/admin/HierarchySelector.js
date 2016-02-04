@@ -55,7 +55,10 @@
             that.treeEl = $('<div></div>');
             that.outer.append(that.treeEl);
 
-            that.tree = that.treeEl.kendoZaHierarchyTree({scope: that.options.scope}).data("kendoZaHierarchyTree");
+            that.tree = that.treeEl.kendoZaHierarchyTree({
+                scope: that.options.scope,
+                dragAndDrop: false
+            }).data("kendoZaHierarchyTree");
             that.tree.bind(BOUND, function(e) { that.trigger(BOUND); });
             that.tree.bind(NODESELECT, function(e) { that.trigger(NODESELECT, {name: e.name}); });
         },
