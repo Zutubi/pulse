@@ -5,6 +5,7 @@
 
     <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/kendo/kendo.metro.min.css?#version()" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.custom.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
     <link href="${base}/css/config.css?#version()" rel="stylesheet"/>

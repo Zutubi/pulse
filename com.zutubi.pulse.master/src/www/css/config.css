@@ -160,11 +160,22 @@
 
 .k-template-icon.k-template-active {
     color: #fff;
-    background-color: #8ebc00;
+    background-color: #667e9f;
 }
 
 .k-template-popup.k-selector-popup {
     border-top: solid 1px #ddd;
+}
+
+.k-template-popup li {
+    padding: 8px 12px;
+    line-height: 1.2em;
+    cursor: pointer;
+}
+
+.k-template-popup li:hover {
+    color: #fff;
+    background-color: #3e4e6a;
 }
 
 .k-composite-help-button {
@@ -265,7 +276,7 @@
 
 .k-configured-descendants a:hover {
     color: #fff;
-    background-color: #8ebc00;
+    background-color: #667e9f;
 }
 
 /* State Display */
@@ -437,7 +448,7 @@ input.k-state-disabled, input.k-state-disabled:hover {
 }
 
 .k-wizard-step-index li.active {
-    border-bottom: solid 3px #8ebc00;
+    border-bottom: solid 3px #667e9f;
 }
 
 .k-wizard-type-select  {

@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     height: 34px;
-    background-color: #7ea700;
+    background-color: #3e4e6a;
     border-bottom: solid 1px #eee;
 }
 
@@ -71,7 +71,7 @@
 
 .k-selector-popup-item:hover {
     color: #fff;
-    background-color: #8ebc00;
+    background-color: #3e4e6a;
 }
 
 /* Main content area (between nav and footer */

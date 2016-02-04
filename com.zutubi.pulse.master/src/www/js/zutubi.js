@@ -399,4 +399,3 @@ Ext.util.Format.plainToHtml = function(s)
 {
     return Ext.util.Format.htmlEncode(s).replace(/(\s) /g, '$1&nbsp;').replace(/\r?\n/g, '<br/>');
 };
-

@@ -9,15 +9,15 @@
 }
 
 .k-build-context .k-status-success {
-    color: #383;
+    color: #81b581;
 }
 
 .k-build-context .k-status-warnings {
-    color: #d09000;
+    color: #eea;
 }
 
 .k-build-context .k-status-error, .k-build-context .k-status-failure, .k-build-context .k-status-terminated, .k-build-context .k-status-cancelled {
-    color: #c00000;
+    color: #f07878;
 }
 
 .k-build-context .k-status-inprogress, .k-build-context .k-status-pending {
