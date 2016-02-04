@@ -62,6 +62,7 @@
         <link href="${base}/css/font-awesome.min.css?#version()" rel="stylesheet"/>
         <link href="${base}/css/core.css?#version()" rel="stylesheet"/>
         <link href="${base}/css/config.css?#version()" rel="stylesheet"/>
+        <link href="${base}/css/reporting.css?#version()" rel="stylesheet"/>
 
         #if ($rssEnabled && $projectId && "$projectId" != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>

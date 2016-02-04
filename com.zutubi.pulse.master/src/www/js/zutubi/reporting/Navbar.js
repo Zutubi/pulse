@@ -3,6 +3,7 @@
 (function($)
 {
     var ui = kendo.ui,
+        NavbarItem = Zutubi.core.NavbarItem,
         MenuNavbarItem = Zutubi.core.MenuNavbarItem,
         Navbar = Zutubi.core.Navbar;
 
@@ -74,17 +75,74 @@
         }
     });
 
+    Zutubi.reporting.BuildContextNavbarItem = NavbarItem.extend({
+        init: function(element, options)
+        {
+            this.isPersonal = options.personalBuild;
+            this.selectedTab = options.selectedTab || "summary";
+
+            NavbarItem.fn.init.call(this, element, options);
+        },
+
+        options: {
+            name: "ZaBuildContextNavbarItem",
+            model: {},
+            template: '<span class="k-build-context"></span>',
+            itemTemplate: '<a class="#= cls #" href="#= url #"><span class="fa fa-square"><span></a>'
+        },
+
+        create: function()
+        {
+            var builds = this.options.builds,
+                buildId = this.options.buildId,
+                i,
+                build;
+
+            this.itemTemplate = kendo.template(this.options.itemTemplate);
+
+            NavbarItem.fn.create.call(this);
+
+            for (i = 0; i < builds.length; i++)
+            {
+                build = builds[i];
+                this.innerElement.append(this.itemTemplate({
+                    url: this._getUrl(build),
+                    cls: 'k-status-' + build.status + (build.id === buildId ? ' k-build-context-current' : '')
+                }));
+            }
+        },
+
+        _getUrl: function(build)
+        {
+            if (this.isPersonal)
+            {
+                return '/dashboard/my/' + build.number + '/' + this.selectedTab;
+            }
+            else
+            {
+                return '/browse/projects/' + encodeURIComponent(build.name) + '/builds/' + build.number + '/' + this.selectedTab;
+            }
+        }
+    });
+
     Zutubi.reporting.UserNavbar = Navbar.extend({
         init: function(element, options)
         {
-            var extraItems = [];
+            var extraItems = [],
+                buildOptions;
+
             if (options.buildId)
             {
+                buildOptions = jQuery.extend({
+                    personalBuild: true
+                }, options, options.data);
+
                 extraItems.push({
                     type: "kendoZaBuildNavbarItem",
-                    options: jQuery.extend({
-                        personalBuild: true
-                    }, options, options.data)
+                    options: buildOptions
+                }, {
+                    type: "kendoZaBuildContextNavbarItem",
+                    options: buildOptions
                 });
             }
 
@@ -103,7 +161,8 @@
     Zutubi.reporting.ProjectNavbar = Navbar.extend({
         init: function(element, options)
         {
-            var extraItems = [{
+            var buildOptions,
+                extraItems = [{
                 options: {
                     model: {
                         content: kendo.htmlEncode(options.projectName),
@@ -114,9 +173,16 @@
 
             if (options.buildId)
             {
+                buildOptions = jQuery.extend({
+                    personalBuild: false
+                }, options, options.data);
+
                 extraItems.push({
                     type: "kendoZaBuildNavbarItem",
-                    options: jQuery.extend({}, options, options.data)
+                    options: buildOptions
+                }, {
+                    type: "kendoZaBuildContextNavbarItem",
+                    options: buildOptions
                 });
             }
 
@@ -155,6 +221,7 @@
     });
 
     ui.plugin(Zutubi.reporting.BuildNavbarItem);
+    ui.plugin(Zutubi.reporting.BuildContextNavbarItem);
     ui.plugin(Zutubi.reporting.UserNavbar);
     ui.plugin(Zutubi.reporting.ProjectNavbar);
     ui.plugin(Zutubi.reporting.AgentNavbar);

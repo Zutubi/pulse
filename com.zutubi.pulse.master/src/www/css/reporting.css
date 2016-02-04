@@ -1,0 +1,25 @@
+/* Navbar */
+
+.k-build-context a {
+    margin-right: 4px;
+}
+
+.k-build-context-current {
+    border-bottom: solid 2px;
+}
+
+.k-build-context .k-status-success {
+    color: #383;
+}
+
+.k-build-context .k-status-warnings {
+    color: #d09000;
+}
+
+.k-build-context .k-status-error, .k-build-context .k-status-failure, .k-build-context .k-status-terminated, .k-build-context .k-status-cancelled {
+    color: #c00000;
+}
+
+.k-build-context .k-status-inprogress, .k-build-context .k-status-pending {
+    color: #88a0b8;
+}
