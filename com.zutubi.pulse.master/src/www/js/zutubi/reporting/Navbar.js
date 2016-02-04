@@ -52,13 +52,14 @@
 
         options: {
             name: "ZaBuildNavbarItem",
-            urlItemTemplate: '<li><a class="k-selector-popup-item k-build-menu-item" href="#= url #"><span class="fa fa-circle #= cls #"></span> #: text #</a></li>'
+            urlItemTemplate: '<li><a class="#= cls #" href="#= url #"><span class="fa fa-circle #= statusCls #"></span> #: text #</a></li>'
         },
 
         _createItem: function(text, build)
         {
             return {
-                cls: 'k-status-' + build.status,
+                cls: 'k-selector-popup-item k-build-menu-item',
+                statusCls: 'k-status-' + build.status,
                 text: text + ' (build ' + build.number + ')',
                 url: this._getUrl(build)
             }

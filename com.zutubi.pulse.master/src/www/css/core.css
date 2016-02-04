@@ -65,6 +65,17 @@
     color: #787878;
 }
 
+.k-selector-popup-item.k-inactive, .k-selector-popup-item.k-inactive:hover {
+    color: #3e4e6a;
+    font-weight: bold;
+    background-color: #fff;
+    border-bottom: solid 1px #ddd;
+}
+
+.k-selector-popup-item.k-admin-popup-item {
+    border-top: solid 1px #ddd;
+}
+
 .k-selector-popup a {
     text-decoration: none;
 }

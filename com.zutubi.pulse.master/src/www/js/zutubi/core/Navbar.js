@@ -89,8 +89,8 @@
                 content: ''
             },
             updateOnSelect: true,
-            itemTemplate: '<li><span class="k-selector-popup-item">#: text #</span></li>',
-            urlItemTemplate: '<li><a class="k-selector-popup-item" href="#= url #">#: text #</a></li>'
+            itemTemplate: '<li><span class="#= cls #">#: text #</span></li>',
+            urlItemTemplate: '<li><a class="#= cls #" href="#= url #">#: text #</a></li>'
         },
 
         events: [
@@ -164,6 +164,11 @@
                 else
                 {
                     model = item;
+                }
+
+                if (typeof model.cls === "undefined")
+                {
+                    model.cls = "k-selector-popup-item" + (model.inactive ? " k-inactive" : "");
                 }
 
                 template = model.url ? that.urlItemTemplate : that.itemTemplate;
@@ -349,7 +354,8 @@
                 url: "/agents/"
             }, {
                 text: "administration",
-                url: "/admin/"
+                url: "/admin/",
+                cls: "k-selector-popup-item k-admin-popup-item"
             });
 
             that.list = $('<div class="k-navlist"></div>');
