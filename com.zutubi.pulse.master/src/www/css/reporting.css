@@ -8,18 +8,27 @@
     border-bottom: solid 2px;
 }
 
-.k-build-context .k-status-success {
+.k-build-menu-item .fa {
+    font-size: 0.8em;
+    margin-right: 0.4em;
+}
+
+.k-build-context .k-status-success,
+.k-build-menu-item .k-status-success{
     color: #81b581;
 }
 
-.k-build-context .k-status-warnings {
+.k-build-context .k-status-warnings,
+.k-build-menu-item.k-status-warnings{
     color: #eea;
 }
 
-.k-build-context .k-status-error, .k-build-context .k-status-failure, .k-build-context .k-status-terminated, .k-build-context .k-status-cancelled {
+.k-build-context .k-status-error, .k-build-context .k-status-failure, .k-build-context .k-status-terminated, .k-build-context .k-status-cancelled,
+.k-build-menu-item .k-status-error, .k-build-menu-item .k-status-failure, .k-build-menu-item .k-status-terminated, .k-build-menu-item .k-status-cancelled{
     color: #f07878;
 }
 
-.k-build-context .k-status-inprogress, .k-build-context .k-status-pending {
+.k-build-context .k-status-inprogress, .k-build-context .k-status-pending,
+.k-build-menu-item .k-status-inprogress, .k-build-menu-item .k-status-pending {
     color: #88a0b8;
 }

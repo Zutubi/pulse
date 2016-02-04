@@ -21,23 +21,23 @@
 
             if (options.nextSuccessful)
             {
-                items.push(this._createItem('next healthy (build ' + options.nextSuccessful.number + ')', options.nextSuccessful, options.personalBuild));
+                items.push(this._createItem('next healthy', options.nextSuccessful, options.personalBuild));
             }
             if (options.nextBroken)
             {
-                items.push(this._createItem('next broken (build ' + options.nextBroken.number + ')', options.nextBroken, options.personalBuild));
+                items.push(this._createItem('next broken', options.nextBroken, options.personalBuild));
             }
             if (options.previousSuccessful)
             {
-                items.push(this._createItem('previous healthy (build ' + options.previousSuccessful.number + ')', options.previousSuccessful, options.personalBuild));
+                items.push(this._createItem('previous healthy', options.previousSuccessful, options.personalBuild));
             }
             if (options.previousBroken)
             {
-                items.push(this._createItem('previous broken (build ' + options.previousBroken.number + ')', options.previousBroken, options.personalBuild));
+                items.push(this._createItem('previous broken', options.previousBroken, options.personalBuild));
             }
             if (options.latest)
             {
-                items.push(this._createItem('latest (build ' + options.latest.number + ')', options.latest, options.personalBuild));
+                items.push(this._createItem('latest', options.latest, options.personalBuild));
             }
 
             jQuery.extend(options, {
@@ -51,13 +51,15 @@
         },
 
         options: {
-            name: "ZaBuildNavbarItem"
+            name: "ZaBuildNavbarItem",
+            urlItemTemplate: '<li><a class="k-selector-popup-item k-build-menu-item" href="#= url #"><span class="fa fa-circle #= cls #"></span> #: text #</a></li>'
         },
 
         _createItem: function(text, build)
         {
             return {
-                text: text,
+                cls: 'k-status-' + build.status,
+                text: text + ' (build ' + build.number + ')',
                 url: this._getUrl(build)
             }
         },
@@ -96,7 +98,9 @@
             var builds = this.options.builds,
                 buildId = this.options.buildId,
                 i,
-                build;
+                build,
+                el,
+                tip;
 
             this.itemTemplate = kendo.template(this.options.itemTemplate);
 
@@ -105,10 +109,26 @@
             for (i = 0; i < builds.length; i++)
             {
                 build = builds[i];
-                this.innerElement.append(this.itemTemplate({
+                el = $(this.itemTemplate({
                     url: this._getUrl(build),
                     cls: 'k-status-' + build.status + (build.id === buildId ? ' k-build-context-current' : '')
                 }));
+                this.innerElement.append(el);
+
+                if (build.id < buildId)
+                {
+                    tip = "step backwards to build " + build.number;
+                }
+                else if (build.id > buildId)
+                {
+                    tip = "step forwards to build " + build.number
+                }
+                else
+                {
+                    tip = "this build";
+                }
+
+                el.kendoTooltip({content: tip});
             }
         },
 
