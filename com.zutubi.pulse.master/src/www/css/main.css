@@ -55,60 +55,6 @@ pre
     font-weight: normal;
 }
 
-/* Tab Bar */
-
-#tabbar
-{
-    width: 100%;
-    background: #88a0b8;
-}
-
-#innernav
-{
-    margin: 0;
-    padding: 10px 5px 0 10px;
-    list-style: none;
-    font-size: 14px;
-}
-
-#innernav li
-{
-    float: left;
-    display: block;
-    margin: 0 5px 0 0;
-    padding: 0 1px 0 0;
-    list-style: none;
-}
-
-#innernav a
-{
-    float: left;
-    display: block;
-    padding: 3px 10px 6px 10px;
-    text-decoration: none;
-    border-top: 3px solid #667e9f;
-    border-bottom: none;
-    color: #fff;
-    background: #3e4e6a;
-}
-
-#innernav a:link, #innernav a:visited {
-    color: #fff;
-}
-
-#innernav a:hover, #innernav a.active
-{
-    border-top: 3px solid #f07e0a;
-    color: #3e4e6a;
-    background: #fff;
-    border-bottom: none;
-}
-
-#innernav a.active
-{
-    font-weight: bold;
-}
-
 /*------------------------------
 Globals
 */
