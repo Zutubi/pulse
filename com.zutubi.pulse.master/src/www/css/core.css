@@ -55,6 +55,15 @@
     color: #fff;
 }
 
+.k-navitem-home {
+    padding-left: 3px;
+    padding-right: 0;
+}
+
+.k-navitem-home img {
+    vertical-align: top;
+}
+
 .k-selector-popup {
     border-top: none;
 }

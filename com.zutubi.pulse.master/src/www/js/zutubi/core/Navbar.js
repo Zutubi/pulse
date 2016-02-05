@@ -374,8 +374,8 @@
 
             that.homeItem = that._addSimpleItem({
                 url: window.baseUrl + '/',
-                content: '<span class="fa fa-heartbeat"></span>'
-            });
+                content: '<img height="34" src="' + window.baseUrl + '/images/pulse-box.svg">'
+            }, 'k-navitem-home');
 
             if (!that.options.expandSections || (that.options.extraItems && that.options.extraItems.length > 0))
             {
