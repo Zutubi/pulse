@@ -65,6 +65,15 @@
         }
     });
 
+    // An item that is an inactive separator between other items.
+    Zutubi.core.SeparatorNavbarItem = Zutubi.core.NavbarItem.extend({
+        options: {
+            name: "ZaSeparatorNavbarItem",
+            template: '<span class="k-navitem-separator">/</span>',
+            model: {}
+        }
+    });
+
     // An item that presents a dropdown menu of textual items.  Items can be either plain links or raise select events
     // on click.  The content of the item can be set in the original model and/or updated to the text of the selected
     // item.
@@ -452,6 +461,7 @@
     });
 
     ui.plugin(Zutubi.core.NavbarItem);
+    ui.plugin(Zutubi.core.SeparatorNavbarItem);
     ui.plugin(Zutubi.core.MenuNavbarItem);
     ui.plugin(Zutubi.core.ButtonNavbarItem);
     ui.plugin(Zutubi.core.Navbar);

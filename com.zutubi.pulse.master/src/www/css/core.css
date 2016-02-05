@@ -42,12 +42,17 @@
     cursor: pointer;
 }
 
-.k-split-button-arrow {
+.k-navitem .k-split-button-arrow {
     cursor: pointer;
+    padding-right: 0;
 }
 
 .k-navitem .k-split-button-arrow .fa {
     vertical-align: middle;
+}
+
+.k-navitem-separator {
+    color: #fff;
 }
 
 .k-selector-popup {

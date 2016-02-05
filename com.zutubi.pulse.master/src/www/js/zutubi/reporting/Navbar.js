@@ -184,6 +184,8 @@
         {
             var buildOptions,
                 extraItems = [{
+                    type: 'kendoZaSeparatorNavbarItem'
+                }, {
                 options: {
                     model: {
                         content: kendo.htmlEncode(options.projectName),
@@ -199,6 +201,8 @@
                 }, options, options.data);
 
                 extraItems.push({
+                    type: 'kendoZaSeparatorNavbarItem'
+                }, {
                     type: "kendoZaBuildNavbarItem",
                     options: buildOptions
                 }, {
@@ -224,6 +228,8 @@
         {
             jQuery.extend(options, {
                 extraItems: [{
+                    type: 'kendoZaSeparatorNavbarItem'
+                }, {
                     options: {
                         model: {
                             content: kendo.htmlEncode(options.agentName),
