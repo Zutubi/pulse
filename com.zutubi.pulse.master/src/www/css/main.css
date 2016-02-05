@@ -558,7 +558,7 @@ td.group-header, th.two-heading, h3.two-heading, .content-table .heading, .conte
     border-left: none;
     border-right: none;
     padding: 6px 4px;
-    background: #f2f2ff;
+    background: #f2f8ff;
     font-weight: bold;
 }
 
@@ -566,7 +566,7 @@ div.xz-summary-tb
 {
     border-top: solid 1px #bbb;
     border-bottom: none;
-    background: #f2f2ff;
+    background: #f2f8ff;
     padding: 3px;
 }
 
@@ -995,7 +995,7 @@ td.status-last
 {
     border-bottom: dotted 1px #bbb;
     padding: 6px 4px;
-    background-color: #f2f2ff;
+    background-color: #f2f8ff;
 }
 
 .xz-tblink, .xz-tbicontext
@@ -1024,7 +1024,7 @@ td.status-last
 {
     border: none;
     border-bottom: dotted 1px #bbb;
-    background: #f2f2ff none;
+    background: #f2f8ff none;
 }
 
 #artifacts-tree .x-grid3-header td
@@ -1061,7 +1061,7 @@ td.status-last
 {
     border-bottom: dotted 1px #bbb;
     padding: 6px 4px;
-    background: #f2f2ff none;
+    background: #f2f8ff none;
     font-weight: bold;
     color: #000;
     font-size: 1.2em;
@@ -1078,7 +1078,7 @@ td.status-last
     border-top: solid 1px #bbb;
     border-bottom: dotted 1px #bbb;
     padding: 4px 5px 4px 10px;
-    background-color: #f2f2ff;
+    background-color: #f2f8ff;
 }
 
 .change-via
@@ -2329,7 +2329,7 @@ div.reference
 .reference h1, .reference h2, .reference h3
 {
     color: #333;
-    background-color: #f2f2ff;
+    background-color: #f2f8ff;
     border-top: dotted 1px #aaa;
     border-bottom: dotted 1px #aaa;
     padding: 4px;
