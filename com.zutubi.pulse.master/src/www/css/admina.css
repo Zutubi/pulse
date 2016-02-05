@@ -150,3 +150,14 @@ ul.k-overview-validation-errors {
 .k-overview-suggestion {
     color: #1b376c;
 }
+
+/* Vertical flexbox layout */
+
+.k-vbox {
+    display: flex;
+    flex-direction: column;
+}
+
+.k-vbox-grow {
+    flex-grow: 1;
+}

@@ -21,9 +21,9 @@
             that.view = new kendo.View(
                 '<div class="k-outer-split" style="height: 100%; width: 100%">' +
                     '<div>' +
-                        '<div class="k-pane-content">' +
+                        '<div class="k-pane-content k-vbox">' +
                             '<div class="k-view-switch"><button class="k-right">configuration <span class="fa fa-angle-right"></span></button></div>' +
-                            '<div class="k-hierarchy-tree"></div>' +
+                            '<div class="k-hierarchy-tree k-vbox-grow"></div>' +
                         '</div>' +
                     '</div>' +
                     '<div>' +
