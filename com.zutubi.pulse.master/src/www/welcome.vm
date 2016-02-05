@@ -7,20 +7,21 @@
 <head>
     <title>welcome</title>
     <style>
-        h1 { margin-top: 0.8em; }
         table.template-actions, p { width: 770px; }
     </style>
 </head>
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 3.0 Alpha!  This is an early access release that is thoroughly incomplete, unstable and
-        unpolished.  We've released it early to solicit feedback from customers that are interested in the brand
-        new administration UI.  Highlights of the new UI include:
+        Welcome to Pulse 3.0 Beta!  This is an early access release that is unpolished and expected to be unstable.
+        We've released it early to solicit feedback from customers that are interested in the brand new administration
+        UI.  Highlights of the new UI include:
     </p>
     <ul style="list-style: circle; width: 720px">
         <li>An all-new HTML5-based implementation.</li>
         <li>Integration with browser history for more convenient navigation.</li>
+        <li>A new navigation bar that is used throughout the UI (not just for admin) to save vertical space and match
+            the new admin styling.</li>
         <li>New project and agent overview pages, showing important configuration at a glance.</li>
         <li>A hierarchy navigator that allows you to easily jump from one project (or agent) to the next,
             maintaining your relative location in the configuration.</li>
@@ -28,15 +29,19 @@
         <li>Improved template decoration of forms, making them less busy so important info is easier to spot.</li>
         <li>Drag and drop reordering of collections.</li>
         <li>Better visibility of defined, inherited and overriden collection orders, with easy reversion.</li>
+        <li>A simpler three-column layout where the main pane no longer includes an extra context column.</li>
         <li>New multi-select and string list widgets that are more compact and usable.</li>
+        <li>More obvious access to built in documentation for forms.</li>
         <li>All based on a new HTTP-based API that is more efficient (it will become publicly accessible in
             a future major.minor release).</li>
     </ul>
     <p>
-        The styling is clunky and poorly linked relative to the existing UI, the links between them
-        will be overhauled before final release.  We may decide to keep somewhat distinct theming for the
-        administration section as it does give a sense of context (a serendipitous discovery as part of
-        these changes).
+        Testing has been mainly done in Chrome, with light workouts in other browsers.  Compatibility will be tested
+        with IE 10+, Safari and Firefox for the final release.  All bug reports and feedback are most welcome!
+    </p>
+    <p>
+        This release also includes major library and framework upgrades under the hood, which you should only notice in
+        the form of improved performance and future-proofing.
     </p>
 </body>
 </html>

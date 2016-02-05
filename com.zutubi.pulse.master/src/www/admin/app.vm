@@ -20,7 +20,7 @@
         zutubi/admin/package.js
     #end
 
-    <title>Pulse Admin</title>
+    <title>:: pulse :: administration</title>
 </head>
 <body>
 <div id="navbar">
