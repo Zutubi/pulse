@@ -1,6 +1,5 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
-<content tag="selectedTab">dashboard</content>
 <html>
 <head>
     <title>#wwtext("name=preferences")</title>
@@ -8,7 +7,7 @@
         $(document).ready(function()
         {
             window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
-            window.configPanel.setPaths("users/" + window.userName + "/preferences", "");
+            window.configPanel.setPaths("users/" + window.userLogin + "/preferences", "");
         });
     </script>
 </head>

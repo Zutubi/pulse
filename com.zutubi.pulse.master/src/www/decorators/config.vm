@@ -16,6 +16,7 @@
         window.apiPath = "/api";
 
 #if($loggedInUser)
+        window.userLogin = '#jss($loggedInUser.login)';
         window.userName = '#jss($loggedInUser.name)';
 #end
 #if($canLogout)
@@ -37,8 +38,6 @@
 
 #if($page.getProperty("page.selectedTab"))
         navbarConfig.section = '$page.getProperty("page.selectedTab")';
-#else
-        navbarConfig.section = 'dashboard';
 #end
 
         $(document).ready(function()

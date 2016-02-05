@@ -113,7 +113,8 @@
         },
 
         options: {
-            name: "ZaAdminNavbar"
+            name: "ZaAdminNavbar",
+            expandSections: false
         },
 
         events: [

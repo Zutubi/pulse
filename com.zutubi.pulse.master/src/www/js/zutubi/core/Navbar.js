@@ -304,14 +304,16 @@
 
         options: {
             name: "ZaNavbar",
-            itemTemplate: '<span class="k-navitem #: cls #"></span>'
+            itemTemplate: '<span class="k-navitem #: cls #"></span>',
+            expandSections: true
         },
 
         create: function()
         {
             var that = this,
                 sectionItems = [],
-                userItems = [];
+                userItems = [],
+                i;
 
             that.itemTemplate = kendo.template(that.options.itemTemplate);
 
@@ -375,9 +377,22 @@
                 content: '<span class="fa fa-heartbeat"></span>'
             });
 
-            that.sectionItem = that._addItemElement().kendoZaMenuNavbarItem({
-                items: sectionItems
-            }).data("kendoZaMenuNavbarItem");
+            if (!that.options.expandSections || (that.options.extraItems && that.options.extraItems.length > 0))
+            {
+                that.sectionItem = that._addItemElement().kendoZaMenuNavbarItem({
+                    items: sectionItems
+                }).data("kendoZaMenuNavbarItem");
+            }
+            else
+            {
+                for (i = 0; i < sectionItems.length; i++)
+                {
+                    that._addSimpleItem({
+                        url: sectionItems[i].url,
+                        content: sectionItems[i].text,
+                    }, 'k-nav-section');
+                }
+            }
 
             that.userItem = that._addItemElement("k-navright").kendoZaMenuNavbarItem({
                 model: {
@@ -447,7 +462,15 @@
 
         setSection: function(section)
         {
-            this.sectionItem.select(section);
+            if (this.sectionItem)
+            {
+                this.sectionItem.select(section);
+            }
+            else
+            {
+                this.element.find(".k-nav-section").removeClass('k-nav-section-active');
+                this.element.find(".k-nav-section:contains(" + section + ")").addClass('k-nav-section-active');
+            }
         },
 
         applyDelta: function(delta)

@@ -110,8 +110,6 @@
 
 #if($page.getProperty("page.selectedTab"))
                         navbarConfig.section = '$page.getProperty("page.selectedTab")';
-#else
-                        navbarConfig.section = 'dashboard';
 #end
                         navbarConfig.selectedTab = '$page.getProperty("page.selectedBuildTab")';
 
@@ -156,7 +154,7 @@
                         {
                             var north = Ext.get('tabbar-wrapper');
                             north.appendChild(tabbar);
-                            tabbarHeight = 39;
+                            tabbarHeight = 35;
                         }
 
                         Ext.get('center').setStyle('margin', '16px');

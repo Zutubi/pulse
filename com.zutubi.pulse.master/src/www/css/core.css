@@ -20,7 +20,7 @@
 
 .k-navitem {
     line-height: 34px;
-    margin: 0 6px;
+    padding: 0 8px;
 }
 
 .k-navitem .k-button {
@@ -79,6 +79,10 @@
 
 .k-selector-popup-item.k-admin-popup-item {
     border-top: solid 1px #ddd;
+}
+
+.k-nav-section-active {
+    background-color: #667e9f;
 }
 
 .k-selector-popup a {

@@ -38,7 +38,7 @@
 #tabbar
 {
     width: 100%;
-    background: #88a0b8;
+    background: #667e9f;
 }
 
 #innernav
@@ -66,7 +66,7 @@
     font-family: serif;
     font-size: 16px;
     text-decoration: none;
-    border-top: 2px solid #667e9f;
+    border-top: 2px solid #88a0b8;
     border-bottom: none;
     color: #fff;
     background: #3e4e6a;
