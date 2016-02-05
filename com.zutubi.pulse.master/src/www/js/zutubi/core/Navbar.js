@@ -168,7 +168,7 @@
                 {
                     model = {
                         text: item
-                    }
+                    };
                 }
                 else
                 {
@@ -233,7 +233,6 @@
             if (el.length > 0)
             {
                 item = el.data(DATA);
-                console.dir(item);
                 if (item && !item.url && !item.inactive)
                 {
                     e.preventDefault();
@@ -389,7 +388,7 @@
                 {
                     that._addSimpleItem({
                         url: sectionItems[i].url,
-                        content: sectionItems[i].text,
+                        content: sectionItems[i].text
                     }, 'k-nav-section');
                 }
             }

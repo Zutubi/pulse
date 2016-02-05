@@ -62,7 +62,7 @@
                 statusCls: 'k-status-' + build.status,
                 text: text + ' (build ' + build.number + ')',
                 url: this._getUrl(build)
-            }
+            };
         },
 
         _getUrl: function(build)
@@ -122,7 +122,7 @@
                 }
                 else if (build.id > buildId)
                 {
-                    tip = "step forwards to build " + build.number
+                    tip = "step forwards to build " + build.number;
                 }
                 else
                 {
