@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" style="height: 100%">
 <head>
+    <link rel="shortcut icon" href="$base/images/favicon.ico"/>
+    <link type="image/png" rel="icon" href="$base/images/favicon.png"/>
+    <link rel="apple-touch-icon" href="$base/images/icon120.png" sizes="120x120">
+    <link rel="apple-touch-icon" href="$base/images/icon152.png" sizes="152x152">
+
     <link href="${base}/css/reset.css?#version()" rel="stylesheet"/>
 
     <link href="${base}/css/kendo/kendo.common.min.css?#version()" rel="stylesheet"/>

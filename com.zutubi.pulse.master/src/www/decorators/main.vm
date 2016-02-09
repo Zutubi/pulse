@@ -48,8 +48,12 @@
         <meta http-equiv="Expires" content="0"/>
         <meta http-equiv="Cache-Control" content="no-cache"/>
 		<title>:: pulse :: #if ($title) $title #end</title>
-        <link rel="shortcut icon" href="$base/favicon.ico"/>
-        <link rel="icon" type="image/png" href="$base/favicon.png"/>
+
+        <link rel="shortcut icon" href="$base/images/favicon.ico"/>
+        <link rel="icon" type="image/png" href="$base/images/favicon.png"/>
+        <link rel="apple-touch-icon" href="$base/images/icon120.png" sizes="120x120">
+        <link rel="apple-touch-icon" href="$base/images/icon152.png" sizes="152x152">
+
         <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css?#version()"/>
         <link rel="stylesheet" type="text/css" href="$base/css/xtheme-pagan.css?#version()"/>
         <link rel="stylesheet" type="text/css" href="$base/css/main.css?#version()" media="screen"/>
