@@ -20,7 +20,7 @@ public class PersonalBuildChangesPage extends SeleniumPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuildChanges(Long.toString(buildId));
+        return urls.myBuildChanges(Long.toString(buildId));
     }
 
     public String getCheckedOutRevision()

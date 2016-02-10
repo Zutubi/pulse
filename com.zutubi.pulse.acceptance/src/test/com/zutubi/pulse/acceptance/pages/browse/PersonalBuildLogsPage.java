@@ -16,6 +16,6 @@ public class PersonalBuildLogsPage extends BuildLogsPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuildLogs(buildNumber);
+        return urls.myBuildLogs(buildNumber);
     }
 }

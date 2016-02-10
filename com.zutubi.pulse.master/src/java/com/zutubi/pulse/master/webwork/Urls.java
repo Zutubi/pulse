@@ -67,64 +67,64 @@ public class Urls
         return base() + "dashboard/";
     }
 
-    public String dashboardMyBuilds()
+    public String myBuilds()
     {
-        return dashboard() + "my/";
+        return base() + "my/";
     }
 
-    public String dashboardMyBuild(String number)
+    public String myBuild(String number)
     {
-        return dashboardMyBuilds() + number + "/";
+        return myBuilds() + number + "/";
     }
 
-    public String dashboardMyBuildChanges(String number)
+    public String myBuildChanges(String number)
     {
-        return dashboardMyBuild(number) + "changes/";
+        return myBuild(number) + "changes/";
     }
 
-    public String dashboardMyBuildDetails(String number)
+    public String myBuildDetails(String number)
     {
-        return dashboardMyBuild(number) + "details/";
+        return myBuild(number) + "details/";
     }
 
-    public String dashboardMyBuildStageDetails(String number, String stageName)
+    public String myBuildStageDetails(String number, String stageName)
     {
-        return dashboardMyBuildDetails(number) + stageName + "/";
+        return myBuildDetails(number) + stageName + "/";
     }
 
-    public String dashboardMyBuildLogs(String number)
+    public String myBuildLogs(String number)
     {
-        return dashboardMyBuild(number) + "logs/";
+        return myBuild(number) + "logs/";
     }
 
-    public String dashboardMyBuildLog(String number)
+    public String myBuildLog(String number)
     {
-        return dashboardMyBuildLogs(number) + "build/";
+        return myBuildLogs(number) + "build/";
     }
 
-    public String dashboardMyBuildTests(String number)
+    public String myBuildTests(String number)
     {
-        return dashboardMyBuild(number) + "tests/";
+        return myBuild(number) + "tests/";
     }
 
-    public String dashboardMyStageLog(String number, String stage)
+    public String myStageLog(String number, String stage)
     {
-        return dashboardMyBuild(number) + "logs/" + uriComponentEncode(stage) + "/";
+        return myBuild(number) + "logs/" + uriComponentEncode(stage) + "/";
     }
 
-    public String dashboardMyBuildFile(String number)
+    public String myBuildFile(String number)
     {
-        return dashboardMyBuild(number) + "file/";
+        return myBuild(number) + "file/";
     }
 
-    public String dashboardMyBuildArtifacts(String number)
+    public String myBuildArtifacts(String number)
     {
-        return dashboardMyBuild(number) + "artifacts/";
+        return myBuild(number) + "artifacts/";
     }
 
-    public String dashboardMyCommandArtifacts(String number, String stage, String command)
+    public String myCommandArtifacts(String number, String stage, String command)
     {
-        return dashboardMyBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
+        return myBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
     public String dashboardPreferences()
@@ -245,7 +245,7 @@ public class Urls
         String prefix;
         if(build.isPersonal())
         {
-            prefix = dashboardMyBuilds();
+            prefix = myBuilds();
         }
         else
         {

@@ -2,7 +2,7 @@
 #authorisationTags($principle)
 <content tag="selectedTab">my builds</content>
 <content tag="header.javascript">
-    zutubi/pulse/project/dashboard/MyBuildsPanel.js
+    zutubi/pulse/project/my/MyBuildsPanel.js
 </content>
 <html>
 <head>
@@ -11,7 +11,7 @@
         var panel = null;
         
         Ext.onReady(function() {
-            panel = new Zutubi.pulse.project.dashboard.MyBuildsPanel({
+            panel = new Zutubi.pulse.project.my.MyBuildsPanel({
                 id: 'my-builds',
                 url: window.baseUrl + '/ajax/myBuildsData.action',
                 loadingId: 'my-builds-loading',

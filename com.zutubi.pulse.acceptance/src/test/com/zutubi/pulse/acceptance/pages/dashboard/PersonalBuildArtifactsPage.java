@@ -19,6 +19,6 @@ public class PersonalBuildArtifactsPage extends BuildArtifactsPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuildArtifacts(Long.toString(buildId));
+        return urls.myBuildArtifacts(Long.toString(buildId));
     }
 }

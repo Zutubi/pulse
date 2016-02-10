@@ -19,6 +19,6 @@ public class PersonalBuildSummaryPage extends BuildSummaryPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuild(Long.toString(buildNumber));
+        return urls.myBuild(Long.toString(buildNumber));
     }
 }

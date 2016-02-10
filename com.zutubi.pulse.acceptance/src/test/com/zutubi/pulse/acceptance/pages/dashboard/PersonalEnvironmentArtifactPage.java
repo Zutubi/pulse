@@ -16,6 +16,6 @@ public class PersonalEnvironmentArtifactPage extends EnvironmentArtifactPage
 
     public String getUrl()
     {
-        return urls.dashboardMyCommandArtifacts(Long.toString(getBuildId()), getStageName(), getCommandName()) + getArtifactPath();
+        return urls.myCommandArtifacts(Long.toString(getBuildId()), getStageName(), getCommandName()) + getArtifactPath();
     }
 }

@@ -19,6 +19,6 @@ public class PersonalBuildFilePage extends BuildFilePage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuildFile(Long.toString(buildId));
+        return urls.myBuildFile(Long.toString(buildId));
     }
 }

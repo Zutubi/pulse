@@ -69,7 +69,7 @@
         {
             if (this.isPersonal)
             {
-                return '/dashboard/my/' + build.number + '/' + this.selectedTab;
+                return '/my/' + build.number + '/' + this.selectedTab;
             }
             else
             {
@@ -137,7 +137,7 @@
         {
             if (this.isPersonal)
             {
-                return '/dashboard/my/' + build.number + '/' + this.selectedTab;
+                return '/my/' + build.number + '/' + this.selectedTab;
             }
             else
             {

@@ -323,7 +323,7 @@
                     url: "/dashboard/"
                 }, {
                     text: "my builds",
-                    url: "/dashboard/my/"
+                    url: "/my/"
                 });
 
                 userItems.push({

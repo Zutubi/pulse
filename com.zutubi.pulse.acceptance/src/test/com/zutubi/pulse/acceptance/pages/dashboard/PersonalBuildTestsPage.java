@@ -19,6 +19,6 @@ public class PersonalBuildTestsPage extends BuildTestsPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuildTests(Long.toString(buildId));
+        return urls.myBuildTests(Long.toString(buildId));
     }
 }

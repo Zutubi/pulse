@@ -229,7 +229,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
 
         if (this.personal)
         {
-            newLocation = '/dashboard/my/';
+            newLocation = '/my/';
             params.personal = true;
         }
         else

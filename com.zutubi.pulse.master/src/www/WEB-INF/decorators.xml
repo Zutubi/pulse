@@ -15,10 +15,10 @@
             Decorated artifact view: potentially too big for sitemesh parsing, and our JavaScript layout
             messes with anchors:
 
-            /dashboard/my/<build id>/artifacts/<stage>/<command>/<artifact>/<path>
+            /my/<build id>/artifacts/<stage>/<command>/<artifact>/<path>
             /browse/projects/<project>/builds/<build id>/artifacts/<stage>/<command>/<artifact>/<path>
         -->
-        <pattern>/dashboard/my/*/artifacts/*/*/*/?*</pattern>
+        <pattern>/my/*/artifacts/*/*/*/?*</pattern>
         <pattern>/browse/projects/*/builds/*/artifacts/*/*/*/?*</pattern>
         <pattern>/selenium/*</pattern>
     </excludes>

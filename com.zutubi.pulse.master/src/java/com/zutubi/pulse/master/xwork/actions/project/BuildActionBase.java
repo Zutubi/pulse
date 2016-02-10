@@ -9,7 +9,7 @@ import com.zutubi.util.StringUtils;
 /**
  * Helper base class for actions under:
  *   browse/projects/&lt;project name&gt;/builds/&lt;build id&gt;/ <b>or</b>
- *   dashboard/my/&lt;build id &gt;/
+ *   my/&lt;build id &gt;/
  */
 public class BuildActionBase extends ProjectActionBase
 {

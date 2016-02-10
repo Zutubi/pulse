@@ -11,7 +11,7 @@
  *
  * @cfg {Array} columns Array of names for columns to show in the table. 
  */
-Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
+Zutubi.pulse.project.my.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
     layout: 'border',
     border: false,
     dataKeys: ['builds'],
@@ -77,6 +77,6 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
             }]
         });
         
-        Zutubi.pulse.project.dashboard.MyBuildsPanel.superclass.initComponent.apply(this, arguments);
+        Zutubi.pulse.project.my.MyBuildsPanel.superclass.initComponent.apply(this, arguments);
     }
 });

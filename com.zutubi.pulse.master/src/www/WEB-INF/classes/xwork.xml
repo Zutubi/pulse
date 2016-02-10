@@ -7,7 +7,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.zutubi.pulse.master.xwork.actions.DefaultAction">
-            <result name="dashboard" type="redirect">/dashboard/home/</result>
+            <result name="dashboard" type="redirect">/dashboard/</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
             <result name="browse" type="redirect">/browse/</result>
         </action>
@@ -277,11 +277,11 @@
         <default-interceptor-ref name="completeSideEffectStack"/>
 
         <action name="hideDashboardProject" class="com.zutubi.pulse.master.xwork.actions.user.HideDashboardProjectAction">
-            <result name="success" type="redirect">/dashboard/home/</result>
+            <result name="success" type="redirect">/dashboard/</result>
         </action>
 
         <action name="hideDashboardGroup" class="com.zutubi.pulse.master.xwork.actions.user.HideDashboardGroupAction">
-            <result name="success" type="redirect">/dashboard/home/</result>
+            <result name="success" type="redirect">/dashboard/</result>
         </action>
     </package>
 

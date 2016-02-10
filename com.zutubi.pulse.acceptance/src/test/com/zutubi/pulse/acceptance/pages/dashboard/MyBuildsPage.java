@@ -30,7 +30,7 @@ public class MyBuildsPage extends SeleniumPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuilds();
+        return urls.myBuilds();
     }
 
     public List<BuildInfo> getBuilds()

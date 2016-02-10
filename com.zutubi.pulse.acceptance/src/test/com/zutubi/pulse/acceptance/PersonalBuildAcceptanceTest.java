@@ -152,7 +152,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         }, null);
 
         assertNotNull(outputArtifact);
-        assertEquals("/dashboard/my/" + buildNumber + "/downloads/default/build/command%20output/", outputArtifact.get("permalink"));
+        assertEquals("/my/" + buildNumber + "/downloads/default/build/command%20output/", outputArtifact.get("permalink"));
 
         Vector<String> listing = rpcClient.RemoteApi.getArtifactFileListingPersonal((int) buildNumber, "default", "build", "command output", "");
         assertEquals(1, listing.size());

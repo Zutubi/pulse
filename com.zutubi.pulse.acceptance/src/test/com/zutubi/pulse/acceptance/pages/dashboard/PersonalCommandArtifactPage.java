@@ -17,6 +17,6 @@ public class PersonalCommandArtifactPage extends CommandArtifactPage
 
     public String getUrl()
     {
-        return urls.dashboardMyCommandArtifacts(Long.toString(getBuildId()), getStageName(), getCommandName()) + getArtifactPath();
+        return urls.myCommandArtifacts(Long.toString(getBuildId()), getStageName(), getCommandName()) + getArtifactPath();
     }
 }

@@ -27,6 +27,7 @@ import java.util.Map;
 public class PulseActionMapper implements ActionMapper
 {
     public static final String DASHBOARD_NAMESPACE = "/dashboard";
+    public static final String MY_NAMESPACE = "/my";
     public static final String BROWSE_NAMESPACE    = "/browse";
     public static final String SERVER_NAMESPACE    = "/server";
     public static final String AGENTS_NAMESPACE    = "/agents";
@@ -78,6 +79,10 @@ public class PulseActionMapper implements ActionMapper
             // Urls in this space currently have no parameters, just the
             // action name.
             mapping = getDashboardMapping(getEncodedPath(request, namespace));
+        }
+        else if(MY_NAMESPACE.equals(namespace))
+        {
+            mapping = getResolverMapping(getEncodedPath(request, namespace), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
         }
         else if(BROWSE_NAMESPACE.equals(namespace))
         {

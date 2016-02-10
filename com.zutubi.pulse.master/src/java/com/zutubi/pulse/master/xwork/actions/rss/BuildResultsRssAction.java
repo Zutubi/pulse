@@ -510,7 +510,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return getBaseUrl() + "/dashboard/home/";
+            return getBaseUrl() + "/dashboard/";
         }
 
         public String getEntryTitle(BuildResult result)
