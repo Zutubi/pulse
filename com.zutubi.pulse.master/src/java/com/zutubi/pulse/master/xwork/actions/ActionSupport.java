@@ -21,7 +21,6 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.TimeStamps;
 import freemarker.template.utility.StringUtil;
 
@@ -37,8 +36,6 @@ import static com.google.common.collect.Collections2.transform;
  */
 public class ActionSupport extends com.opensymphony.xwork.ActionSupport implements Cancelable
 {
-    private static final Logger LOG = Logger.getLogger(ActionSupport.class);
-
     protected static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
     protected static final String ERROR_MESSAGE = "javax.servlet.error.message";
     protected static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
@@ -234,10 +231,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         if (loggedInUser == null)
         {
-            Object principle = getPrinciple();
-            if(principle != null && principle instanceof String)
+            String principle = getPrinciple();
+            if (principle != null)
             {
-                loggedInUser = userManager.getUser((String)principle);
+                loggedInUser = userManager.getUser(principle);
             }
         }
 
