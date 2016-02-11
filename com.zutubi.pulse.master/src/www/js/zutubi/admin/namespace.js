@@ -142,7 +142,7 @@ if (window.Zutubi.admin === undefined)
 
             router.route("/", function()
             {
-                router.navigate("/hierarchy/projects");
+                router.replace("/hierarchy/projects");
             });
 
             router.route("/hierarchy/projects(/)(:name)(/)", function(name)
