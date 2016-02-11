@@ -373,7 +373,7 @@
 
             that.homeItem = that._addSimpleItem({
                 url: window.baseUrl + '/',
-                content: '<img height="34" src="' + window.baseUrl + '/images/pulse-box.svg">'
+                content: '<img height="34" width="34" src="' + window.baseUrl + '/images/pulse-box.svg">'
             }, 'k-navitem-home');
 
             if (!that.options.expandSections || (that.options.extraItems && that.options.extraItems.length > 0))
