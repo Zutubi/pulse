@@ -88,7 +88,7 @@
 </head>
 <body>
 <div id="dashboard-content" style="padding-bottom: 20px;">
-    <table class="columns" width="98%">
+    <table class="columns" width="100%">
         <tr>
             <td>
                 <h2 style="margin-top: 0; white-space: nowrap">

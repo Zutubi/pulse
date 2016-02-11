@@ -6,7 +6,7 @@
 #end
 
 <div id='#id("${result.ownerName}-build-${result.number}-tests")'>
-    <table class="columns" width="98%">
+    <table class="columns" width="100%">
         <tr>
     #if($result.testSummary.errors > 0)
         #set($statusImage = "exclamation")

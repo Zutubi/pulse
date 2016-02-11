@@ -245,7 +245,7 @@ table.content, table.fill-content, table.decorated
 
 table.fill-content
 {
-    width: 98%;
+    width: 100%;
 }
 
 h3.heading, div.box, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-centre, th.content-centre, td.content-right, td.content-large, td.image, td.note, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.warnings, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right, td.cancelling-right, td.cancelled-right
@@ -486,7 +486,7 @@ Browse view
 
 .project-group, .two-content
 {
-    width: 98%;
+    width: 100%;
     border-collapse: collapse;
 }
 

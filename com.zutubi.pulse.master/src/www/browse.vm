@@ -59,7 +59,7 @@
     #end
 </head>
 <body>
-    <table class="columns" width="98%">
+    <table class="columns" width="100%">
         <tr>
             <td>
                 <h2 style="margin-top: 0; margin-bottom: 1em; white-space: nowrap">
