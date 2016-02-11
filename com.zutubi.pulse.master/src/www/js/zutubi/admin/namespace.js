@@ -387,8 +387,8 @@ if (window.Zutubi.admin === undefined)
                 rootPath = scope + "/" + newOwner;
                 app.router.navigate(Zutubi.config.encodePath("/config/" + rootPath + "/" + configPath), true);
                 app.navbar.selectScope(scope, newOwner);
-                // Lazy setPaths will take care of choosing the longest valid config path.
-                app.configPanel.setPaths(rootPath, configPath, true);
+                // setPaths will take care of choosing the longest valid config path.
+                app.configPanel.setPaths(rootPath, configPath);
             },
 
             replaceConfigPath: function(newPath)

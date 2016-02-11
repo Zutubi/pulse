@@ -165,6 +165,11 @@
             return path;
         },
 
+        isReady: function()
+        {
+            return this.bound;
+        },
+
         getRootPath: function()
         {
             return this.rootPath;

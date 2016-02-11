@@ -89,7 +89,7 @@
             return this.configTree.getConfigPath();
         },
 
-        setPaths: function(rootPath, configPath, lazy)
+        setPaths: function(rootPath, configPath)
         {
             var that = this,
                 path = rootPath,
@@ -111,7 +111,12 @@
 
             that.configTree.setRootPath(rootPath);
 
-            if (lazy)
+            if (that.configTree.isReady())
+            {
+                that.configTree.selectConfig(configPath);
+                that.loadContentPanes(path);
+            }
+            else
             {
                 that.beginNavigation();
                 that.contextPanel.beginNavigation();
@@ -122,11 +127,6 @@
                     Zutubi.admin.replaceConfigPath(path);
                     that.loadContentPanes(path);
                 });
-            }
-            else
-            {
-                that.configTree.selectConfig(configPath);
-                that.loadContentPanes(path);
             }
         },
 
@@ -289,6 +289,7 @@
         _showCollection: function(data)
         {
             var that = this;
+
 
             that.contentPanel = new Zutubi.admin.CollectionPanel({
                 container: that.contentEl,
