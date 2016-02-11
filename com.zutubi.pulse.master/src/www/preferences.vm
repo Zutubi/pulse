@@ -4,10 +4,43 @@
 <head>
     <title>#wwtext("name=preferences")</title>
     <script>
+        function _createRouter()
+        {
+            var router = new kendo.Router({
+                root: baseUrl + "/preferences",
+                pushState: true,
+                routeMissing: function (e) {
+                    showStatus("Unknown preferences path '" + e.url + "', redirecting.", "failure");
+                    router.navigate("/");
+                }
+            });
+
+            router.route("/*path", function(path)
+            {
+                window.configPanel.setPaths(window.rootPath, path);
+            });
+
+            return router;
+        }
+
         $(document).ready(function()
         {
+            window.rootPath = "users/" + window.userLogin + "/preferences";
+            window.router = _createRouter();
             window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
-            window.configPanel.setPaths("users/" + window.userLogin + "/preferences", "");
+            window.configPanel.bind("pathselect", function(e)
+            {
+                var path = e.path;
+
+                if (path.indexOf(window.rootPath) === 0)
+                {
+                    path = path.substring(window.rootPath.length);
+                }
+
+                window.router.navigate(Zutubi.config.encodePath(path), true);
+            });
+
+            window.router.start();
         });
     </script>
 </head>

@@ -1,9 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Function;
-import static com.google.common.collect.Collections2.transform;
 import com.zutubi.i18n.Messages;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -18,25 +16,28 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
-import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.PreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static java.util.Arrays.asList;
 
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 {
@@ -172,7 +173,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         // user access
         assertRedirectionToLogin(DashboardPage.class);
         assertRedirectionToLogin(MyBuildsPage.class);
-        assertRedirectionToLogin(MyPreferencesPage.class);
+        assertRedirectionToLogin(PreferencesPage.class);
 
         // admin access
         assertRedirectionToLogin(UsersPage.class);

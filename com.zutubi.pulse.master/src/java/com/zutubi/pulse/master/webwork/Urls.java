@@ -127,9 +127,9 @@ public class Urls
         return myBuildArtifacts(number) + uriComponentEncode(stage) + "/" + uriComponentEncode(command) + "/";
     }
 
-    public String dashboardPreferences()
+    public String preferences()
     {
-        return dashboard() + "preferences/";
+        return base() + "preferences/";
     }
 
     public String dashboardChangelist(long id)

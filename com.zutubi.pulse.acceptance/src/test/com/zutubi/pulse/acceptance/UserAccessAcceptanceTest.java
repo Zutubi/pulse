@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
-import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.PreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 
 public class UserAccessAcceptanceTest extends AcceptanceTestBase
@@ -28,7 +28,7 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAndWait(random, "");
 
         checkAccessible(DashboardPage.class);
-        checkAccessible(MyPreferencesPage.class);
+        checkAccessible(PreferencesPage.class);
         checkAccessible(MyBuildsPage.class);
 
         checkAccessible(BrowsePage.class);

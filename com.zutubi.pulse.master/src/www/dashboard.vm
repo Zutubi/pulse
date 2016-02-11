@@ -58,7 +58,7 @@
             var points = data.contactPointsWithErrors;
             for (var i = 0; i < points.length; i++)
             {
-                center.insertHtml("afterBegin", "<p class='note'>Your contact point '" + Ext.util.Format.htmlEncode(points[i]) + "' has caused a notification error. View its <a href='$base/dashboard/preferences/contacts/" + encodeURIComponent(points[i]) + "/'>configuration</a> for details.</p>");
+                center.insertHtml("afterBegin", "<p class='note'>Your contact point '" + Ext.util.Format.htmlEncode(points[i]) + "' has caused a notification error. View its <a href='$base/preferences/contacts/" + encodeURIComponent(points[i]) + "/'>configuration</a> for details.</p>");
             }
 
             projectsTable.update(data.projectsFilter, data.projects);

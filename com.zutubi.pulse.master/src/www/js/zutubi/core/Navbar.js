@@ -331,7 +331,7 @@
                     inactive: true
                 }, {
                     text: "preferences",
-                    url: "/dashboard/preferences/"
+                    url: "/preferences/"
                 });
 
                 if (that.options.userCanLogout)

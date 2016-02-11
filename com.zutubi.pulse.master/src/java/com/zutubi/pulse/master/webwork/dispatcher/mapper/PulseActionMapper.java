@@ -28,6 +28,7 @@ public class PulseActionMapper implements ActionMapper
 {
     public static final String DASHBOARD_NAMESPACE = "/dashboard";
     public static final String MY_NAMESPACE = "/my";
+    public static final String PREFERENCES_NAMESPACE = "/preferences";
     public static final String BROWSE_NAMESPACE    = "/browse";
     public static final String SERVER_NAMESPACE    = "/server";
     public static final String AGENTS_NAMESPACE    = "/agents";
@@ -83,6 +84,10 @@ public class PulseActionMapper implements ActionMapper
         else if(MY_NAMESPACE.equals(namespace))
         {
             mapping = getResolverMapping(getEncodedPath(request, namespace), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
+        }
+        else if(PREFERENCES_NAMESPACE.equals(namespace))
+        {
+            mapping = new ActionMapping(PATH_PREFERENCES, DASHBOARD_NAMESPACE, null, Collections.emptyMap());
         }
         else if(BROWSE_NAMESPACE.equals(namespace))
         {
@@ -148,7 +153,7 @@ public class PulseActionMapper implements ActionMapper
         encodedPath = normalise(encodedPath);
         if(encodedPath.startsWith(PATH_PREFERENCES))
         {
-            // /dashboard/preferences/<path> is a config view rooted at
+            // Legacy: /dashboard/preferences/<path> is a config view rooted at
             // users/<user>/preferences
             return new ActionMapping(encodedPath, DASHBOARD_NAMESPACE, null, Collections.emptyMap());
         }
@@ -217,13 +222,12 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping getAdminMapping(String path)
     {
-        ActionMapping mapping;Map<String, String> params = Maps.newHashMap();
+        Map<String, String> params = Maps.newHashMap();
         params.put("path", path);
-        mapping = new ActionMapping("app", ADMIN_NAMESPACE, null, params);
-        return mapping;
+        return new ActionMapping("app", ADMIN_NAMESPACE, null, params);
     }
 
-    private ActionMapping getResolverMapping(String encodedPath, String namespace, ActionResolver resolver)
+    private ActionMapping   getResolverMapping(String encodedPath, String namespace, ActionResolver resolver)
     {
         return resolve(namespace, normalise(encodedPath), resolver);
     }
@@ -274,8 +278,8 @@ public class PulseActionMapper implements ActionMapper
 
         Map<String, Optional<ActionResolver>> baseResolvers = ImmutableMap.<String, Optional<ActionResolver>>builder()
                 .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", Optional.<ActionResolver>absent())
-                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, Optional.<ActionResolver>of(new MyBuildsActionResolver()))
-                .put(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", Optional.<ActionResolver>absent())
+                .put(MY_NAMESPACE, Optional.<ActionResolver>of(new MyBuildsActionResolver()))
+                .put(PREFERENCES_NAMESPACE, Optional.<ActionResolver>absent())
                 .put(BROWSE_NAMESPACE, Optional.<ActionResolver>of(new BrowseActionResolver()))
                 .put(SERVER_NAMESPACE, Optional.<ActionResolver>of(new ServerActionResolver()))
                 .put(AGENTS_NAMESPACE, Optional.<ActionResolver>of(new AgentsActionResolver()))

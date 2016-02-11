@@ -24,6 +24,8 @@
     </excludes>
 
     <decorator name="config" page="config.vm">
+        <pattern>/preferences*</pattern>
+        <!-- This supports a legacy URL -->
         <pattern>/dashboard/preferences*</pattern>
     </decorator>
 
