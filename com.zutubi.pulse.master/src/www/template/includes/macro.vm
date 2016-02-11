@@ -209,6 +209,35 @@
 #end
 
 ##
+## Outputs a standard footer, used in multiple decorators.
+##
+#macro(footer $id)
+    <div id="$id">
+        <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+        <b>::</b> copyright &copy; 2005-2016 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+        <a href="http://jira.zutubi.com/">report bug/request feature</a>
+    #if($license)
+        #if($license.evaluation)
+            #if($license.expired)
+                    <div class="license-status" id="license-expired">#wwtext("name=license.expiry.notice")</div>
+            #end
+        #else
+            #if($license.expired)
+                #if($licenseCanRunVersion)
+                        <b>::</b> <span id="support-expired">#wwtext("name=license.support.expiry.notice")</span>
+                #else
+                        <div class="license-status" id="license-cannot-run">#wwtext("name=license.cannot.run.notice")</div>
+                #end
+            #end
+            #if($licenseExceeded)
+                    <div class="license-status" id="license-exceeded">#wwtext("name=license.exceeded.notice")</div>
+            #end
+        #end
+    #end
+    </div>
+#end
+
+##
 ## Outputs an image tag with alt key looked up
 ##
 #macro(image $src $altKey)

@@ -24,26 +24,26 @@ pre
     padding: 0
 }
 
-/* Kendo Content/resets */
+/* Kendo Content/resets (note #main is for the reference view) */
 
 #content, #menus-window {
     font-family: Verdana, sans-serif;
     font-size: 12px;
 }
 
-#content a:link, #content a:visited, #menus-window a:link, #menus-window a:visited
+#content a:link, #content a:visited, #menus-window a:link, #menus-window a:visited, #main a:link, #main a:visited
 {
     color: #668;
     text-decoration: none;
 }
 
-#content a:hover, #menus-window a:hover
+#content a:hover, #menus-window a:hover, #main a:hover
 {
     color: #336;
     border-bottom: solid 2px #336;
 }
 
-#content a, #menus-window a
+#content a, #menus-window a, #main a
 {
     font-weight: bold;
     text-decoration: none;
@@ -163,7 +163,7 @@ strong
     font-weight: bold;
 }
 
-#content a.unadorned, #content a.unadorned:hover, #menus-window a.unadorned, #menus-window a.unadorned:hover, #content a.x-tabs-right, #content a.x-tabs-right:hover, #content .x-tree-node a, #content .x-tree-node a:hover
+#content a.unadorned, #content a.unadorned:hover, #menus-window a.unadorned, #menus-window a.unadorned:hover, #main  a.unadorned, #main a.unadorned:hover, #content a.x-tabs-right, #content a.x-tabs-right:hover, #content .x-tree-node a, #content .x-tree-node a:hover
 {
     border-bottom: none;
 }
@@ -212,19 +212,6 @@ img.centre
 /*------------------------------
 Content
 */
-
-#main
-{
-    float: left;
-    width: 66%;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-#sidebar
-{
-    margin-left: 69%;
-}
 
 ul.points
 {

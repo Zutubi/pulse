@@ -7,6 +7,7 @@
     <link rel="apple-touch-icon" href="$base/images/icon120.png" sizes="120x120">
     <link rel="apple-touch-icon" href="$base/images/icon152.png" sizes="152x152">
     <link type="text/css" rel="stylesheet" href="$base/css/ext-all.css?#version()"/>
+    <link type="text/css" rel="stylesheet" href="$base/css/core.css?#version()" media="screen"/>
     <link type="text/css" rel="stylesheet" href="$base/css/main.css?#version()" media="screen"/>
     #javascript()
         ext/package.js
@@ -36,7 +37,7 @@
         
         function onSelect(selectionModel, node)
         {
-            Ext.get('content').load({
+            Ext.get('main').load({
                 url: '$base/ajax/reference.action',
                 params: { 'path': node.getPath('baseName') },
                 method: 'GET',
@@ -85,7 +86,7 @@
                             split: false
                         }, {
                             region: 'center',
-                            contentEl: 'content',
+                            contentEl: 'main',
                             autoScroll: true,
                             split: false
                         }, {
@@ -115,12 +116,8 @@
 </head>
 <html>
     <body>
-        <div id="content" class="reference">
+        <div id="main" class="reference">
         </div>
-        <div id="south">
-            <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
-            <b>::</b> copyright &copy; 2005-2016 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
-            <a href="http://jira.zutubi.com/">report bug/request feature</a>
-        </div>
+        #footer("south")
     </body>
 </html>

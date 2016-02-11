@@ -122,6 +122,10 @@
     left: 0;
     right: 0;
     height: 20px;
+}
+
+/* #south is a legacy footer on the reference view */
+#footer, #south {
     font-size: 12px;
     color: #aaa;
     text-align: center;
@@ -129,7 +133,7 @@
     border-top: solid 1px #eee;
 }
 
-#footer a {
+#footer a, #south a {
     text-decoration: none;
     border: none;
     font-weight: bold;
