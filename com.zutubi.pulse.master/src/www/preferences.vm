@@ -9,7 +9,8 @@
             var router = new kendo.Router({
                 root: baseUrl + "/preferences",
                 pushState: true,
-                routeMissing: function (e) {
+                routeMissing: function(e)
+                {
                     showStatus("Unknown preferences path '" + e.url + "', redirecting.", "failure");
                     router.navigate("/");
                 }
@@ -23,24 +24,36 @@
             return router;
         }
 
+        function _relativePath(path)
+        {
+            if (path.indexOf(window.rootPath) === 0)
+            {
+                path = path.substring(window.rootPath.length);
+            }
+
+            return path;
+        }
+
+        // Hackish override.  The proper fix is to split up the admin package to allow ConfigPanel to be used without
+        // relying on Zutubi.admin at all, but at the moment that seems overkill.
+        Zutubi.admin.replaceConfigPath = function(newPath)
+        {
+            Zutubi.admin.app.router.replace(Zutubi.config.encodePath(_relativePath(newPath)), true);
+        },
+
         $(document).ready(function()
         {
+            var router;
+
             window.rootPath = "users/" + window.userLogin + "/preferences";
-            window.router = _createRouter();
+            router = Zutubi.admin.app.router = _createRouter();
             window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
             window.configPanel.bind("pathselect", function(e)
             {
-                var path = e.path;
-
-                if (path.indexOf(window.rootPath) === 0)
-                {
-                    path = path.substring(window.rootPath.length);
-                }
-
-                window.router.navigate(Zutubi.config.encodePath(path), true);
+                router.navigate(Zutubi.config.encodePath(_relativePath(e.path)), true);
             });
 
-            window.router.start();
+            router.start();
         });
     </script>
 </head>
