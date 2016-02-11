@@ -1,11 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
+    #favicon()
+
     <title>:: pulse :: #if ($title) $title #end</title>
-    <link rel="shortcut icon" href="$base/images/favicon.ico"/>
-    <link type="image/png" rel="icon" href="$base/images/favicon.png"/>
-    <link rel="apple-touch-icon" href="$base/images/icon120.png" sizes="120x120">
-    <link rel="apple-touch-icon" href="$base/images/icon152.png" sizes="152x152">
+
     <link type="text/css" rel="stylesheet" href="$base/css/ext-all.css?#version()"/>
     <link type="text/css" rel="stylesheet" href="$base/css/core.css?#version()" media="screen"/>
     <link type="text/css" rel="stylesheet" href="$base/css/main.css?#version()" media="screen"/>
