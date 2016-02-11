@@ -24,10 +24,9 @@
     padding: 0.5em;
 }
 
-.k-hierarchy-selector input {
+.k-hierarchy-selector input.k-textbox {
     box-sizing: border-box;
     width: 100%;
-    font-size: 80%;
     height: 1.6em;
     margin-bottom: 0.5em;
 }
@@ -46,8 +45,8 @@
     position:relative;
     z-index: 2;
     float: right;
-    margin-top: -33px;
-    margin-right: 6px;
+    margin-top: -1.8em;
+    margin-right: 0.4em;
     color: #444;
 }
 
