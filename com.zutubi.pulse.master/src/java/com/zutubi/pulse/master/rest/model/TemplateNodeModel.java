@@ -9,18 +9,25 @@ import java.util.List;
 public class TemplateNodeModel
 {
     private String name;
+    private long handle;
     private boolean concrete;
     private List<TemplateNodeModel> nested;
 
-    public TemplateNodeModel(String name, boolean concrete)
+    public TemplateNodeModel(String name, long handle, boolean concrete)
     {
         this.name = name;
+        this.handle = handle;
         this.concrete = concrete;
     }
 
     public String getName()
     {
         return name;
+    }
+
+    public long getHandle()
+    {
+        return handle;
     }
 
     public boolean isConcrete()

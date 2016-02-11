@@ -49,7 +49,9 @@
             that.configButton = that.view.element.find(".k-view-switch button").kendoButton({
                 click: jQuery.proxy(this._openConfig, this)
             });
-            that.hierarchySelector = that.view.element.find(".k-hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.hierarchySelector = that.view.element.find(".k-hierarchy-tree").kendoZaHierarchySelector({
+                namespace: "ScopePanel"
+            }).data("kendoZaHierarchySelector");
             that.contentEl = that.view.element.find(".k-center-pane-content");
             that.contextPanel = that.view.element.find(".k-right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
 

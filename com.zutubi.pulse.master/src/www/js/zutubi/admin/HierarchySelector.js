@@ -56,6 +56,7 @@
             that.outer.append(that.treeEl);
 
             that.tree = that.treeEl.kendoZaHierarchyTree({
+                namespace: that.options.namespace,
                 scope: that.options.scope,
                 dragAndDrop: false
             }).data("kendoZaHierarchyTree");

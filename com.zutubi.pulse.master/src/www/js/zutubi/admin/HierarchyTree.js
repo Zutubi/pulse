@@ -10,7 +10,8 @@
         DRAG = "drag",
         DROP = "drop",
         NODESELECT = "nodeselect",
-        SELECT = "select";
+        SELECT = "select",
+        BEFORE_UNLOAD = "beforeunload";
 
     Zutubi.admin.HierarchyTree = TreeView.extend({
         init: function(element, options)
@@ -18,6 +19,10 @@
             TreeView.fn.init.call(this, element, options);
 
             this.bound = false;
+
+            // jQuery has issues with beforeunload handling, so we don't use it for this binding.
+            this.unloadHandler = jQuery.proxy(this._beforeUnload, this);
+            window.addEventListener(BEFORE_UNLOAD, this.unloadHandler);
 
             if (options && options.scope)
             {
@@ -79,6 +84,42 @@
             {
                 var that = this;
                 that.trigger(NODESELECT, {name: that.dataItem(e.node).name});
+            }
+        },
+
+        destroy: function()
+        {
+            window.removeEventListener(BEFORE_UNLOAD, this.unloadHandler);
+            this._saveState();
+            TreeView.fn.destroy.call(this);
+        },
+
+        _beforeUnload: function()
+        {
+            this._saveState();
+        },
+
+        _stateKey: function()
+        {
+            return this.options.name + "_" + this.options.namespace + "_" + this.scope;
+        },
+
+        _saveState: function()
+        {
+            var that = this,
+                expandedItems = [];
+
+            if (that.bound)
+            {
+                that.element.find(".k-item").each(function () {
+                    var item = that.dataItem(this);
+                    if (item.expanded)
+                    {
+                        expandedItems.push(item.handle);
+                    }
+                });
+
+                localStorage[that._stateKey()] = JSON.stringify(expandedItems);
             }
         },
 
@@ -215,10 +256,20 @@
 
         _setScope: function (scope)
         {
-            var dataSource;
+            var expanded, dataSource;
 
             this.scope = scope;
             this.bound = false;
+
+            expanded = localStorage[this._stateKey()];
+            if (expanded)
+            {
+                expanded = JSON.parse(expanded);
+            }
+            else
+            {
+                expanded = [];
+            }
 
             dataSource = new kendo.data.HierarchicalDataSource({
                 transport: {
@@ -240,18 +291,19 @@
                         return jQuery.map(items, function(item)
                         {
                             item.spriteCssClass = item.concrete ? "fa fa-circle" : "fa fa-circle-thin";
+                            item.expanded = expanded.indexOf(item.handle) >= 0;
                             if (item.nested)
                             {
                                 parseItems(item.nested);
                             }
                             return item;
                         });
-
                     }
                 }
             });
 
-            dataSource.bind('error', function (e) {
+            dataSource.bind('error', function(e)
+            {
                 Zutubi.core.reportError('Could not load hierarchy tree: ' + Zutubi.core.ajaxError(e.xhr));
             });
 

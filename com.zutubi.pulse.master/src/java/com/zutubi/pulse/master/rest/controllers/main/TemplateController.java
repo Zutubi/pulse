@@ -61,7 +61,7 @@ public class TemplateController
             throw new NotFoundException("Scope '" + scope + "' has no item named '" + name + "'");
         }
 
-        TemplateNodeModel model = new TemplateNodeModel(name, templateNode.isConcrete());
+        TemplateNodeModel model = new TemplateNodeModel(name, configurationTemplateManager.getRecord(path).getHandle(), templateNode.isConcrete());
         addChildren(model, templateNode);
         return new TemplateNodeModel[]{ model };
     }
@@ -88,7 +88,7 @@ public class TemplateController
 
         for (TemplateNode childNode: visibleChildren)
         {
-            TemplateNodeModel childModel = new TemplateNodeModel(childNode.getId(), childNode.isConcrete());
+            TemplateNodeModel childModel = new TemplateNodeModel(childNode.getId(), configurationTemplateManager.getRecord(childNode.getPath()).getHandle(), childNode.isConcrete());
             model.addChild(childModel);
             addChildren(childModel, childNode);
         }

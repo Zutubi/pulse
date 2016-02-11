@@ -48,7 +48,9 @@
                 popup;
 
             that.popupEl = $("<div class='k-hierarchy-popup'></div>");
-            that.selector = that.popupEl.kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.selector = that.popupEl.kendoZaHierarchySelector({
+                namespace: "Navbar"
+            }).data("kendoZaHierarchySelector");
             that.selector.bind("nodeselect", function(e)
             {
                 that.select(e.name);
