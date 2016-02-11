@@ -6,7 +6,9 @@ if (window.Zutubi.admin === undefined)
     window.Zutubi.admin = (function($)
     {
         var app = {},
-            baseUrl = window.baseUrl;
+            baseUrl = window.baseUrl,
+            unloadListeners = [],
+            BEFORE_UNLOAD = "beforeunload";
 
         function _createNotificationWidget()
         {
@@ -293,6 +295,16 @@ if (window.Zutubi.admin === undefined)
             return navbar;
         }
 
+        function _unloadHandler()
+        {
+            var i;
+
+            for (i = 0; i < unloadListeners.length; i++)
+            {
+                unloadListeners[i]();
+            }
+        }
+
         return {
             app: app,
 
@@ -352,6 +364,10 @@ if (window.Zutubi.admin === undefined)
                 app.isAdmin = isAdmin;
                 app.notificationWidget = _createNotificationWidget();
                 Zutubi.core.registerFeedbackHandler(app.notificationWidget);
+
+                // jQuery has issues with beforeunload handling, so we don't use it for this binding.
+                window.addEventListener(BEFORE_UNLOAD, _unloadHandler);
+
                 app.router = _createRouter();
                 app.navbar = _createNavbar({
                     section: "administration",
@@ -418,6 +434,11 @@ if (window.Zutubi.admin === undefined)
             clearLastAddedPath: function()
             {
                 delete app.addedPath;
+            },
+
+            registerUnloadListener: function(callback, context)
+            {
+                unloadListeners.push(jQuery.bind(callback, context));
             }
         };
     }(jQuery));

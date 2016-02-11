@@ -14,6 +14,8 @@
         {
             Widget.fn.init.call(this, options);
 
+            Zutubi.admin.registerUnloadListener(this._beforeUnload, this);
+
             this.element.append("<div></div>");
             this.contentElement = this.element.children("div");
             this.linkTemplate = kendo.template(this.options.linkTemplate);
@@ -37,6 +39,8 @@
 
         destroy: function()
         {
+            this._saveState();
+
             if (this.actionLists)
             {
                 this.actionLists.off(ns);
@@ -48,6 +52,47 @@
             }
         },
 
+        _beforeUnload: function()
+        {
+            this._saveState();
+        },
+
+        _stateKey: function()
+        {
+            return this.options.name;
+        },
+
+        _loadState: function()
+        {
+            var stateString = localStorage[this._stateKey()];
+            return stateString ? JSON.parse(stateString) : {};
+        },
+
+        _saveState: function()
+        {
+            var that = this,
+                collapsedPanels = this._loadState(),
+                text;
+
+            if (that.panelBar)
+            {
+                that.panelBar.element.find("li.k-item").each(function()
+                {
+                    text = $(this).find(".k-header").text();
+                    if ($(this).attr("aria-expanded") === "true")
+                    {
+                        delete collapsedPanels[text];
+                    }
+                    else
+                    {
+                        collapsedPanels[text] = true;
+                    }
+                });
+
+                localStorage[that._stateKey()] = JSON.stringify(collapsedPanels);
+            }
+        },
+
         _createContentElement: function ()
         {
             return $('<div class="k-context-content"></div>');
@@ -56,6 +101,7 @@
         setData: function(path, data)
         {
             var that = this,
+                collapsedPanels,
                 panels = [],
                 element,
                 docs,
@@ -63,7 +109,9 @@
 
             if (that.panelBar)
             {
+                that._saveState();
                 that.panelBar.destroy();
+                that.panelBar = null;
             }
 
             that.path = path;
@@ -71,13 +119,15 @@
 
             if (data)
             {
+                collapsedPanels = that._loadState();
+
                 if (data.links && data.links.length > 0)
                 {
                     element = this._createContentElement();
                     that._renderLinks(element, data.links);
                     panels.push({
                         text: "links",
-                        expanded: true,
+                        expanded: !collapsedPanels.links,
                         content: element[0].outerHTML
                     });
                 }
@@ -91,7 +141,7 @@
                     that._renderActions(element, that.actions, "action");
                     panels.push({
                         text: "actions",
-                        expanded: true,
+                        expanded: !collapsedPanels.actions,
                         content: element[0].outerHTML
                     });
                 }
@@ -104,7 +154,7 @@
                     that._renderActions(element, data.descendantActions, "descendant");
                     panels.push({
                         text: "descendant actions",
-                        expanded: true,
+                        expanded: !collapsedPanels["descendant actions"],
                         content: element[0].outerHTML
                     });
                 }
@@ -128,7 +178,7 @@
                         element.append(content);
                         panels.push({
                             text: "documentation",
-                            expanded: true,
+                            expanded: !collapsedPanels.documentation,
                             content: element[0].outerHTML
                         });
                     }

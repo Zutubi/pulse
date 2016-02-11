@@ -10,8 +10,7 @@
         DRAG = "drag",
         DROP = "drop",
         NODESELECT = "nodeselect",
-        SELECT = "select",
-        BEFORE_UNLOAD = "beforeunload";
+        SELECT = "select";
 
     Zutubi.admin.HierarchyTree = TreeView.extend({
         init: function(element, options)
@@ -20,9 +19,7 @@
 
             this.bound = false;
 
-            // jQuery has issues with beforeunload handling, so we don't use it for this binding.
-            this.unloadHandler = jQuery.proxy(this._beforeUnload, this);
-            window.addEventListener(BEFORE_UNLOAD, this.unloadHandler);
+            Zutubi.admin.registerUnloadListener(this._beforeUnload, this);
 
             if (options && options.scope)
             {
@@ -89,7 +86,6 @@
 
         destroy: function()
         {
-            window.removeEventListener(BEFORE_UNLOAD, this.unloadHandler);
             this._saveState();
             TreeView.fn.destroy.call(this);
         },
@@ -111,7 +107,8 @@
 
             if (that.bound)
             {
-                that.element.find(".k-item").each(function () {
+                that.element.find(".k-item").each(function()
+                {
                     var item = that.dataItem(this);
                     if (item.expanded)
                     {
@@ -257,6 +254,8 @@
         _setScope: function (scope)
         {
             var expanded, dataSource;
+
+            this._saveState();
 
             this.scope = scope;
             this.bound = false;
