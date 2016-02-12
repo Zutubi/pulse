@@ -323,7 +323,7 @@ public class ConfigModelBuilder
             model.setFormattedProperties(getFormattedProperties(path, type));
         }
 
-        if (isFieldSelected(filters, "validationErrors"))
+        if (instance != null && isFieldSelected(filters, "validationErrors"))
         {
             model.setValidationErrors(getValidationErrors(instance));
         }

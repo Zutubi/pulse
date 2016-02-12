@@ -226,6 +226,11 @@
             {
                 this.path = delta.renamedPaths[this.path];
             }
+
+            if (delta.updatedPaths && delta.updatedPaths.indexOf(this.path) >= 0)
+            {
+                this.setData(this.path, delta.models[this.path]);
+            }
         },
 
         _renderLinks: function(element, links)
