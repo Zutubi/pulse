@@ -432,7 +432,9 @@ ul.k-form-validation-errors {
     margin: 0.4em 0;
 }
 
-input.k-state-disabled, input.k-state-disabled:hover {
+input.k-state-disabled, input.k-state-disabled:hover,
+.k-button.k-state-disabled, .k-button.k-state-disabled:hover, .k-button.k-state-disabled:active, .k-button.k-state-disabled:active:hover,
+.k-state-disabled .k-multiselect-wrap {
     background-color: #f2f2f2;
     border-color: #ddd;
 }
