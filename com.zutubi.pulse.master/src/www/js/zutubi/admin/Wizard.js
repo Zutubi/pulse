@@ -20,6 +20,7 @@
 
     WizardStep = function(config, wizard)
     {
+        this.config = config;
         this.wizard = wizard;
         this.kind = config.kind;
         this.key = config.key;
@@ -41,6 +42,21 @@
         }
         else if (config.kind === "typed")
         {
+            this.initialiseTypesFromConfig();
+        }
+        else
+        {
+            Zutubi.core.reportWarning("Unknown wizard step type '" + config.kind + "'");
+        }
+    };
+
+    WizardStep.prototype = {
+        initialiseTypesFromConfig: function()
+        {
+            var config = this.config;
+
+            this.filtered = false;
+
             config.types.sort(Zutubi.admin.labelCompare);
 
             this.types = jQuery.map(config.types, function(type)
@@ -61,13 +77,17 @@
             {
                 this.selectedTypeIndex = this.indexOfType(config.defaultType);
             }
+            else
+            {
+                this.selectedTypeIndex = 0;
+            }
 
             this.valuesByType = jQuery.map(config.types, function(type)
             {
                 return type.type.simplePropertyDefaults || {};
             });
 
-            if (wizard.templateCollectionWizard() && config.types.length > 1)
+            if (this.wizard.templateCollectionWizard() && config.types.length > 1)
             {
                 // Add an additional option to skip this step.
                 this.types.splice(0, 0, {
@@ -83,14 +103,8 @@
 
                 this.selectedTypeIndex += 1;
             }
-        }
-        else
-        {
-            Zutubi.core.reportWarning("Unknown wizard step type '" + config.kind + "'");
-        }
-    };
+        },
 
-    WizardStep.prototype = {
         applyDefaults: function(composite)
         {
             var i,
@@ -98,6 +112,12 @@
                 fields,
                 field,
                 values = {};
+
+            if (this.filtered)
+            {
+                // We've previously filtered, reset to all available types.
+                this.initialiseTypesFromConfig();
+            }
 
             for (i = 0; i < this.types.length; i++)
             {
@@ -111,6 +131,8 @@
 
             if (i < this.types.length)
             {
+                this.filtered = this.config.types.length > 1;
+
                 this.types = [type];
                 this.selectedTypeIndex = 0;
                 fields = type.form.fields;
@@ -754,12 +776,16 @@
                 {
                     step.applyDefaults(parent);
                 }
-                else
+                else if (step.kind === "typed")
                 {
                     stepParent = this._findNested(parent, step.key);
-                    if (stepParent)
+                    if (stepParent && stepParent.kind === "composite")
                     {
                         step.applyDefaults(stepParent);
+                    }
+                    else
+                    {
+                        step.initialiseTypesFromConfig();
                     }
                 }
             }
