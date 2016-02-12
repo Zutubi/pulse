@@ -235,6 +235,10 @@
     border-right-width: 0;
 }
 
+.k-grid-clickable {
+    cursor: pointer;
+}
+
 /* This makes the actions menu open with its right side aligned with the right side of the ... hover target. */
 .k-collection-table .k-menu .k-animation-container {
     left: auto !important;

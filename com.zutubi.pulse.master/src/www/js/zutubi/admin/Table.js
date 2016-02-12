@@ -5,7 +5,9 @@
     var ui = kendo.ui,
         Widget = ui.Widget,
         ACTION = "action",
-        REORDER = "reorder";
+        REORDER = "reorder",
+        ns = ".kendoZaTable",
+        CLICK = "click" + ns;
 
     Zutubi.admin.Table = Widget.extend({
         init: function (element, options) {
@@ -48,6 +50,26 @@
                 scrollable: false
             }).data("kendoGrid");
 
+            that.grid.element.find(".k-grid-clickable").on(CLICK, function(e)
+            {
+                var row = $(e.target).closest("tr"),
+                    item,
+                    action;
+
+                if (row.length === 1)
+                {
+                    item = that.grid.dataItem(row);
+                    if (item)
+                    {
+                        action = that._actionLabelled("view", item);
+                        if (action)
+                        {
+                            that.trigger(ACTION, {key: item.key, action: action});
+                        }
+                    }
+                }
+            });
+
             that._addDecorationsAndMenus();
 
             if (that.options.allowSorting)
@@ -73,6 +95,13 @@
                     }
                 });
             }
+        },
+
+        destroy: function()
+        {
+            this.grid.element.find(".k-grid-clickable").off(ns);
+            this.grid.destroy();
+            Widget.fn.destroy.call(this);
         },
 
         _needsTemplateDecoration: function()
@@ -112,7 +141,17 @@
             for (i = 0; i < originalColumns.length; i++)
             {
                 column = originalColumns[i];
-                columns.push({title: column.label, field: column.name});
+                columnOptions = {
+                    title: column.label,
+                    field: column.name
+                };
+
+                if (column.name === "name")
+                {
+                    columnOptions.template = '<span class="k-grid-clickable">#: name # </span>';
+                }
+
+                columns.push(columnOptions);
             }
 
             columns.push({
@@ -223,20 +262,24 @@
             }
         },
 
+        _actionLabelled: function(label, item)
+        {
+            var actions = jQuery.grep(item.actions, function(action)
+            {
+                return action.label === label;
+            });
+
+            return actions.length === 1 ? actions[0] : null;
+        },
+
         _actionSelected: function(row, e)
         {
             var item = this.grid.dataSource.at(row),
-                actionLabel = $(e.item).text(),
-                actions;
+                action = this._actionLabelled($(e.item).text(), item);
 
-            actions = jQuery.grep(item.actions, function(action)
+            if (action)
             {
-                return action.label === actionLabel;
-            });
-
-            if (actions.length > 0)
-            {
-                this.trigger(ACTION, {key: item.key, action: actions[0]});
+                this.trigger(ACTION, {key: item.key, action: action});
             }
         },
 
