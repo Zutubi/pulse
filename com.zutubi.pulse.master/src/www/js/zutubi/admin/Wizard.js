@@ -16,9 +16,11 @@
         KEY_HIERARCHY = "meta.hierarchy",
         PARAMETER_IGNORE = "wizardIgnore",
         PARAMETER_NO_INHERIT = "noInherit",
+        LABEL_NONE = "[none]",
 
-    WizardStep = function(config)
+    WizardStep = function(config, wizard)
     {
+        this.wizard = wizard;
         this.kind = config.kind;
         this.key = config.key;
         this.label = config.label;
@@ -37,7 +39,7 @@
             this.valuesByType = [config.formDefaults];
             this.parameters = config.parameters;
         }
-        else if(config.kind === "typed")
+        else if (config.kind === "typed")
         {
             config.types.sort(Zutubi.admin.labelCompare);
 
@@ -64,6 +66,23 @@
             {
                 return type.type.simplePropertyDefaults || {};
             });
+
+            if (wizard.templateCollectionWizard() && config.types.length > 1)
+            {
+                // Add an additional option to skip this step.
+                this.types.splice(0, 0, {
+                    label: LABEL_NONE,
+                    help: "leave blank in this template",
+                    symbolicName: "",
+                    form: { fields: [] },
+                    docs: {},
+                    simpleProperties: []
+                });
+
+                this.valuesByType.splice(0, 0, {});
+
+                this.selectedTypeIndex += 1;
+            }
         }
         else
         {
@@ -115,10 +134,17 @@
         getValue: function()
         {
             var type = this.types[this.selectedTypeIndex],
-                value = {
-                    kind: "composite",
-                    properties: this.valuesByType[this.selectedTypeIndex]
-                };
+                value;
+
+            if (this.kind === "typed" && type.symbolicName === "")
+            {
+                return null;
+            }
+
+            value = {
+                kind: "composite",
+                properties: this.valuesByType[this.selectedTypeIndex]
+            };
 
             Zutubi.config.coerceProperties(value.properties, type.simpleProperties);
 
@@ -132,7 +158,7 @@
 
         requiresValidation: function()
         {
-            return this.kind === "typed";
+            return this.kind === "typed" && this.types[this.selectedTypeIndex].form.fields.length > 0;
         },
 
         indexOfTypeLabel: function(label)
@@ -147,7 +173,7 @@
 
         indexOfTypeProperty: function(name, value)
         {
-            var index = 0;
+            var index = -1;
 
             jQuery.each(this.types, function(i, type)
             {
@@ -163,11 +189,18 @@
 
         validTypeLabels: function(typesByKey)
         {
-            var validTypes = jQuery.grep(this.types, function(type)
+            var filterTemplate = this.kind === "typed" && this.wizard.templateCollectionWizard() && !this.wizard.configuringTemplate(),
+                validTypes;
+
+            validTypes = jQuery.grep(this.types, function(type)
             {
                 if (type.filter && typesByKey.hasOwnProperty(type.filter.stepKey))
                 {
                     return jQuery.inArray(typesByKey[type.filter.stepKey], type.filter.compatibleTypes) >= 0;
+                }
+                else if (filterTemplate)
+                {
+                    return type.symbolicName !== "";
                 }
                 else
                 {
@@ -277,7 +310,7 @@
 
             that.steps = jQuery.map(steps, function(step)
             {
-                return new WizardStep(step);
+                return new WizardStep(step, that);
             });
 
             that.template = kendo.template(that.options.template);
@@ -356,11 +389,16 @@
         getValue: function()
         {
             var that = this,
+                value,
                 result = {};
 
             jQuery.each(that.steps, function(index, step)
             {
-                result[step.key] = step.getValue();
+                value = step.getValue();
+                if (value)
+                {
+                    result[step.key] = value;
+                }
             });
 
             return result;
@@ -490,7 +528,8 @@
             if (step.requiresConfig(typesByKey))
             {
                 validTypeLabels = step.validTypeLabels(typesByKey);
-                if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0) {
+                if (jQuery.inArray(step.types[step.selectedTypeIndex].label, validTypeLabels) < 0)
+                {
                     step.selectedTypeIndex = step.indexOfTypeLabel(validTypeLabels[0]);
                 }
 
@@ -530,9 +569,19 @@
             this._showTypeAtIndex(step.indexOfTypeLabel(typeLabel));
         },
 
+        templateCollectionWizard: function()
+        {
+            return this.options.structure.steps[0].key === KEY_HIERARCHY;
+        },
+
+        configuringTemplate: function()
+        {
+            return this.templateCollectionWizard() && this.steps[0].getValue().properties.isTemplate;
+        },
+
         _shouldMarkRequired: function()
         {
-            if (this.steps[0].key === KEY_HIERARCHY)
+            if (this.templateCollectionWizard())
             {
                 return this.steps[0].getValue().properties.isTemplate === false;
             }
@@ -885,7 +934,7 @@
             else
             {
                 typeStep = this.steps[this._indexOfStepWithKey("type")];
-                if (typeStep.getValue().type.symbolicName === "zutubi.multiRecipeTypeConfig")
+                if (typeStep.getValue() && typeStep.getValue().type.symbolicName === "zutubi.multiRecipeTypeConfig")
                 {
                     ignoreDefaultRecipe = false;
                 }

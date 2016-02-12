@@ -73,11 +73,19 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
     public MutableRecord buildRecord(CompositeType type, WizardContext wizardContext) throws TypeException
     {
         MutableRecord projectRecord = wizardModelBuilder.buildAndValidateRecord(type, "", wizardContext);
-        CompositeType scmType = wizardModelBuilder.getCompositeType(ScmConfiguration.class);
-        projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, KEY_SCM, wizardContext));
-        CompositeType typeType = wizardModelBuilder.getCompositeType(TypeConfiguration.class);
-        MutableRecord typeRecord = wizardModelBuilder.buildAndValidateRecord(typeType, KEY_TYPE, wizardContext);
-        projectRecord.put(KEY_TYPE, typeRecord);
+        if (wizardContext.getModels().containsKey(KEY_SCM))
+        {
+            CompositeType scmType = wizardModelBuilder.getCompositeType(ScmConfiguration.class);
+            projectRecord.put(KEY_SCM, wizardModelBuilder.buildAndValidateRecord(scmType, KEY_SCM, wizardContext));
+        }
+
+        MutableRecord typeRecord = null;
+        if (wizardContext.getModels().containsKey(KEY_TYPE))
+        {
+            CompositeType typeType = wizardModelBuilder.getCompositeType(TypeConfiguration.class);
+            typeRecord = wizardModelBuilder.buildAndValidateRecord(typeType, KEY_TYPE, wizardContext);
+            projectRecord.put(KEY_TYPE, typeRecord);
+        }
 
         if (wizardContext.getModels().containsKey(KEY_DEFAULTS))
         {
@@ -102,29 +110,32 @@ public class ProjectConfigurationWizard implements ConfigurationWizard
             addTrigger(projectType, projectRecord, DependentBuildTriggerConfiguration.class, DEPENDENCY_TRIGGER, context);
         }
 
-        CompositeType multiRecipeType = typeRegistry.getType(MultiRecipeTypeConfiguration.class);
-        if (multiRecipeType.getSymbolicName().equals(typeRecord.getSymbolicName()) && defaults.isAddDefaultRecipe())
+        if (typeRecord != null)
         {
-            MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
-            if (recipesRecord == null)
+            CompositeType multiRecipeType = typeRegistry.getType(MultiRecipeTypeConfiguration.class);
+            if (multiRecipeType.getSymbolicName().equals(typeRecord.getSymbolicName()) && defaults.isAddDefaultRecipe())
             {
-                recipesRecord = ((CollectionType) multiRecipeType.getPropertyType(PROPERTY_RECIPES)).createNewRecord(true);
-                typeRecord.put(PROPERTY_RECIPES, recipesRecord);
-            }
-
-            if (recipesRecord.size() == 0)
-            {
-                String recipeName = defaults.getRecipeName();
-                if (!StringUtils.stringSet(recipeName))
+                MutableRecord recipesRecord = (MutableRecord) typeRecord.get(PROPERTY_RECIPES);
+                if (recipesRecord == null)
                 {
-                    recipeName = DEFAULT_RECIPE;
+                    recipesRecord = ((CollectionType) multiRecipeType.getPropertyType(PROPERTY_RECIPES)).createNewRecord(true);
+                    typeRecord.put(PROPERTY_RECIPES, recipesRecord);
                 }
 
-                typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
+                if (recipesRecord.size() == 0)
+                {
+                    String recipeName = defaults.getRecipeName();
+                    if (!StringUtils.stringSet(recipeName))
+                    {
+                        recipeName = DEFAULT_RECIPE;
+                    }
 
-                MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
-                recipeRecord.put(PROPERTY_NAME, recipeName);
-                recipesRecord.put(recipeName, recipeRecord);
+                    typeRecord.put(PROPERTY_DEFAULT_RECIPE, recipeName);
+
+                    MutableRecord recipeRecord = typeRegistry.getType(RecipeConfiguration.class).createNewRecord(true);
+                    recipeRecord.put(PROPERTY_NAME, recipeName);
+                    recipesRecord.put(recipeName, recipeRecord);
+                }
             }
         }
 
