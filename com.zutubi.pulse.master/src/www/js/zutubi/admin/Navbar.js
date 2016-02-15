@@ -130,6 +130,8 @@
 
             Navbar.fn.create.call(this);
 
+            that.addExtraItem({type: "kendoZaSeparatorNavbarItem"});
+
             that.scopeCrumb = that.addExtraItem({
                 type: "kendoZaScopeCrumb",
                 options: {
@@ -142,6 +144,7 @@
                 that.trigger(SCOPE_SELECTED, {scope: e.scope});
             });
 
+            that.hierarchySeparator = that.addExtraItem({type: "kendoZaSeparatorNavbarItem"});
             that.hierarchyCrumb = that.addExtraItem({
                 type: "kendoZaHierarchyCrumb"
             });
@@ -149,6 +152,7 @@
             {
                 that.trigger(ITEM_SELECTED, {name: e.name});
             });
+
 
             that.addButton = that.addExtraItem({
                 type: "kendoZaButtonNavbarItem",
@@ -167,10 +171,12 @@
             this.scopeCrumb.select(scope);
             if (typeof hierarchyPath === "undefined")
             {
+                this.hierarchySeparator.hide();
                 this.hierarchyCrumb.hide();
             }
             else
             {
+                this.hierarchySeparator.show();
                 this.hierarchyCrumb.setScope(scope);
                 this.hierarchyCrumb.select(Zutubi.config.subPath(hierarchyPath, 0, 1));
                 this.hierarchyCrumb.show();

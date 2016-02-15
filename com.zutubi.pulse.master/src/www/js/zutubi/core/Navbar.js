@@ -354,13 +354,13 @@
             }
 
             sectionItems.push({
-                text: "projects",
+                text: "browse",
                 url: "/browse/"
             }, {
                 text: "server",
                 url: "/server/"
             }, {
-                text: "agents",
+                text: "grid",
                 url: "/agents/"
             }, {
                 text: "administration",
