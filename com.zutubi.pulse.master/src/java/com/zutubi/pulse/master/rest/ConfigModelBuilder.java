@@ -362,7 +362,6 @@ public class ConfigModelBuilder
 
     public Map<String, Object> getProperties(String templateOwnerPath, CompositeType type, Record record) throws TypeException
     {
-        // FIXME kendo generalise toXmlRpc if necessary?
         Map<String, Object> result = new HashMap<>();
         for (TypeProperty property: type.getProperties(SimpleType.class))
         {

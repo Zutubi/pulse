@@ -41,7 +41,6 @@
 
         bindValue: function(value)
         {
-            // FIXME kendo this is hackish
             if (value === "true")
             {
                 value = true;

@@ -94,9 +94,8 @@
                 name,
                 i;
 
-            // Some actions need to transform from the form to a more direct representation.
-            // FIXME kendo this is perhaps where we also need to coerce? Could generic actions
-            // have a type to allow this?
+            // Some actions need to transform from the form to a more direct representation.  At the moment it's only
+            // cloning, so we just deal with that special cases here.  If we see more cases we can abstract.
             if (this.action.action === CLONE || this.action.action === SMART_CLONE)
             {
                 properties = {};

@@ -75,7 +75,6 @@
 
         destroy: function()
         {
-            // FIXME kendo need we do more?
             this.view.destroy();
         },
 

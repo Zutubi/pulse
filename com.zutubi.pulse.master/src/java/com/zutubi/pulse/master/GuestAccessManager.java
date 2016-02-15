@@ -35,7 +35,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
 
     public synchronized void init()
     {
-        // FIXME kendo not sure if its kosher to modify this list in place.
+        // Not entirely sure if its kosher to modify this list in place, but it appears to work.
         List<GrantedAuthority> authorities = anonymousAuthenticationFilter.getAuthorities();
         authorities.clear();
         authorities.add(new SimpleGrantedAuthority(Role.ANONYMOUS));
