@@ -5,7 +5,7 @@ Personal build 12 has completed with status 'failure'.
 
 You can view the full build result at:
 
-/dashboard/my/12/
+/my/12/
 
 Build stages:
   * first stage :: first recipe@[pending] :: failure

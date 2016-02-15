@@ -1,5 +1,5 @@
 Project: test project
-Personal build 12 (/dashboard/my/12/)
+Personal build 12 (/my/12/)
 
 Completed with status: failure
 
@@ -8,4 +8,4 @@ Build stages:
   * second stage :: second recipe@[pending] :: failure
   * third stage :: third recipe@[pending] :: failure
 
-Test summary: 5 of 5 broken (/dashboard/my/12/tests/)
+Test summary: 5 of 5 broken (/my/12/tests/)

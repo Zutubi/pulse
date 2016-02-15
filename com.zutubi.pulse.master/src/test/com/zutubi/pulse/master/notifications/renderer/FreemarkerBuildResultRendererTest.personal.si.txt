@@ -1,2 +1,2 @@
 project test project: personal build 12: failure
-see: /dashboard/my/12/
+see: /my/12/
