@@ -382,9 +382,37 @@ table.k-form {
     color: #c33;
 }
 
-input[type=checkbox].k-input {
-    height: 2em;
-    line-height: 2em;
+.k-za-checkbox {
+    opacity: 0;
+    width: 1px;
+    padding: 0;
+    margin: 0;
+}
+
+.k-za-checkbox + label::before {
+    display: inline-block;
+    font-family: "FontAwesome";
+    font-size: 1.2em;
+    height: 1.775em;
+    line-height: 1.775em;
+    vertical-align: middle;
+    content: '\f096';
+    color: #787878;
+    cursor: pointer;
+}
+
+.k-za-checkbox:focus + label::before, .k-za-checkbox + label:hover::before {
+    color: #1b376c;
+}
+
+.k-state-disabled.k-za-checkbox + label::before {
+    content: '\f0c8';
+    color: #eee;
+    cursor: default;
+}
+
+.k-za-checkbox:checked + label::before, .k-state-disabled.k-za-checkbox:checked + label::before {
+    content: '\f046'
 }
 
 input.k-input[readonly] {

@@ -35,7 +35,7 @@
                             '</tr>' +
                             '<tr>' +
                                 '<th><label for="rememberMe">remember me:</label></th>' +
-                                '<td><input type="checkbox" name="rememberMe" value="true"/></td>' +
+                                '<td><input class="k-za-checkbox" type="checkbox" name="rememberMe" id="rememberMe" value="true"/><label for="rememberMe">&nbsp;</label></td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<th>&nbsp;</th>' +

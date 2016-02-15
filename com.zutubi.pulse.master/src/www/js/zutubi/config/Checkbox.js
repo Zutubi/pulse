@@ -17,7 +17,7 @@
 
         options: {
             name: "ZaCheckbox",
-            template: '<input class="k-input" type="checkbox" id="#: id #" name="#: name #" value="true">'
+            template: '<input class="k-input k-za-checkbox" type="checkbox" id="#: id #" name="#: name #" value="true"><label for="#: id #">&nbsp;</label>'
         },
 
         _create: function()
