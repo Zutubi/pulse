@@ -1,10 +1,5 @@
 package com.zutubi.tove.config.api;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Holds the result of executing a configuration action, used for giving
  * feedback to the user.
@@ -39,13 +34,9 @@ public class ActionResult
      */
     private String message;
     /**
-     * A list of paths that this action execution has invalidated.  The UI will
-     * refresh displays of these paths.
-     *
-     * FIXME kendo I've overloaded this in the RESTish API action handlers, so if a path is added
-     * it is taken to be a new path added by the action processing, dodgy?
+     * If executing the action created a new path, that path is set here.
      */
-    private List<String> invalidatedPaths;
+    private String createdPath;
 
     /**
      * Creates a new result with the given status and message.
@@ -56,24 +47,21 @@ public class ActionResult
      */
     public ActionResult(Status status, String message)
     {
-        this(status, message, Collections.<String>emptyList());
+        this(status, message, null);
     }
 
     /**
-     * Creates a new result with the given status and message for an action
-     * that invalidated some configuration paths.
+     * Creates a new result with the given status and message for an action that created a given path.
      *
-     * @param status           the result of the action execution
-     * @param message          feedback for the user, may be null to indicate
-     *                         that the default message should be used
-     * @param invalidatedPaths configuration paths that have been invalidated
-     *                         by executing the action
+     * @param status the result of the action execution
+     * @param message feedback for the user, may be null to indicate that the default message should be used
+     * @param createdPath path created by executing the action (may be null)
      */
-    public ActionResult(Status status, String message, Collection<String> invalidatedPaths)
+    public ActionResult(Status status, String message, String createdPath)
     {
         this.status = status;
         this.message = message;
-        this.invalidatedPaths = new LinkedList<>(invalidatedPaths);
+        this.createdPath = createdPath;
     }
 
     /**
@@ -92,12 +80,8 @@ public class ActionResult
         return message;
     }
 
-    /**
-     * @return an unmodifiable list of configuration paths invalidated by the
-     *         action execution
-     */
-    public List<String> getInvalidatedPaths()
+    public String getCreatedPath()
     {
-        return Collections.unmodifiableList(invalidatedPaths);
+        return createdPath;
     }
 }

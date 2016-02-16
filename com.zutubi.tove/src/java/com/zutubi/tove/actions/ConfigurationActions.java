@@ -336,7 +336,7 @@ public class ConfigurationActions
 
         if (result.getMessage() == null)
         {
-            result = new ActionResult(result.getStatus(), getDefaultFeedback(name), result.getInvalidatedPaths());
+            result = new ActionResult(result.getStatus(), getDefaultFeedback(name), result.getCreatedPath());
         }
 
         return result;

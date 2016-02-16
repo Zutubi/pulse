@@ -89,7 +89,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         ActionResult result = ca.execute(actionName, new T(), null);
         assertEquals(ActionResult.Status.SUCCESS, result.getStatus());
         assertEquals(expectedMessage, result.getMessage());
-        assertEquals(0, result.getInvalidatedPaths().size());
+        assertNull(result.getCreatedPath());
     }
 
     public void testEnabledMethod() throws Exception

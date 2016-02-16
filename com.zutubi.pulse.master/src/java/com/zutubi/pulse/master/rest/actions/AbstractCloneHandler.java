@@ -20,7 +20,10 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper base class for implementing regular and smart clone handlers, which share very similar
@@ -186,7 +189,7 @@ public abstract class AbstractCloneHandler implements ActionHandler
             configurationRefactoringManager.clone(parentPath, keyMap);
         }
 
-        return new ActionResult(ActionResult.Status.SUCCESS, "configuration cloned", Collections.singletonList(PathUtils.getPath(parentPath, keyMap.get(baseName))));
+        return new ActionResult(ActionResult.Status.SUCCESS, "configuration cloned", PathUtils.getPath(parentPath, keyMap.get(baseName)));
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -23,12 +24,10 @@ import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +57,6 @@ public class ProjectConfigurationActions
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ScmManager scmManager;
-    private ObjectFactory objectFactory;
 
     public boolean actionsEnabled(ProjectConfiguration instance, boolean deeplyValid)
     {
@@ -233,25 +231,16 @@ public class ProjectConfigurationActions
     @Permission(AccessManager.ACTION_WRITE)
     public ActionResult doConvertToCustom(final ProjectConfiguration projectConfig, final CustomTypeConfiguration custom)
     {
-        return configurationProvider.executeInsideTransaction(new NullaryFunction<ActionResult>()
-        {
-            public ActionResult process()
-            {
-                if(!canConvertType(projectConfig))
-                {
-                    throw new IllegalArgumentException("Cannot convert type as it is either not defined at this level or overridden");
-                }
-
-                String typePath = projectConfig.getType().getConfigurationPath();
-                configurationProvider.delete(typePath);
-                configurationProvider.insert(typePath, custom);
-                return new ActionResult(ActionResult.Status.SUCCESS, null, Arrays.asList(typePath));
-            }
-        });
+        return convertType(projectConfig, custom);
     }
 
     @Permission(AccessManager.ACTION_WRITE)
     public ActionResult doConvertToVersioned(final ProjectConfiguration projectConfig, final VersionedTypeConfiguration versioned)
+    {
+        return convertType(projectConfig, versioned);
+    }
+
+    private ActionResult convertType(final ProjectConfiguration projectConfig, final TypeConfiguration newType)
     {
         return configurationProvider.executeInsideTransaction(new NullaryFunction<ActionResult>()
         {
@@ -264,8 +253,8 @@ public class ProjectConfigurationActions
 
                 String typePath = projectConfig.getType().getConfigurationPath();
                 configurationProvider.delete(typePath);
-                configurationProvider.insert(typePath, versioned);
-                return new ActionResult(ActionResult.Status.SUCCESS, null, Arrays.asList(typePath));
+                configurationProvider.insert(typePath, newType);
+                return new ActionResult(ActionResult.Status.SUCCESS, null);
             }
         });
     }
@@ -288,10 +277,5 @@ public class ProjectConfigurationActions
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 }

@@ -329,10 +329,9 @@ public class ConfigActionsController
 
         String newPath = null;
         ConfigModel model = null;
-        List<String> invalidatedPaths = actionResult.getInvalidatedPaths();
-        if (invalidatedPaths.size() > 0)
+        if (actionResult.getCreatedPath() != null)
         {
-            newPath = invalidatedPaths.get(0);
+            newPath = actionResult.getCreatedPath();
             model = configModelBuilder.buildModel(null, newPath, -1);
         }
         else if (Utils.hasModellableType(configPath, configurationTemplateManager))
