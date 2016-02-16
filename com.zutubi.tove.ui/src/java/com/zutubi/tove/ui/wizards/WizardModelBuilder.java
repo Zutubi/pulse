@@ -1,8 +1,6 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.tove.ui.wizards;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.rest.Utils;
-import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
@@ -14,6 +12,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.ui.ConfigModelBuilder;
 import com.zutubi.tove.ui.ToveUiUtils;
+import com.zutubi.tove.ui.ValidationException;
 import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.CompositeModel;
 import com.zutubi.tove.ui.model.CompositeTypeModel;
@@ -141,7 +140,7 @@ public class WizardModelBuilder
         MutableRecord record;
         if (templateParentRecord == null)
         {
-            record = Utils.convertProperties(type, templateOwnerPath, model.getProperties());
+            record = ToveUiUtils.convertProperties(type, templateOwnerPath, model.getProperties());
         }
         else
         {
@@ -150,7 +149,7 @@ public class WizardModelBuilder
             // defaults where available.
             TemplateRecord trivialChild = new TemplateRecord("", templateParentRecord, type, type.createNewRecord(false));
             record = trivialChild.flatten(false);
-            MutableRecord providedRecord = Utils.convertProperties(type, templateOwnerPath, model.getProperties());
+            MutableRecord providedRecord = ToveUiUtils.convertProperties(type, templateOwnerPath, model.getProperties());
             // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
             // passwords.  So replace any suppressions with values from the parent.
             ToveUiUtils.unsuppressPasswords(record, providedRecord, type, false);

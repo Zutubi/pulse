@@ -1,11 +1,8 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.pulse.master.tove.config.user;
 
 import com.google.common.collect.Sets;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.TemplateInfo;
-import com.zutubi.pulse.master.tove.config.user.ProjectSubscriptionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.SubscriptionConditionConfiguration;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.CompositeType;
@@ -16,6 +13,9 @@ import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.TypedWizardStepModel;
 import com.zutubi.tove.ui.model.WizardModel;
 import com.zutubi.tove.ui.model.WizardTypeModel;
+import com.zutubi.tove.ui.wizards.ConfigurationWizard;
+import com.zutubi.tove.ui.wizards.WizardContext;
+import com.zutubi.tove.ui.wizards.WizardModelBuilder;
 
 import java.util.HashSet;
 import java.util.List;

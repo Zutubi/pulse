@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import static java.util.Arrays.asList;
 
 /**

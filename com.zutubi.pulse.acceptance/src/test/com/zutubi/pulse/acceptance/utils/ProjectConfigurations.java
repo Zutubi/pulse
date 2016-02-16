@@ -13,7 +13,7 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 
 import java.io.File;
 
-import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 
 /**
  * The project configurations instance provides the acceptance tests with a set of

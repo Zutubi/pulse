@@ -51,7 +51,7 @@
     <bean id="configModelBuilder" class="com.zutubi.tove.ui.ConfigModelBuilder"/>
     <bean id="formModelBuilder" class="com.zutubi.tove.ui.FormModelBuilder"/>
     <bean id="tableModelBuilder" class="com.zutubi.tove.ui.TableModelBuilder"/>
-    <bean id="wizardModelBuilder" class="com.zutubi.pulse.master.rest.wizards.WizardModelBuilder"/>
+    <bean id="wizardModelBuilder" class="com.zutubi.tove.ui.wizards.WizardModelBuilder"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"/>
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory" autowire="no"/>
 

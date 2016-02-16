@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Wizard
 {
+    String value();
+
     @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     @Handler(className = DefaultAnnotationHandlers.WIZARD_IGNORE)

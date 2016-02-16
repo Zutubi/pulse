@@ -31,12 +31,6 @@ import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Builds {@link FormModel} instances out of annotated type information.
- *
- * FIXME kendo it feels like this belongs in Tove (along with the models) as it is not really
- *       specific to the RESTish API: it just makes a model that is not dependent on the backend
- *       (and thus is suitable to serialise for any purpose).  However, some other models are
- *       really just ways to represent things in an API-friendly manner, so the question is
- *       whether it is better to keep forms with them (all models together)?
  */
 public class FormModelBuilder
 {

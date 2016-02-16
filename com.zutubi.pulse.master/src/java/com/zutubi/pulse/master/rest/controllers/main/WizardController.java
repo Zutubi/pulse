@@ -5,9 +5,8 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.PostContext;
 import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.Validation;
-import com.zutubi.pulse.master.rest.wizards.ConfigurationWizard;
-import com.zutubi.pulse.master.rest.wizards.DefaultWizard;
-import com.zutubi.pulse.master.rest.wizards.WizardContext;
+import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
@@ -23,14 +22,19 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.ui.ConfigModelBuilder;
+import com.zutubi.tove.ui.ValidationException;
 import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.*;
 import com.zutubi.tove.ui.model.forms.CheckboxFieldModel;
 import com.zutubi.tove.ui.model.forms.DropdownFieldModel;
 import com.zutubi.tove.ui.model.forms.FormModel;
+import com.zutubi.tove.ui.wizards.ConfigurationWizard;
+import com.zutubi.tove.ui.wizards.DefaultWizard;
+import com.zutubi.tove.ui.wizards.WizardContext;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +55,8 @@ import java.util.*;
 @RequestMapping("/wizard")
 public class WizardController
 {
+    private static final Logger LOG = Logger.getLogger(WizardController.class);
+
     private static final String STEP_HIERARCHY = "meta.hierarchy";
     private static final String FIELD_PARENT_TEMPLATE = "parentTemplate";
     private static final String LABEL_PARENT_TEMPLATE = "parent template";
@@ -156,25 +162,40 @@ public class WizardController
 
     private WizardModel buildModel(CompositeType type, String parentPath) throws TypeException
     {
-        ConfigurationWizard wizard = buildWizard(type);
-        FormContext context = new FormContext(parentPath);
-        return wizard.buildModel(type, context);
+        try
+        {
+            ConfigurationWizard wizard = buildWizard(type);
+            FormContext context = new FormContext(parentPath);
+            return wizard.buildModel(type, context);
+        }
+        catch (ValidationException e)
+        {
+            throw new com.zutubi.pulse.master.rest.errors.ValidationException(e.getInstance(), e.getKey());
+        }
     }
 
     private ConfigurationWizard buildWizard(CompositeType type)
     {
         Class wizardClass = null;
-        Class<ConfigurationWizard> winter = ConfigurationWizard.class;
-        try
+        Wizard annotation = type.getAnnotation(Wizard.class, true);
+        if (annotation != null)
         {
-            wizardClass = winter.getClassLoader().loadClass(winter.getPackage().getName() + "." + type.getClazz().getSimpleName() + "Wizard");
-        }
-        catch (ClassNotFoundException e)
-        {
-            // Continue.
+            try
+            {
+                wizardClass = type.getClazz().getClassLoader().loadClass(annotation.value());
+            }
+            catch (ClassNotFoundException e)
+            {
+                LOG.warning("Could not load wizard class '" + annotation.value() + "'" + e.getMessage(), e);
+            }
         }
 
-        if (wizardClass == null || !winter.isAssignableFrom(wizardClass))
+        if (wizardClass == null)
+        {
+            wizardClass = ConventionSupport.loadClass(type, "Wizard", ConfigurationWizard.class);
+        }
+
+        if (wizardClass == null)
         {
             wizardClass = DefaultWizard.class;
         }
@@ -240,8 +261,16 @@ public class WizardController
         Object isTemplate = hierarchyDetails.getProperties().get(FIELD_TEMPLATE);
         boolean templated = isTemplate == null ? false : Boolean.valueOf(isTemplate.toString());
 
-        ConfigurationWizard wizard = buildWizard(itemType);
-        MutableRecord record = wizard.buildRecord(itemType, new WizardContext(scope, null, (TemplateRecord) templateParentRecord, null, !templated, body));
+        MutableRecord record;
+        try
+        {
+            ConfigurationWizard wizard = buildWizard(itemType);
+            record = wizard.buildRecord(itemType, new WizardContext(scope, null, (TemplateRecord) templateParentRecord, null, !templated, body));
+        }
+        catch (ValidationException e)
+        {
+            throw new com.zutubi.pulse.master.rest.errors.ValidationException(e.getInstance(), e.getKey());
+        }
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if (templated)
@@ -259,10 +288,17 @@ public class WizardController
         PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);
 
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
-        ConfigurationWizard wizard = buildWizard(context.getPostableType());
-        boolean concrete = templateOwnerPath == null || configurationTemplateManager.isConcrete(templateOwnerPath);
-        MutableRecord record = wizard.buildRecord(context.getPostableType(), new WizardContext(configPath, context.getBaseName(), null, templateOwnerPath, concrete, body));
+        try
+        {
+            ConfigurationWizard wizard = buildWizard(context.getPostableType());
+            boolean concrete = templateOwnerPath == null || configurationTemplateManager.isConcrete(templateOwnerPath);
+            MutableRecord record = wizard.buildRecord(context.getPostableType(), new WizardContext(configPath, context.getBaseName(), null, templateOwnerPath, concrete, body));
 
-        return configurationTemplateManager.insertRecord(configPath, record);
+            return configurationTemplateManager.insertRecord(configPath, record);
+        }
+        catch (ValidationException e)
+        {
+            throw new com.zutubi.pulse.master.rest.errors.ValidationException(e.getInstance(), e.getKey());
+        }
     }
 }

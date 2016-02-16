@@ -1,12 +1,11 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.rest.wizards.CommandResourceConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
@@ -15,6 +14,9 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.ui.ConfigModelBuilder;
 import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.*;
+import com.zutubi.tove.ui.wizards.ConfigurationWizard;
+import com.zutubi.tove.ui.wizards.WizardContext;
+import com.zutubi.tove.ui.wizards.WizardModelBuilder;
 import com.zutubi.util.StringUtils;
 
 import java.util.HashSet;

@@ -1,11 +1,14 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.rest.wizards.UserConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.WizardModel;
+import com.zutubi.tove.ui.wizards.ConfigurationWizard;
+import com.zutubi.tove.ui.wizards.WizardContext;
+import com.zutubi.tove.ui.wizards.WizardModelBuilder;
 
 /**
  * Customised interface for creating users that handles password confirmation and creation of a

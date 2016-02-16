@@ -15,6 +15,7 @@ import com.zutubi.util.StringUtils;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class ToveUiUtils
 {
@@ -286,5 +287,39 @@ public class ToveUiUtils
         }
 
         return actionName;
+    }
+
+    public static MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
+    {
+        MutableRecord result = type.createNewRecord(true);
+
+        // Internal properties may not be set this way, so strip them from the default config.
+        for (TypeProperty property: type.getInternalProperties())
+        {
+            result.remove(property.getName());
+        }
+
+        for (TypeProperty property: type.getProperties(SimpleType.class))
+        {
+            Object value = properties.get(property.getName());
+            if (value != null)
+            {
+                result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
+            }
+        }
+
+        for (TypeProperty property: type.getProperties(CollectionType.class))
+        {
+            if (property.getType().getTargetType() instanceof SimpleType)
+            {
+                Object value = properties.get(property.getName());
+                if (value != null)
+                {
+                    result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
+                }
+            }
+        }
+
+        return result;
     }
 }

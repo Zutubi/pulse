@@ -1,8 +1,5 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookTaskConfiguration;
-import com.zutubi.pulse.master.tove.config.project.hooks.CompatibleHooks;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -11,6 +8,9 @@ import com.zutubi.tove.ui.handler.FormContext;
 import com.zutubi.tove.ui.model.TypedWizardStepModel;
 import com.zutubi.tove.ui.model.WizardModel;
 import com.zutubi.tove.ui.model.WizardTypeModel;
+import com.zutubi.tove.ui.wizards.ConfigurationWizard;
+import com.zutubi.tove.ui.wizards.WizardContext;
+import com.zutubi.tove.ui.wizards.WizardModelBuilder;
 
 import java.util.HashSet;
 import java.util.Set;

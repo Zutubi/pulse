@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import static com.google.common.collect.Iterables.find;
 import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 
 public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 {

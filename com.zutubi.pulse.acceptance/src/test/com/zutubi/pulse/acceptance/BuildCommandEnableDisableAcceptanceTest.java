@@ -12,7 +12,7 @@ import java.util.Vector;
 
 import static com.google.common.collect.Iterables.find;
 import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 
 public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 {

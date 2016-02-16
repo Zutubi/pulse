@@ -5,7 +5,6 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.ui.model.CheckResultModel;
@@ -145,40 +144,6 @@ public class Utils
         }
 
         return new PostContext(parentPath, baseName, postableType);
-    }
-
-    public static MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
-    {
-        MutableRecord result = type.createNewRecord(true);
-
-        // Internal properties may not be set this way, so strip them from the default config.
-        for (TypeProperty property: type.getInternalProperties())
-        {
-            result.remove(property.getName());
-        }
-
-        for (TypeProperty property: type.getProperties(SimpleType.class))
-        {
-            Object value = properties.get(property.getName());
-            if (value != null)
-            {
-                result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
-            }
-        }
-
-        for (TypeProperty property: type.getProperties(CollectionType.class))
-        {
-            if (property.getType().getTargetType() instanceof SimpleType)
-            {
-                Object value = properties.get(property.getName());
-                if (value != null)
-                {
-                    result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
-                }
-            }
-        }
-
-        return result;
     }
 
     public static Map<String, Object> getSimplePropertyValues(CompositeType type, Configuration instance) throws Exception

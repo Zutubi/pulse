@@ -16,6 +16,7 @@ import java.util.Map;
  */
 @SymbolicName("zutubi.commandConfig")
 @Table(columns = {"name", "force", "enabled"})
+@Wizard("com.zutubi.pulse.master.tove.config.project.CommandConfigurationWizard")
 public interface CommandConfiguration extends NamedConfiguration
 {
     /**

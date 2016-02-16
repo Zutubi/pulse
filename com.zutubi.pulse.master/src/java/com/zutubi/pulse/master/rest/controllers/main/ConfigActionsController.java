@@ -158,7 +158,7 @@ public class ConfigActionsController
             throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
         }
 
-        MutableRecord record = Utils.convertProperties(type, null, model.getComposite().getProperties());
+        MutableRecord record = ToveUiUtils.convertProperties(type, null, model.getComposite().getProperties());
         Configuration instance = configurationTemplateManager.validate(parentPath, model.getBaseName(), record, model.isConcrete(), false, model.getIgnoredFields());
         if (!instance.isValid())
         {
@@ -204,13 +204,13 @@ public class ConfigActionsController
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
 
         Record existingRecord = configurationTemplateManager.getRecord(configPath);
-        MutableRecord record = Utils.convertProperties(compositeType, null, check.getMain().getProperties());
+        MutableRecord record = ToveUiUtils.convertProperties(compositeType, null, check.getMain().getProperties());
         if (existingRecord != null)
         {
             ToveUiUtils.unsuppressPasswords(existingRecord, record, compositeType, false);
         }
 
-        MutableRecord checkRecord = Utils.convertProperties(checkType, null, check.getCheck().getProperties());
+        MutableRecord checkRecord = ToveUiUtils.convertProperties(checkType, null, check.getCheck().getProperties());
         String parentPath = PathUtils.getParentPath(configPath);
         String baseName = PathUtils.getBaseName(configPath);
         Configuration checkInstance = configurationTemplateManager.validate(parentPath, baseName, checkRecord, true, false);
@@ -407,7 +407,7 @@ public class ConfigActionsController
 
                     if (argumentType.isAssignableFrom(bodyType))
                     {
-                        MutableRecord record = Utils.convertProperties(bodyType, null, compositeBody.getProperties());
+                        MutableRecord record = ToveUiUtils.convertProperties(bodyType, null, compositeBody.getProperties());
 
                         argument = configurationTemplateManager.validate(null, null, record, true, false);
                         if (!argument.isValid())

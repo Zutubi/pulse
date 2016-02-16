@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest.controllers.main;
 
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.security.CustomRememberMeServices;
 import com.zutubi.pulse.master.security.SecurityUtils;
@@ -13,6 +12,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.ui.ToveUiUtils;
 import com.zutubi.tove.ui.model.CompositeModel;
 import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +87,7 @@ public class AuthController
         }
 
         CompositeType type = typeRegistry.getType(SignupUserConfiguration.class);
-        Record record = Utils.convertProperties(type, null, body.getProperties());
+        Record record = ToveUiUtils.convertProperties(type, null, body.getProperties());
 
         SignupUserConfiguration instance = configurationTemplateManager.validate(null, null, record, true, true);
         if (!instance.isValid())

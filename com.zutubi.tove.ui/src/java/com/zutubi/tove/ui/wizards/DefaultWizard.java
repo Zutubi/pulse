@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.rest.wizards;
+package com.zutubi.tove.ui.wizards;
 
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;

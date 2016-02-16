@@ -43,6 +43,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.ui.ConfigModelBuilder;
+import com.zutubi.tove.ui.ToveUiUtils;
 import com.zutubi.tove.ui.model.*;
 import com.zutubi.util.StringUtils;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -416,8 +417,8 @@ public class SetupController
             throw new IllegalArgumentException("Type '" + compositeType + "' does not support configuration checking");
         }
 
-        MutableRecord record = Utils.convertProperties(compositeType, null, check.getMain().getProperties());
-        MutableRecord checkRecord = Utils.convertProperties(checkType, null, check.getCheck().getProperties());
+        MutableRecord record = ToveUiUtils.convertProperties(compositeType, null, check.getMain().getProperties());
+        MutableRecord checkRecord = ToveUiUtils.convertProperties(checkType, null, check.getCheck().getProperties());
         Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord, true, false);
         Configuration mainInstance = configurationTemplateManager.validate(null, null, record, true, false);
         if (!checkInstance.isValid())
@@ -441,7 +442,7 @@ public class SetupController
     public <T extends Configuration> T convertAndValidate(Class<T> clazz, CompositeModel model) throws TypeException
     {
         CompositeType type = typeRegistry.getType(clazz);
-        Record record = Utils.convertProperties(type, null, model.getProperties());
+        Record record = ToveUiUtils.convertProperties(type, null, model.getProperties());
 
         T instance = configurationTemplateManager.validate(null, null, record, true, true);
         if (!instance.isValid())

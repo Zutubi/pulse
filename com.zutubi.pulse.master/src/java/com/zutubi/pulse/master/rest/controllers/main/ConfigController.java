@@ -154,7 +154,7 @@ public class ConfigController
             String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
 
             CompositeModel compositeModel = (CompositeModel) config;
-            MutableRecord record = Utils.convertProperties(compositeType, templateOwnerPath, compositeModel.getProperties());
+            MutableRecord record = ToveUiUtils.convertProperties(compositeType, templateOwnerPath, compositeModel.getProperties());
             ToveUiUtils.unsuppressPasswords(existingRecord, record, type, false);
 
             Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);

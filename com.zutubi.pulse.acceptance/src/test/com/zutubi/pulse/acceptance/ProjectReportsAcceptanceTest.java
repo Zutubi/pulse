@@ -22,7 +22,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECI
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static com.zutubi.pulse.master.rest.wizards.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 
