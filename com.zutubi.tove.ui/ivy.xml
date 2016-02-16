@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+    <info organisation="zutubi" module="com.zutubi.tove.ui" status="integration">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+    </info>
+
+    <configurations>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
+    </configurations>
+
+    <publications>
+        <artifact name="com.zutubi.tove.ui" type="jar" conf="release, build"/>
+        <artifact name="com.zutubi.tove.ui-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.tove.ui-test" type="jar" conf="test"/>
+    </publications>
+
+    <dependencies>
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="*->@"/>
+
+        <!-- external libraries -->
+        <dependency org="com.fasterxml.jackson" name="com.fasterxml.jackson" rev="2.5.4" conf="build,release->default;src->src"/>
+        <dependency org="org.freemarker" name="org.freemarker" rev="2.3.12" conf="build,release->default;src->src"/>
+    </dependencies>
+</ivy-module>
