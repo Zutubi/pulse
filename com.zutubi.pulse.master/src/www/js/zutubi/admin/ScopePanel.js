@@ -199,7 +199,8 @@
         _showContent: function(data)
         {
             var links,
-                contextData;
+                contextData,
+                path;
 
             this._clearContent();
             this.data = data;
@@ -221,12 +222,15 @@
 
             // Deliberately pick out the subset of data we want to show in the scope view.
             links = data.links || [];
-            // FIXME kendo it would be nicer not to do a full page load here, since we point back into
-            // admin.  Can this be done in a navigation handler?
+            path = this.scope + "/" + this.name;
             links.splice(0, 0, {
                 name: "config",
                 label: "configuration",
-                url: "admin/config/" + Zutubi.config.encodePath(this.scope + "/" + this.name)
+                url: "admin/config/" + Zutubi.config.encodePath(path),
+                click: function()
+                {
+                    Zutubi.admin.openConfigPath(path);
+                }
             });
 
             contextData = {links: links};

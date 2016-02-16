@@ -46,6 +46,8 @@
                 this.actionLists.off(ns);
             }
 
+            this.element.find(".k-dynamic-link").off(ns);
+
             if (this.panelBar)
             {
                 this.panelBar.destroy();
@@ -237,20 +239,34 @@
         {
             var list = $('<ul class="k-config-links"></ul>'),
                 i,
-                link;
+                link,
+                linkEl;
 
             for (i = 0; i < links.length; i++)
             {
                 link = links[i];
-                list.append(this.linkTemplate({
+                linkEl = $(this.linkTemplate({
                     baseUrl: window.baseUrl,
                     icon: this._getIcon(link.name, Zutubi.admin.LINK_ICONS),
                     label: link.label,
                     url: link.url
                 }));
+                list.append(linkEl);
+
+                if (link.click)
+                {
+                    linkEl.addClass("k-dynamic-link");
+                    linkEl.on(CLICK, jQuery.proxy(this._onLinkClick, this, link));
+                }
             }
 
             element.append(list);
+        },
+
+        _onLinkClick: function(link, e)
+        {
+            e.preventDefault();
+            link.click(e);
         },
 
         _renderActions: function(element, actions, prefix)
