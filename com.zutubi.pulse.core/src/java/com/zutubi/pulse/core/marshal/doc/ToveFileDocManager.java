@@ -236,7 +236,7 @@ public class ToveFileDocManager
 
     private void getExamples(ElementDocs docs, CompositeType type, Messages messages)
     {
-        Class<?> examplesClass = ConventionSupport.getExamples(type.getClazz());
+        Class<?> examplesClass = ConventionSupport.loadClass(type.getClazz(), "Examples", Object.class);
         if (examplesClass != null)
         {
             Iterable<Method> exampleMethods = filter(asList(examplesClass.getMethods()),

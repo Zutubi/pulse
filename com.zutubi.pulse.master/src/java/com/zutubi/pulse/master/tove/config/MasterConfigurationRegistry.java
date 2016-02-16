@@ -255,7 +255,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
         {
             public void handle(CompositeType type) throws TypeException
             {
-                Class<? extends Configuration> checkClass = ConventionSupport.getCheckHandler(type);
+                Class<? extends Configuration> checkClass = ConventionSupport.loadClass(type, "CheckHandler", Configuration.class);
                 if (checkClass != null && !Modifier.isAbstract(checkClass.getModifiers()))
                 {
                     if (!ConfigurationCheckHandler.class.isAssignableFrom(checkClass))
@@ -270,7 +270,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
                     checkTypeMapping.put(type, checkType);
                 }
 
-                Class actionsClass = ConventionSupport.getActions(type.getClazz());
+                Class<?> actionsClass = ConventionSupport.loadClass(type.getClazz(), "Actions", Object.class);
                 if(actionsClass != null)
                 {
                     ConfigurationActions configurationActions = actionManager.getConfigurationActions(type);

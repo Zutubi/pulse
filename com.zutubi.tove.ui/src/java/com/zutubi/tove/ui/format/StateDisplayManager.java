@@ -200,7 +200,7 @@ public class StateDisplayManager
             Class stateDisplayClass;
             if (annotation == null)
             {
-                stateDisplayClass = ConventionSupport.getStateDisplay(configurationClass);
+                stateDisplayClass = ConventionSupport.loadClass(configurationClass, "StateDisplay", Object.class);
             }
             else
             {

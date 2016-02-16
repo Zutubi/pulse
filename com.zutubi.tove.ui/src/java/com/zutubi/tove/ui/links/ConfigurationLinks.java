@@ -44,7 +44,7 @@ public class ConfigurationLinks
     public ConfigurationLinks(Class<? extends Configuration> configurationClass, ObjectFactory objectFactory)
     {
         this.configurationClass = configurationClass;
-        Class<?> linksClass = ConventionSupport.getLinks(configurationClass);
+        Class<?> linksClass = ConventionSupport.loadClass(configurationClass, "Links", Object.class);
         if (linksClass != null)
         {
             try

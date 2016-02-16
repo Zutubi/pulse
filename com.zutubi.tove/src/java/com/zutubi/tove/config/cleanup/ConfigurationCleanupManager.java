@@ -97,7 +97,7 @@ public class ConfigurationCleanupManager implements EventListener
         ConfigurationCleanupTaskFinder finder = findersByType.get(configurationClass);
         if (finder == null)
         {
-            finder = new ConfigurationCleanupTaskFinder(configurationClass, ConventionSupport.getCleanupTasks(configurationClass), objectFactory);
+            finder = new ConfigurationCleanupTaskFinder(configurationClass, ConventionSupport.loadClass(configurationClass, "CleanupTasks", Object.class), objectFactory);
             findersByType.put(configurationClass, finder);
         }
 

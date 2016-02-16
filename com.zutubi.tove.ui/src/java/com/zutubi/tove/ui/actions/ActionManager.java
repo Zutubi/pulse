@@ -261,7 +261,7 @@ public class ActionManager
         if (actions == null)
         {
             Class<? extends Configuration> configurationClass = type.getClazz();
-            actions = new ConfigurationActions(configurationClass, ConventionSupport.getActions(configurationClass), objectFactory);
+            actions = new ConfigurationActions(configurationClass, ConventionSupport.loadClass(configurationClass, "Actions", Object.class), objectFactory);
             actionsByType.put(type, actions);
         }
 

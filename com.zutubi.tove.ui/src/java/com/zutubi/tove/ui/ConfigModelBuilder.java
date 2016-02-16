@@ -395,7 +395,7 @@ public class ConfigModelBuilder
         if (instance != null)
         {
             Map<String, Object> properties = new HashMap<>();
-            Class<?> formatter = ConventionSupport.getFormatter(type);
+            Class<?> formatter = ConventionSupport.loadClass(type, "Formatter", Object.class);
 
             if (formatter != null)
             {

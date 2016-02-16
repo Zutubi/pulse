@@ -15,59 +15,13 @@ public class ConventionSupport
 {
     public static final String I18N_KEY_SUFFIX_LABEL   = ".label";
 
-    @SuppressWarnings({"unchecked"})
-    public static Class<? extends Configuration> getCheckHandler(Type type)
-    {
-        return loadClass(type, "CheckHandler");
-    }
-
-    public static Class getWizard(Type type)
-    {
-        return loadClass(type, "Wizard");
-    }
-
-    public static Class getActions(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "Actions");
-    }
-
-    public static Class getLinks(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "Links");
-    }
-
-    public static Class getCleanupTasks(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "CleanupTasks");
-    }
-
-    public static Class<?> getFormatter(Type type)
-    {
-        return loadClass(type, "Formatter");
-    }
-
-    public static Class getStateDisplay(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "StateDisplay");
-    }
-
-    public static Class getClassifier(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "Classifier");
-    }
-
-    public static Class getExamples(Class<? extends Configuration> clazz)
-    {
-        return loadClass(clazz, "Examples");
-    }
-
-    private static Class loadClass(Type type, String suffix)
+    public static <T> Class<? extends T> loadClass(Type type, String suffix, Class<T> required)
     {
         // we need to search up the inheritence hierarchy.
-        return loadClass(type.getClazz(), suffix);
+        return loadClass(type.getClazz(), suffix, required);
     }
 
-    private static Class loadClass(Class clazz, String suffix)
+    public static <T> Class<? extends T> loadClass(Class clazz, String suffix, Class<T> required)
     {
         Class searchClass = clazz;
         if (searchClass.isArray() || searchClass.isPrimitive())
@@ -80,7 +34,11 @@ public class ConventionSupport
             try
             {
                 String className = searchClass.getName() + suffix;
-                return searchClass.getClassLoader().loadClass(className);
+                Class<?> found = searchClass.getClassLoader().loadClass(className);
+                if (required.isAssignableFrom(found))
+                {
+                    return found.asSubclass(required);
+                }
             }
             catch (ClassNotFoundException e)
             {
@@ -93,7 +51,7 @@ public class ConventionSupport
         // ordering.  Because of this we actually verify that we only find one
         // matching *Actions interface (we don't want silent non-determinism).
         Set<Class> implementedInterfaces = ReflectionUtils.getImplementedInterfaces(clazz, Object.class, true);
-        Set<Class> foundInterfaces = new HashSet<Class>();
+        Set<Class> foundInterfaces = new HashSet<>();
         for (Class iface: implementedInterfaces)
         {
             if (iface != Configuration.class && Configuration.class.isAssignableFrom(iface))
@@ -116,7 +74,13 @@ public class ConventionSupport
         }
         else if (foundInterfaces.size() == 1)
         {
-            return foundInterfaces.iterator().next();
+            Class<?> found = foundInterfaces.iterator().next();
+            if (required.isAssignableFrom(found))
+            {
+                return found.asSubclass(required);
+            }
+
+            return null;
         }
         else
         {
