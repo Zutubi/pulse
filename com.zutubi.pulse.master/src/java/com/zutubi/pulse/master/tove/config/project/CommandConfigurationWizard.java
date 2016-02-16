@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.master.rest.wizards.CommandResourceConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
