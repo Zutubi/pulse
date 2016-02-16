@@ -43,7 +43,7 @@ public class FormModelBuilder
 {
     private static final Logger LOG = Logger.getLogger(FormModelBuilder.class);
 
-    public static final String PARAMETER_NO_INHERIT = "noInherit";
+    static final String PARAMETER_NO_INHERIT = "noInherit";
 
     /**
      * The object factory is required for the instantiation of objects that occurs within the form descriptor.
@@ -86,7 +86,7 @@ public class FormModelBuilder
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldModel.class);
     }
 
-    public void registerFieldType(String type, Class<? extends FieldModel> clazz)
+    private void registerFieldType(String type, Class<? extends FieldModel> clazz)
     {
         fieldDescriptorTypes.put(type, clazz);
     }
@@ -126,7 +126,7 @@ public class FormModelBuilder
         return form;
     }
 
-    public void applyContextToForm(FormContext context, CompositeType type, FormModel form)
+    void applyContextToForm(FormContext context, CompositeType type, FormModel form)
     {
         for (FieldModel field: form.getFields())
         {
