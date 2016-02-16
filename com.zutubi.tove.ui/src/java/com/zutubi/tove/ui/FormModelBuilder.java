@@ -64,24 +64,30 @@ public class FormModelBuilder
 
     public FormModelBuilder()
     {
-        // FIXME kendo: There is a duplication here: the default constructors set these types, and
-        // we also pair them with the classes here.
-        registerFieldType(FieldType.CHECKBOX, CheckboxFieldModel.class);
-        registerFieldType(FieldType.COMBOBOX, ComboboxFieldModel.class);
-        registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldModel.class);
-        registerFieldType(FieldType.CONTROLLING_SELECT, ControllingSelectFieldModel.class);
-        registerFieldType(FieldType.DROPDOWN, DropdownFieldModel.class);
-        registerFieldType(FieldType.HIDDEN, HiddenFieldModel.class);
-        registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldModel.class);
-        registerFieldType(FieldType.PASSWORD, PasswordFieldModel.class);
-        registerFieldType(FieldType.STRING_LIST, StringListFieldModel.class);
-        registerFieldType(FieldType.TEXT, TextFieldModel.class);
-        registerFieldType(FieldType.TEXTAREA, TextAreaFieldModel.class);
+        registerFieldType(CheckboxFieldModel.class);
+        registerFieldType(ComboboxFieldModel.class);
+        registerFieldType(ControllingCheckboxFieldModel.class);
+        registerFieldType(ControllingSelectFieldModel.class);
+        registerFieldType(DropdownFieldModel.class);
+        registerFieldType(HiddenFieldModel.class);
+        registerFieldType(ItemPickerFieldModel.class);
+        registerFieldType(PasswordFieldModel.class);
+        registerFieldType(StringListFieldModel.class);
+        registerFieldType(TextFieldModel.class);
+        registerFieldType(TextAreaFieldModel.class);
     }
 
-    private void registerFieldType(String type, Class<? extends FieldModel> clazz)
+    private void registerFieldType(Class<? extends FieldModel> clazz)
     {
-        fieldDescriptorTypes.put(type, clazz);
+        try
+        {
+            FieldModel fieldModel = clazz.newInstance();
+            fieldDescriptorTypes.put(fieldModel.getType(), clazz);
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            LOG.severe(e);
+        }
     }
 
     /**
