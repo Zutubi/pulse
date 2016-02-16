@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
@@ -46,11 +45,6 @@ public class ToveUtils
         }
 
         return result;
-    }
-
-    public static String getIconCls(String path, ClassificationManager classificationManager)
-    {
-        return "config-" + classificationManager.classify(path) + "-icon";
     }
 
     /**
