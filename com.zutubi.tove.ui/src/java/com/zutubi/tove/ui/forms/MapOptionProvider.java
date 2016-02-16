@@ -1,4 +1,4 @@
-package com.zutubi.tove.ui.handler;
+package com.zutubi.tove.ui.forms;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;

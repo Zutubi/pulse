@@ -1,4 +1,4 @@
-package com.zutubi.tove.ui.handler;
+package com.zutubi.tove.ui.forms;
 
 import com.zutubi.tove.annotations.FieldScript;
 import com.zutubi.tove.type.CompositeType;

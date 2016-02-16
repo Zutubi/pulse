@@ -22,7 +22,7 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.ui.actions.ActionManager;
 import com.zutubi.tove.ui.format.StateDisplayManager;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.links.LinkManager;
 import com.zutubi.tove.ui.model.*;
 import com.zutubi.tove.ui.model.forms.FieldModel;

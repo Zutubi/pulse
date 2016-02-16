@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.core;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.MapOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.MapOptionProvider;
 import com.zutubi.util.Sort;
 
 import java.util.*;

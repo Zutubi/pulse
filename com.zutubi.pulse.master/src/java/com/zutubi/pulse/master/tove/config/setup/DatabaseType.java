@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
-import com.zutubi.tove.ui.handler.EnumOptionProvider;
+import com.zutubi.tove.ui.forms.EnumOptionProvider;
 
 import java.util.Properties;
 

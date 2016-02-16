@@ -12,8 +12,8 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.ui.handler.FieldActionPredicate;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.FieldActionPredicate;
+import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.model.forms.FieldModel;
 import com.zutubi.util.logging.Logger;
 

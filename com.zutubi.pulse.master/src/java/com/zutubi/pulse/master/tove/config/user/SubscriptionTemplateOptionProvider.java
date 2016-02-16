@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.user;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.TemplateInfo;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.MapOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.MapOptionProvider;
 
 import java.util.HashMap;
 import java.util.Map;

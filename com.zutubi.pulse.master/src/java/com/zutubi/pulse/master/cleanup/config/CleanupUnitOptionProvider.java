@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.EnumOptionProvider;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.EnumOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
 
 /**
  * An enum option provider for the CleanupUnit enumeration that does not provide

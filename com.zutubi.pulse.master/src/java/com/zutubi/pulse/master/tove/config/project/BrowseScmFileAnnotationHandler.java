@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.AnnotationHandler;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.AnnotationHandler;
+import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.model.forms.FieldModel;
 import com.zutubi.util.StringUtils;
 

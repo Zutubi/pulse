@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.DefaultReferenceOptionProvider;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.DefaultReferenceOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
 
 import java.util.Map;
 

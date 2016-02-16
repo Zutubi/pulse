@@ -13,7 +13,7 @@ import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.ui.ConfigModelBuilder;
 import com.zutubi.tove.ui.ToveUiUtils;
 import com.zutubi.tove.ui.ValidationException;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.model.CompositeModel;
 import com.zutubi.tove.ui.model.CompositeTypeModel;
 import com.zutubi.tove.ui.model.TypedWizardStepModel;

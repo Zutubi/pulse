@@ -12,7 +12,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.ui.ConfigModelBuilder;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.model.*;
 import com.zutubi.tove.ui.wizards.ConfigurationWizard;
 import com.zutubi.tove.ui.wizards.WizardContext;

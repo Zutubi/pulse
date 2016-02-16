@@ -1,4 +1,4 @@
-package com.zutubi.tove.ui.handler;
+package com.zutubi.tove.ui.forms;
 
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;

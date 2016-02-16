@@ -5,8 +5,8 @@ import com.google.common.base.Predicates;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.ListOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.ListOptionProvider;
 import com.zutubi.util.Sort;
 
 import java.util.LinkedList;

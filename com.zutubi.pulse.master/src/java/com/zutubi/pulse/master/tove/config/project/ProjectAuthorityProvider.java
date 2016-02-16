@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.MapOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.MapOptionProvider;
 import com.zutubi.util.Sort;
 
 import java.util.*;

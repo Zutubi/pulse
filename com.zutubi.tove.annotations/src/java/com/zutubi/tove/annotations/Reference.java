@@ -18,7 +18,7 @@ public @interface Reference
 {
     String DEFAULT_dependentOn = "";
 
-    String optionProvider() default "com.zutubi.tove.ui.handler.DefaultReferenceOptionProvider";
+    String optionProvider() default "com.zutubi.tove.ui.forms.DefaultReferenceOptionProvider";
     String cleanupTaskProvider() default "com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider";
 
     /**

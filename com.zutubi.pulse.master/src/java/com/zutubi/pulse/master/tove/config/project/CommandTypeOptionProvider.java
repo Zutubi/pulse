@@ -4,9 +4,9 @@ import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.tove.ui.handler.ExtensionOptionProvider;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.MapOptionProvider;
+import com.zutubi.tove.ui.forms.ExtensionOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.MapOptionProvider;
 
 import java.util.List;
 import java.util.Map;

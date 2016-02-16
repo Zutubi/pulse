@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.ListOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.ListOptionProvider;
 import com.zutubi.util.Sort;
 
 import java.util.ArrayList;

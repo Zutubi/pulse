@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.ui.handler.FormContext;
-import com.zutubi.tove.ui.handler.ListOptionProvider;
+import com.zutubi.tove.ui.forms.FormContext;
+import com.zutubi.tove.ui.forms.ListOptionProvider;
 
 import java.util.List;
 

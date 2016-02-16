@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.forms.FormContext;
 
 import java.util.Arrays;
 

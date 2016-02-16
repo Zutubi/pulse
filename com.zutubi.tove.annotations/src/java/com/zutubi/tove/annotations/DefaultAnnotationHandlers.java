@@ -5,7 +5,7 @@ package com.zutubi.tove.annotations;
  */
 public interface DefaultAnnotationHandlers
 {
-    String HANDLER_PACKAGE    = "com.zutubi.tove.ui.handler";
+    String HANDLER_PACKAGE    = "com.zutubi.tove.ui.forms";
 
     String FIELD_ACTION       = HANDLER_PACKAGE + ".FieldActionAnnotationHandler";
     String FIELD_SCRIPT       = HANDLER_PACKAGE + ".FieldScriptAnnotationHandler";
