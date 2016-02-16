@@ -31,10 +31,10 @@ import java.util.Set;
  */
 public abstract class AbstractCloneHandler implements ActionHandler
 {
-    protected static final String FIELD_PARENT_KEY = "parentKey";
-    protected static final String FIELD_CLONE_KEY = "cloneKey";
-    protected static final String CHECK_FIELD_PREFIX = "cloneCheck_";
-    protected static final String KEY_FIELD_PREFIX   = "cloneKey_";
+    private static final String FIELD_PARENT_KEY = "parentKey";
+    private static final String FIELD_CLONE_KEY = "cloneKey";
+    private static final String CHECK_FIELD_PREFIX = "cloneCheck_";
+    private static final String KEY_FIELD_PREFIX   = "cloneKey_";
 
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationRefactoringManager configurationRefactoringManager;

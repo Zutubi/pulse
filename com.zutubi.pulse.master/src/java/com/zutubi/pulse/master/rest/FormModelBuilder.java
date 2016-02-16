@@ -258,7 +258,6 @@ public class FormModelBuilder
             field.setReadOnly(true);
         }
 
-        // FIXME kendo these two special cases look like they should be handled elsewhere?
         if (field instanceof TextFieldModel)
         {
             Numeric numeric = AnnotationUtils.findAnnotation(property.getAnnotations(), Numeric.class);
