@@ -231,7 +231,7 @@ public class ConfigActionsController
 
         @SuppressWarnings("unchecked")
         ConfigurationCheckHandler<Configuration> handler = (ConfigurationCheckHandler<Configuration>) instantiator.instantiate(checkType, checkRecord);
-        CheckResultModel result = Utils.runCheck(handler, instance);
+        CheckResultModel result = ToveUiUtils.runCheck(handler, instance);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

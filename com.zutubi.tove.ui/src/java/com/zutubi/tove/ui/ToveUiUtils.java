@@ -4,21 +4,24 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.tove.ui.model.CheckResultModel;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ToveUiUtils
 {
+    private static final Logger LOG = Logger.getLogger(ToveUiUtils.class);
+
     public static final String SUPPRESSED_PASSWORD = "[suppressed password]";
 
     public static String format(Messages messages, String key)
@@ -321,5 +324,33 @@ public class ToveUiUtils
         }
 
         return result;
+    }
+
+    public static CheckResultModel runCheck(ConfigurationCheckHandler<Configuration> handler, Configuration instance)
+    {
+        CheckResultModel result;
+        try
+        {
+            handler.test(instance);
+            result = new CheckResultModel();
+        }
+        catch (Exception e)
+        {
+            LOG.debug(e);
+            result = new CheckResultModel(e);
+        }
+
+        return result;
+    }
+
+    public static Map<String, Object> getSimplePropertyValues(CompositeType type, Configuration instance) throws Exception
+    {
+        Map<String, Object> values = new HashMap<>();
+        for (TypeProperty property: type.getProperties(SimpleType.class))
+        {
+            values.put(property.getName(), property.getValue(instance));
+        }
+
+        return values;
     }
 }

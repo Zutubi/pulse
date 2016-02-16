@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.setup.SetupModel;
 import com.zutubi.pulse.master.rest.model.setup.TaskModel;
@@ -120,7 +119,7 @@ public class SetupController
             case SETTINGS:
             {
                 TransientModel input = configModelBuilder.buildTransientModel(ServerSettingsConfiguration.class);
-                input.getType().setSimplePropertyDefaults(Utils.getSimplePropertyValues(typeRegistry.getType(ServerSettingsConfiguration.class), setupManager.getDefaultServerSettings()));
+                input.getType().setSimplePropertyDefaults(ToveUiUtils.getSimplePropertyValues(typeRegistry.getType(ServerSettingsConfiguration.class), setupManager.getDefaultServerSettings()));
                 model.setInput(input);
                 break;
             }
@@ -138,7 +137,7 @@ public class SetupController
     private void fillDataModel(SetupModel model) throws Exception
     {
         TransientModel input = configModelBuilder.buildTransientModel(SetupDataConfiguration.class);
-        input.getType().setSimplePropertyDefaults(Utils.getSimplePropertyValues(typeRegistry.getType(SetupDataConfiguration.class), setupManager.getDefaultData()));
+        input.getType().setSimplePropertyDefaults(ToveUiUtils.getSimplePropertyValues(typeRegistry.getType(SetupDataConfiguration.class), setupManager.getDefaultData()));
         model.setInput(input);
 
         File pulseConfig = getPulseConfig();
@@ -435,7 +434,7 @@ public class SetupController
         Configuration instance = (Configuration) instantiator.instantiate(compositeType, record);
         @SuppressWarnings("unchecked")
         ConfigurationCheckHandler<Configuration> handler = (ConfigurationCheckHandler<Configuration>) instantiator.instantiate(checkType, checkRecord);
-        CheckResultModel result = Utils.runCheck(handler, instance);
+        CheckResultModel result = ToveUiUtils.runCheck(handler, instance);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
