@@ -520,18 +520,10 @@ public class ConfigActionsController
                 }
             }
 
-            // FIXME kendo in future move this into the normal actions class??  Or alongside the config class, or in a
-            // class specified in the ActionVariant.  We just need to move models down (as we do for wizards).
-            String handlerName = ActionHandler.class.getPackage().getName() + "." + context.type.getClazz().getSimpleName() + StringUtils.capitalise(context.actionName) + "Handler";
-            try
+            Class<? extends ActionHandler> handlerClass = ConventionSupport.loadClass(context.type, StringUtils.capitalise(context.actionName) + "Handler", ActionHandler.class);
+            if (handlerClass != null)
             {
-                Class<?> candidateClass = Class.forName(handlerName);
-                Class<? extends ActionHandler> handlerClass = candidateClass.asSubclass(ActionHandler.class);
                 context.handler = objectFactory.buildBean(handlerClass);
-            }
-            catch (ClassNotFoundException | ClassCastException e)
-            {
-                // Expected, no custom handler
             }
         }
 

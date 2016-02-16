@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.rest.actions;
+package com.zutubi.pulse.master.tove.config.project;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -16,11 +16,11 @@ import com.zutubi.pulse.master.model.NamedManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.rest.actions.ActionHandler;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.tove.config.ConfigurationProvider;
