@@ -1,4 +1,4 @@
-package com.zutubi.tove.actions;
+package com.zutubi.tove.ui.actions;
 
 import com.google.common.base.Predicate;
 import com.zutubi.i18n.Messages;

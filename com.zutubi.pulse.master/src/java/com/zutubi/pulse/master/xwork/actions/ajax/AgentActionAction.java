@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.xwork.actions.agents.AgentActionBase;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.ui.actions.ActionManager;
 import com.zutubi.util.StringUtils;
 
 /**

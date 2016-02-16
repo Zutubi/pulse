@@ -1,4 +1,4 @@
-package com.zutubi.tove.actions;
+package com.zutubi.tove.ui.actions;
 
 import java.lang.reflect.Method;
 

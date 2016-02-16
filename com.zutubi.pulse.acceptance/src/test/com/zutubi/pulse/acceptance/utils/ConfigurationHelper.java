@@ -24,17 +24,12 @@ import com.zutubi.pulse.core.postprocessors.unittestpp.UnitTestPlusPlusReportPos
 import com.zutubi.pulse.core.postprocessors.visualstudio.VisualStudioPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
@@ -46,7 +41,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static org.mockito.Mockito.*;
+import com.zutubi.tove.ui.actions.ActionManager;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -55,6 +50,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
+import static org.mockito.Mockito.*;
 
 /**
  * The configuration helper is a support class that bridges the gap between local

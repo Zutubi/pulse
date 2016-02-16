@@ -1,4 +1,4 @@
-package com.zutubi.tove.links;
+package com.zutubi.tove.ui.links;
 
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;

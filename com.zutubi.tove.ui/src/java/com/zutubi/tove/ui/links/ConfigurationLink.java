@@ -1,4 +1,4 @@
-package com.zutubi.tove.links;
+package com.zutubi.tove.ui.links;
 
 /**
  * Represents a single link from a configuration page to a related page.

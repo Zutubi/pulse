@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -18,13 +17,15 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.CommentSummaryModel;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.HostStatus;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.actions.ActionManager;
 import com.zutubi.util.Sort;
 
 import java.io.File;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.any;
 
 /**
  * An action to display all agents attached to this master, including local

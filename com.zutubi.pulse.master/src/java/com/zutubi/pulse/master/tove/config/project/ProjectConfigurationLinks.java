@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.tove.links.ConfigurationLink;
+import com.zutubi.tove.ui.links.ConfigurationLink;
 import com.zutubi.util.WebUtils;
 
 import java.util.Arrays;

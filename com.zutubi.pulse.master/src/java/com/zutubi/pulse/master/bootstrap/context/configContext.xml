@@ -44,8 +44,8 @@
     </bean>
     <bean id="configurationHealthChecker" class="com.zutubi.tove.config.health.ConfigurationHealthChecker"/>
     <bean id="configurationArchiver" class="com.zutubi.tove.config.ConfigurationArchiver"/>
-    <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager"/>
-    <bean id="linkManager" class="com.zutubi.tove.links.LinkManager"/>
+    <bean id="actionManager" class="com.zutubi.tove.ui.actions.ActionManager"/>
+    <bean id="linkManager" class="com.zutubi.tove.ui.links.LinkManager"/>
     <bean id="stateDisplayManager" class="com.zutubi.tove.ui.format.StateDisplayManager"/>
     <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager"/>
 

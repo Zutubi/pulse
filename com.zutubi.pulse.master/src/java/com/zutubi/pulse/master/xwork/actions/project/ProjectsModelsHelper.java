@@ -12,12 +12,12 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.ui.actions.ActionManager;
 
 import java.util.*;
 

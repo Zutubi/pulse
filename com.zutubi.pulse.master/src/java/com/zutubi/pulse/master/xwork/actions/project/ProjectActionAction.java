@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.ui.actions.ActionManager;
 import com.zutubi.util.StringUtils;
 
 /**

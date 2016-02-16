@@ -1,7 +1,7 @@
 package com.zutubi.tove.ui.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.zutubi.tove.links.ConfigurationLink;
+import com.zutubi.tove.ui.links.ConfigurationLink;
 
 import java.util.ArrayList;
 import java.util.List;

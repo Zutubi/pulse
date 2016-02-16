@@ -27,9 +27,9 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.ui.actions.ActionManager;
+import com.zutubi.tove.ui.links.ConfigurationLinks;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 

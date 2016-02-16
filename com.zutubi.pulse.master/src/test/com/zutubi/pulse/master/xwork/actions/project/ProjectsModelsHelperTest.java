@@ -2,25 +2,26 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNodeImpl;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.actions.ActionManager;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
+import static org.mockito.Mockito.*;
 
 public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 {

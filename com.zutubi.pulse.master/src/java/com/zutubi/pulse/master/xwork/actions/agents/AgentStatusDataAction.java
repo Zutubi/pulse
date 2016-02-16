@@ -12,9 +12,9 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.CommentModel;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.HostStatus;
-import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
+import com.zutubi.tove.ui.actions.ActionManager;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.time.TimeStamps;
 
