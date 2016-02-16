@@ -3,15 +3,9 @@ package com.zutubi.pulse.master.rest.controllers.main;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
-import com.zutubi.pulse.master.rest.model.CollectionModel;
-import com.zutubi.pulse.master.rest.model.CompositeModel;
-import com.zutubi.pulse.master.rest.model.ConfigDeltaModel;
-import com.zutubi.pulse.master.rest.model.ConfigModel;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
@@ -24,6 +18,12 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.ui.ConfigModelBuilder;
+import com.zutubi.tove.ui.ToveUiUtils;
+import com.zutubi.tove.ui.model.CollectionModel;
+import com.zutubi.tove.ui.model.CompositeModel;
+import com.zutubi.tove.ui.model.ConfigDeltaModel;
+import com.zutubi.tove.ui.model.ConfigModel;
 import com.zutubi.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -155,7 +155,7 @@ public class ConfigController
 
             CompositeModel compositeModel = (CompositeModel) config;
             MutableRecord record = Utils.convertProperties(compositeType, templateOwnerPath, compositeModel.getProperties());
-            ToveUtils.unsuppressPasswords(existingRecord, record, type, false);
+            ToveUiUtils.unsuppressPasswords(existingRecord, record, type, false);
 
             Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);
             if (!instance.isValid())

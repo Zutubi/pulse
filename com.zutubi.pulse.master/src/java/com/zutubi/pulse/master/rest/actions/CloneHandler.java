@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.rest.actions;
 
-import com.zutubi.pulse.master.rest.model.ActionModel;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.ui.model.ActionModel;
 
 import java.util.Map;
 

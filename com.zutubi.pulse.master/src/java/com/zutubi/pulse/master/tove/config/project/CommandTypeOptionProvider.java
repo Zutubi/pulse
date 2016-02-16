@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.master.tove.handler.ExtensionOptionProvider;
-import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.ui.handler.ExtensionOptionProvider;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.handler.MapOptionProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class CommandTypeOptionProvider extends MapOptionProvider
 {
     private TypeRegistry typeRegistry;
 
-    public Option getEmptyOption(TypeProperty property, FormContext context)
+    public MapOptionProvider.Option getEmptyOption(TypeProperty property, FormContext context)
     {
         return null;
     }

@@ -24,7 +24,7 @@
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.tove.ui" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
 

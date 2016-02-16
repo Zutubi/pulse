@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfigurati
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import com.zutubi.pulse.core.engine.api.PropertyConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
@@ -63,6 +64,13 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
     public <T extends Configuration> CompositeType registerConfigurationType(Class<T> clazz) throws TypeException
     {
         return typeRegistry.register(clazz);
+    }
+
+    @Override
+    public CompositeType getConfigurationCheckType(CompositeType type)
+    {
+        // TODO we really could handle this here, or even in a lower implementation in tove.ui.
+        return null;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

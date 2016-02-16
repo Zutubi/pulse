@@ -45,8 +45,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
-import com.zutubi.pulse.master.tove.format.StateDisplayManager;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -59,6 +57,8 @@ import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.ui.ToveUiUtils;
+import com.zutubi.tove.ui.format.StateDisplayManager;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -464,7 +464,7 @@ public class RemoteApi
             Object unstantiated = type.unstantiate(instance, templateOwnerPath);
             if (unstantiated instanceof MutableRecord)
             {
-                ToveUtils.suppressPasswords((MutableRecord) unstantiated, type, true);
+                ToveUiUtils.suppressPasswords((MutableRecord) unstantiated, type, true);
             }
             
             return type.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), unstantiated);
@@ -568,7 +568,7 @@ public class RemoteApi
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
             ComplexType type = configurationTemplateManager.getType(path);
             MutableRecord clone = record.copy(true, true);
-            ToveUtils.suppressPasswords(clone, type, true);
+            ToveUiUtils.suppressPasswords(clone, type, true);
             return type.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), clone);
         }
         finally
@@ -784,7 +784,7 @@ public class RemoteApi
             MutableRecord providedRecord = type.fromXmlRpc(null, config, false);
             // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
             // passwords.  So replace any suppressions with values from the parent.
-            ToveUtils.unsuppressPasswords(record, providedRecord, type, true);
+            ToveUiUtils.unsuppressPasswords(record, providedRecord, type, true);
             record.update(providedRecord, true, true);
             record.update(type.createNewRecord(true), true, false);
             configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
@@ -871,7 +871,7 @@ public class RemoteApi
 
             CompositeType type = typeRegistry.getType(existingSymbolicName);
             MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config, true);
-            ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
+            ToveUiUtils.unsuppressPasswords(existingRecord, record, type, true);
 
             Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, configurationTemplateManager.isConcrete(path), deep);
             if ((deep && !type.isValid(instance)) || !instance.isValid())

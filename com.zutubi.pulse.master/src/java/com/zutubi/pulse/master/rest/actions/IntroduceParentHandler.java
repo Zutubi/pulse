@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.rest.actions;
 
 import com.zutubi.pulse.master.rest.Validation;
-import com.zutubi.pulse.master.rest.model.ActionModel;
-import com.zutubi.pulse.master.rest.model.forms.CheckboxFieldModel;
-import com.zutubi.pulse.master.rest.model.forms.FormModel;
-import com.zutubi.pulse.master.rest.model.forms.TextFieldModel;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.model.ActionModel;
+import com.zutubi.tove.ui.model.forms.CheckboxFieldModel;
+import com.zutubi.tove.ui.model.forms.FormModel;
+import com.zutubi.tove.ui.model.forms.TextFieldModel;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Collections;

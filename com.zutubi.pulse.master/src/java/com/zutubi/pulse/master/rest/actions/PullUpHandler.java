@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.rest.actions;
 
 import com.zutubi.pulse.master.rest.Validation;
-import com.zutubi.pulse.master.rest.model.ActionModel;
-import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
-import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.ui.model.ActionModel;
+import com.zutubi.tove.ui.model.forms.DropdownFieldModel;
+import com.zutubi.tove.ui.model.forms.FormModel;
 
 import java.util.Map;
 

@@ -4,18 +4,11 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.rest.ConfigModelBuilder;
-import com.zutubi.pulse.master.rest.FormModelBuilder;
 import com.zutubi.pulse.master.rest.Utils;
 import com.zutubi.pulse.master.rest.actions.*;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
-import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.handler.OptionProvider;
-import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
@@ -35,6 +28,13 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.ui.ConfigModelBuilder;
+import com.zutubi.tove.ui.FormModelBuilder;
+import com.zutubi.tove.ui.ToveUiUtils;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.handler.OptionProvider;
+import com.zutubi.tove.ui.handler.OptionProviderFactory;
+import com.zutubi.tove.ui.model.*;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,7 +170,7 @@ public class ConfigActionsController
 
     @RequestMapping(value = "check/**", method = RequestMethod.POST)
     public ResponseEntity<CheckResultModel> check(HttpServletRequest request,
-                                      @RequestBody CheckModel check) throws TypeException
+                                                  @RequestBody CheckModel check) throws TypeException
     {
         String configPath = Utils.getRequestedPath(request);
 
@@ -207,7 +207,7 @@ public class ConfigActionsController
         MutableRecord record = Utils.convertProperties(compositeType, null, check.getMain().getProperties());
         if (existingRecord != null)
         {
-            ToveUtils.unsuppressPasswords(existingRecord, record, compositeType, false);
+            ToveUiUtils.unsuppressPasswords(existingRecord, record, compositeType, false);
         }
 
         MutableRecord checkRecord = Utils.convertProperties(checkType, null, check.getCheck().getProperties());

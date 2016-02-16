@@ -15,8 +15,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfigura
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.ToveUiUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
 import org.openqa.selenium.By;
@@ -1172,7 +1172,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(projectName)) + "scm/");
         PerforceForm form = new PerforceForm(getBrowser());
         form.waitFor();
-        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        assertEquals(ToveUiUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
         
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkFormElementsAndWait();
@@ -1187,14 +1187,14 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         
         form.applyNamedFormElements(asPair(FIELD_PASSWORD, "broken"));
         form.waitFor();
-        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        assertEquals(ToveUiUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
         
         checkForm.checkFormElementsAndWait();
         assertFalse(checkForm.isResultOk());
 
         form.applyNamedFormElements(asPair(FIELD_PASSWORD, P4PASSWD));
         form.waitFor();
-        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        assertEquals(ToveUiUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
         
         checkForm.checkFormElementsAndWait();
         assertTrue(checkForm.isResultOk());

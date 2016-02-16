@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.bootstrap.freemarker;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.logging.Logger;
-import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -46,16 +45,6 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
             }
         }
         return FREEMARKER_CONFIGURATION;
-    }
-
-    public static Configuration addClassTemplateLoader(Class clazz, Configuration configuration)
-    {
-        Configuration newConfig = (Configuration) configuration.clone();
-        TemplateLoader currentLoader = configuration.getTemplateLoader();
-        TemplateLoader classLoader = new ClassTemplateLoader(clazz, "");
-        MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
-        newConfig.setTemplateLoader(loader);
-        return newConfig;
     }
 
     private static TemplateLoader getMultiLoader(List<File> paths)

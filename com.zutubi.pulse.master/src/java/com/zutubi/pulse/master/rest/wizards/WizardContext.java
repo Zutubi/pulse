@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.rest.wizards;
 
-import com.zutubi.pulse.master.rest.model.CompositeModel;
 import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.tove.ui.model.CompositeModel;
 
 import java.util.Map;
 

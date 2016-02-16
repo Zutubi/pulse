@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest;
 
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
-import com.zutubi.pulse.master.rest.model.CheckResultModel;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
@@ -9,6 +8,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.ui.model.CheckResultModel;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.springframework.util.AntPathMatcher;

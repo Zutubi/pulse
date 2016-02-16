@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.pulse.master.xwork.actions.DefaultAction;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.handler.ListOptionProvider;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.security.LastAccessManager;
-import com.zutubi.pulse.master.tove.format.MessagesAware;
+import com.zutubi.tove.ui.format.MessagesAware;
 import com.zutubi.util.Constants;
 import com.zutubi.util.time.TimeStamps;
 

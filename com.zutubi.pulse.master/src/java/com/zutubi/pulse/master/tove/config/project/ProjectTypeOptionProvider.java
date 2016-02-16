@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.handler.ListOptionProvider;
 
 import java.util.Arrays;
 import java.util.List;

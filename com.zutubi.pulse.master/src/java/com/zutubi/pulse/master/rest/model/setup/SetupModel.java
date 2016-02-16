@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.rest.model.setup;
 
-import com.zutubi.pulse.master.rest.model.TransientModel;
 import com.zutubi.pulse.master.util.monitor.Monitor;
+import com.zutubi.tove.ui.model.TransientModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

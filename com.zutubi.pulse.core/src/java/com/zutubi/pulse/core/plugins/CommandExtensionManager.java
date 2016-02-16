@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.plugins;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
-import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;

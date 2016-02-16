@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.ui.ToveUiUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -60,7 +61,7 @@ public class ConfigErrorFileObject extends AbstractPulseFileObject
         }
         else
         {
-            return ToveUtils.getDisplayName(configPath, type, parentType, value);
+            return ToveUiUtils.getDisplayName(configPath, type, parentType, value);
         }
     }
 

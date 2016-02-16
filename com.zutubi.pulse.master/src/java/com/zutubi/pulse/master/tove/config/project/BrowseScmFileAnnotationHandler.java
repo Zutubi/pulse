@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
-import com.zutubi.pulse.master.rest.model.forms.FieldModel;
-import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
-import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.tove.ui.handler.AnnotationHandler;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.model.forms.FieldModel;
 import com.zutubi.util.StringUtils;
 
 import java.lang.annotation.Annotation;

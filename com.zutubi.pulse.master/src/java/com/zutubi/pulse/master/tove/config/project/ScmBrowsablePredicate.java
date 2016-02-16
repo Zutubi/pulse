@@ -7,14 +7,14 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.handler.FieldActionPredicate;
-import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.annotations.FieldAction;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.handler.FieldActionPredicate;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.model.forms.FieldModel;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;

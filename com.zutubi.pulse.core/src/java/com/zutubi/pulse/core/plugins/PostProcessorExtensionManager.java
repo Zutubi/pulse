@@ -1,10 +1,9 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -16,6 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * Extension manager for managing post-processors (e.g. JUnit report

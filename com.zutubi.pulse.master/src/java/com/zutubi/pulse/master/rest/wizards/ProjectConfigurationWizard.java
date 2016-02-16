@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.rest.wizards;
 
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.rest.model.TypedWizardStepModel;
-import com.zutubi.pulse.master.rest.model.WizardModel;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -11,7 +9,6 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfi
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.master.tove.handler.FormContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
@@ -19,6 +16,9 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.model.TypedWizardStepModel;
+import com.zutubi.tove.ui.model.WizardModel;
 import com.zutubi.util.StringUtils;
 
 /**

@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.user.contacts;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
-import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.ConfigurationList;
+import com.zutubi.tove.ui.format.MessagesAware;
 
 import java.util.List;
 

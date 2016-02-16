@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurationToRequirement;
-import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.NamedConfigurationComparator;
+import com.zutubi.tove.ui.format.MessagesAware;
 import com.zutubi.util.Sort;
 
 import java.util.*;

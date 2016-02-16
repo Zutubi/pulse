@@ -7,10 +7,10 @@ import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.Configurations;
+import com.zutubi.tove.ui.format.MessagesAware;
 import com.zutubi.util.Sort;
 
 import java.util.*;

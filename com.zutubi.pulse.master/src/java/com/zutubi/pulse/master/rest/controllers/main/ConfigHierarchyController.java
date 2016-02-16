@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.rest.controllers.main;
 
-import com.zutubi.pulse.master.rest.model.MoveModel;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.ui.model.MoveModel;
 import com.zutubi.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

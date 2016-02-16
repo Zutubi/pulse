@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.tove.handler.FormContext;
-import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.tove.ui.handler.FormContext;
+import com.zutubi.tove.ui.handler.ListOptionProvider;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 

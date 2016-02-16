@@ -46,12 +46,12 @@
     <bean id="configurationArchiver" class="com.zutubi.tove.config.ConfigurationArchiver"/>
     <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager"/>
     <bean id="linkManager" class="com.zutubi.tove.links.LinkManager"/>
-    <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager"/>
+    <bean id="stateDisplayManager" class="com.zutubi.tove.ui.format.StateDisplayManager"/>
     <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager"/>
 
-    <bean id="configModelBuilder" class="com.zutubi.pulse.master.rest.ConfigModelBuilder"/>
-    <bean id="formModelBuilder" class="com.zutubi.pulse.master.rest.FormModelBuilder"/>
-    <bean id="tableModelBuilder" class="com.zutubi.pulse.master.rest.TableModelBuilder"/>
+    <bean id="configModelBuilder" class="com.zutubi.tove.ui.ConfigModelBuilder"/>
+    <bean id="formModelBuilder" class="com.zutubi.tove.ui.FormModelBuilder"/>
+    <bean id="tableModelBuilder" class="com.zutubi.tove.ui.TableModelBuilder"/>
     <bean id="wizardModelBuilder" class="com.zutubi.pulse.master.rest.wizards.WizardModelBuilder"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"/>
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory" autowire="no"/>
