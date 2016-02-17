@@ -9,7 +9,6 @@ import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.annotations.NoOverride;
 import com.zutubi.tove.annotations.Password;
-import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
@@ -21,23 +20,18 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.tove.ui.actions.ActionManager;
+import com.zutubi.tove.ui.format.ConfigPropertyFormatter;
 import com.zutubi.tove.ui.format.StateDisplayManager;
 import com.zutubi.tove.ui.forms.FormContext;
 import com.zutubi.tove.ui.links.LinkManager;
 import com.zutubi.tove.ui.model.*;
 import com.zutubi.tove.ui.model.forms.FieldModel;
 import com.zutubi.tove.ui.model.forms.FormModel;
-import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -45,20 +39,18 @@ import java.util.*;
  */
 public class ConfigModelBuilder
 {
-    private static final Logger LOG = Logger.getLogger(ConfigModelBuilder.class);
-
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private FormModelBuilder formModelBuilder;
     private TableModelBuilder tableModelBuilder;
     private LinkManager linkManager;
-    private ObjectFactory objectFactory;
     private ConfigurationRegistry configurationRegistry;
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationDocsManager configurationDocsManager;
     private StateDisplayManager stateDisplayManager;
+    private ConfigPropertyFormatter configPropertyFormatter;
 
     public ConfigModel buildModel(String[] filters, String path, int depth) throws TypeException
     {
@@ -390,69 +382,10 @@ public class ConfigModelBuilder
 
     private Map<String, Object> getFormattedProperties(String path, CompositeType type) throws TypeException
     {
-        // FIXME kendo there is reflection here that could be cached (and moved outside this controller).
         Configuration instance = configurationTemplateManager.getInstance(path);
         if (instance != null)
         {
-            Map<String, Object> properties = new HashMap<>();
-            Class<?> formatter = ConventionSupport.loadClass(type, "Formatter", Object.class);
-
-            if (formatter != null)
-            {
-                Object formatterInstance = objectFactory.buildBean(formatter);
-                for (Method method : formatter.getMethods())
-                {
-                    if (isGetter(method, type))
-                    {
-                        try
-                        {
-                            Object result = method.invoke(formatterInstance, instance);
-                            if (result != null)
-                            {
-                                properties.put(method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4), result);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            LOG.severe(e);
-                        }
-                    }
-                }
-            }
-
-            // If there is a table annotation, it could reference transient properties which we
-            // include with default formatting.
-            Table table = type.getAnnotation(Table.class, true);
-            if (table != null)
-            {
-                for (String column: table.columns())
-                {
-                    // We ignore properties which are already in the formatted or default list, taking care around
-                    // enums which are formatted by default (so the existing property value can't be directly used).
-                    if (!properties.containsKey(column) && (!type.hasProperty(column) || type.getPropertyType(column) instanceof EnumType))
-                    {
-                        String methodName = getGetterMethodName(column);
-                        try
-                        {
-                            Method getter = instance.getClass().getMethod(methodName);
-                            Object result = getter.invoke(instance);
-                            if (result != null)
-                            {
-                                if (result instanceof Enum)
-                                {
-                                    result = EnumUtils.toPrettyString((Enum) result);
-                                }
-                                properties.put(column, result);
-                            }
-                        }
-                        catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
-                        {
-                            // noop
-                        }
-                    }
-                }
-            }
-
+            Map<String, Object> properties = configPropertyFormatter.getFormattedProperties(instance, type);
             if (properties.size() > 0)
             {
                 return properties;
@@ -460,19 +393,6 @@ public class ConfigModelBuilder
         }
 
         return null;
-    }
-
-    private boolean isGetter(Method method, CompositeType type)
-    {
-        return method.getName().length() > 3 &&
-                method.getName().startsWith("get") &&
-                ReflectionUtils.acceptsParameters(method, type.getClazz()) &&
-                ReflectionUtils.returnsType(method, Object.class);
-    }
-
-    private String getGetterMethodName(String name)
-    {
-        return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
     }
 
     private Map<String, List<String>> getValidationErrors(Configuration instance)
@@ -535,7 +455,6 @@ public class ConfigModelBuilder
 
     private void templateDecorateForm(FormModel form, CompositeType type, TemplateRecord record)
     {
-        // FIXME kendo does not add empty options to selects, do we need that?
         TemplateRecord parentRecord = record.getParent();
         String templateOriginatorId = getTemplateOriginator(record);
 
@@ -801,11 +720,6 @@ public class ConfigModelBuilder
         this.tableModelBuilder = tableModelBuilder;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
     public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
@@ -834,6 +748,11 @@ public class ConfigModelBuilder
     public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
     {
         this.stateDisplayManager = stateDisplayManager;
+    }
+
+    public void setConfigPropertyFormatter(ConfigPropertyFormatter configPropertyFormatter)
+    {
+        this.configPropertyFormatter = configPropertyFormatter;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>

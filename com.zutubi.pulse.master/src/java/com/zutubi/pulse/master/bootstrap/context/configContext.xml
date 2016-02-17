@@ -47,6 +47,7 @@
     <bean id="actionManager" class="com.zutubi.tove.ui.actions.ActionManager"/>
     <bean id="linkManager" class="com.zutubi.tove.ui.links.LinkManager"/>
     <bean id="stateDisplayManager" class="com.zutubi.tove.ui.format.StateDisplayManager"/>
+    <bean id="configPropertyFormatter" class="com.zutubi.tove.ui.format.ConfigPropertyFormatter"/>
 
     <bean id="configModelBuilder" class="com.zutubi.tove.ui.ConfigModelBuilder"/>
     <bean id="formModelBuilder" class="com.zutubi.tove.ui.FormModelBuilder"/>
