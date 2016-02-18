@@ -102,10 +102,10 @@ public class SetupController
                 fillDataModel(model);
                 break;
             case DATABASE:
-                model.setInput(configModelBuilder.buildTransientModel(SetupDatabaseTypeConfiguration.class));
+                model.setInput(configModelBuilder.buildTransientModel(SetupDatabaseTypeConfiguration.class, null));
                 break;
             case LICENSE:
-                model.setInput(configModelBuilder.buildTransientModel(SetupLicenseConfiguration.class));
+                model.setInput(configModelBuilder.buildTransientModel(SetupLicenseConfiguration.class, null));
                 break;
             case MIGRATE:
                 fillMigrateModel(model);
@@ -114,11 +114,11 @@ public class SetupController
                 fillRestoreModel(model);
                 break;
             case ADMIN:
-                model.setInput(configModelBuilder.buildTransientModel(AdminUserConfiguration.class));
+                model.setInput(configModelBuilder.buildTransientModel(AdminUserConfiguration.class, null));
                 break;
             case SETTINGS:
             {
-                TransientModel input = configModelBuilder.buildTransientModel(ServerSettingsConfiguration.class);
+                TransientModel input = configModelBuilder.buildTransientModel(ServerSettingsConfiguration.class, null);
                 input.getType().setSimplePropertyDefaults(ToveUiUtils.getSimplePropertyValues(typeRegistry.getType(ServerSettingsConfiguration.class), setupManager.getDefaultServerSettings()));
                 model.setInput(input);
                 break;
@@ -136,7 +136,7 @@ public class SetupController
 
     private void fillDataModel(SetupModel model) throws Exception
     {
-        TransientModel input = configModelBuilder.buildTransientModel(SetupDataConfiguration.class);
+        TransientModel input = configModelBuilder.buildTransientModel(SetupDataConfiguration.class, null);
         input.getType().setSimplePropertyDefaults(ToveUiUtils.getSimplePropertyValues(typeRegistry.getType(SetupDataConfiguration.class), setupManager.getDefaultData()));
         model.setInput(input);
 
@@ -187,7 +187,7 @@ public class SetupController
         model.setProgressMonitor(monitor);
         if (monitor == null || !monitor.isStarted())
         {
-            model.setInput(configModelBuilder.buildTransientModel(MigrateDatabaseTypeConfiguration.class));
+            model.setInput(configModelBuilder.buildTransientModel(MigrateDatabaseTypeConfiguration.class, null));
         }
 
         DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();

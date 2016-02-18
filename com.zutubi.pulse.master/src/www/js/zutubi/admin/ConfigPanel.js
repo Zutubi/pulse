@@ -194,7 +194,7 @@
 
             that.path = path;
 
-            Zutubi.admin.navigate("/api/config/" + Zutubi.config.encodePath(path) + "?depth=-1", [that, that.contextPanel], function(data)
+            Zutubi.admin.navigate("/api/config/" + Zutubi.config.encodePath(path) + "?depth=2", [that, that.contextPanel], function(data)
             {
                 if (data.length === 1)
                 {

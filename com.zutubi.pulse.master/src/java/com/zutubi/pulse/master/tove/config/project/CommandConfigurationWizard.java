@@ -59,7 +59,7 @@ public class CommandConfigurationWizard implements ConfigurationWizard
             resourceNames.remove(projectRequirement.getResource());
         }
 
-        CompositeTypeModel requirementTypeModel = configModelBuilder.buildCompositeTypeModel(typeRegistry.getType(CommandResourceConfiguration.class), new FormContext((String) null));
+        CompositeTypeModel requirementTypeModel = configModelBuilder.buildCompositeTypeModel(typeRegistry.getType(CommandResourceConfiguration.class), new FormContext((String) null), null);
         CustomWizardStepModel requirementStep = new CustomWizardStepModel("resource requirement", KEY_RESOURCE, requirementTypeModel.getForm());
         requirementStep.setDocs(requirementTypeModel.getDocs());
 

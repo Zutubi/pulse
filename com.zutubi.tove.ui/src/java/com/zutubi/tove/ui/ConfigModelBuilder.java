@@ -85,7 +85,7 @@ public class ConfigModelBuilder
             }
             else
             {
-                model = createTransientModel(path, compositeType, label);
+                model = createTransientModel(path, compositeType, label, filters);
             }
         }
 
@@ -105,15 +105,47 @@ public class ConfigModelBuilder
         }
 
         fieldName = fieldName.toLowerCase();
+
+        // Fields may have the form <parent>.<field>, e.g. "type.simpleProperties".  In this case
+        // filtering of the parent works the same as at the top level: if nothing in the parent is
+        // filtered then all fields are included, but as soon as anything in the parent is filtered
+        // only explicitly-mentioned fields are included.  To included only the non-filterable
+        // fields of a parent field you can pass filter <parent>., e.g. "type.".
+        boolean parentIsFiltered = false;
+        int separatorIndex = fieldName.indexOf('.');
+        if (separatorIndex > 0 && separatorIndex < fieldName.length() - 1)
+        {
+            String parentPrefix = fieldName.substring(0, separatorIndex + 1);
+            for (String filter: filters)
+            {
+                if (filter.startsWith(parentPrefix))
+                {
+                    parentIsFiltered = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for (String filter: filters)
+            {
+                if (filter.indexOf('.') == -1)
+                {
+                    parentIsFiltered = true;
+                    break;
+                }
+            }
+        }
+
         for (String filter: filters)
         {
-            if (filter.equals(fieldName))
+            if (filter.equals(fieldName) || filter.equals(fieldName + "."))
             {
                 return true;
             }
         }
 
-        return false;
+        return !parentIsFiltered;
     }
 
     private String getLabel(String path, ComplexType type, ComplexType parentType, Record value)
@@ -256,7 +288,7 @@ public class ConfigModelBuilder
         if (isFieldSelected(filters, "type"))
         {
             FormContext context = new FormContext(closestExistingPath);
-            model.setType(buildCompositeTypeModel(compositeType, context));
+            model.setType(buildCompositeTypeModel(compositeType, context, filters));
         }
 
         if (isFieldSelected(filters, "configuredDescendants"))
@@ -324,10 +356,13 @@ public class ConfigModelBuilder
 
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(buildCompositeTypeModel(type, new FormContext(instance)));
-            if (record instanceof TemplateRecord)
+            model.setType(buildCompositeTypeModel(type, new FormContext(instance), filters));
+            if (model.getType().getForm() != null)
             {
-                templateDecorateForm(model.getType().getForm(), type, (TemplateRecord) record);
+                if (record instanceof TemplateRecord)
+                {
+                    templateDecorateForm(model.getType().getForm(), type, (TemplateRecord) record);
+                }
             }
         }
 
@@ -414,13 +449,16 @@ public class ConfigModelBuilder
         return errors.isEmpty() ? null : errors;
     }
 
-    public CompositeTypeModel buildCompositeTypeModel(CompositeType type, FormContext context)
+    public CompositeTypeModel buildCompositeTypeModel(CompositeType type, FormContext context, String[] filters)
     {
         CompositeTypeModel typeModel = new CompositeTypeModel(type);
         if (!type.isExtendable())
         {
-            typeModel.setForm(formModelBuilder.createForm(type));
-            formModelBuilder.applyContextToForm(context, type, typeModel.getForm());
+            if (isFieldSelected(filters, "type.form"))
+            {
+                typeModel.setForm(formModelBuilder.createForm(type));
+                formModelBuilder.applyContextToForm(context, type, typeModel.getForm());
+            }
 
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
             if (checkType != null)
@@ -431,13 +469,19 @@ public class ConfigModelBuilder
             }
         }
 
-        List<CompositeType> extensions = type.getExtensions();
-        for (CompositeType extension: extensions)
+        if (isFieldSelected(filters, "type.extensions"))
         {
-            typeModel.addSubType(buildCompositeTypeModel(extension, context));
+            List<CompositeType> extensions = type.getExtensions();
+            for (CompositeType extension: extensions)
+            {
+                typeModel.addSubType(buildCompositeTypeModel(extension, context, filters));
+            }
         }
 
-        typeModel.setDocs(configurationDocsManager.getDocs(type));
+        if (isFieldSelected(filters, "type.docs"))
+        {
+            typeModel.setDocs(configurationDocsManager.getDocs(type));
+        }
 
         return typeModel;
     }
@@ -572,7 +616,7 @@ public class ConfigModelBuilder
         }
     }
 
-    public TransientModel buildTransientModel(Class<? extends Configuration> clazz)
+    public TransientModel buildTransientModel(Class<? extends Configuration> clazz, String[] filters)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -588,13 +632,13 @@ public class ConfigModelBuilder
 
         String path = paths.get(0);
         ComplexType parentType = configurationTemplateManager.getType(PathUtils.getParentPath(path));
-        return createTransientModel(path, type, ToveUiUtils.getDisplayName(path, type, parentType, null));
+        return createTransientModel(path, type, ToveUiUtils.getDisplayName(path, type, parentType, null), filters);
     }
 
-    private TransientModel createTransientModel(String path, CompositeType compositeType, String label)
+    private TransientModel createTransientModel(String path, CompositeType compositeType, String label, String[] filters)
     {
         TransientModel model = new TransientModel(PathUtils.getBaseName(path), label);
-        model.setType(buildCompositeTypeModel(compositeType, new FormContext((String) null)));
+        model.setType(buildCompositeTypeModel(compositeType, new FormContext((String) null), filters));
         return model;
     }
 

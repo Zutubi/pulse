@@ -277,7 +277,7 @@
             Zutubi.core.ajax({
                 type: "PUT",
                 maskAll: true,
-                url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=-1",
+                url: "/api/config/" + Zutubi.config.encodePath(that.options.path) + "?depth=2",
                 data: {
                     kind: "collection",
                     nested: jQuery.map(order, function(key)

@@ -60,7 +60,7 @@ public class WizardModelBuilder
         {
             messages = Messages.getInstance(stepType.getClazz());
             String labelKey = messages.isKeyDefined(KEY_WIZARD_LABEL) ? "wizard.label" : "label";
-            WizardTypeModel typeModel = new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context), messages.format(labelKey));
+            WizardTypeModel typeModel = new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(stepType, context, null), messages.format(labelKey));
             step.addType(typeModel);
             if (messages.isKeyDefined(KEY_WIZARD_HELP))
             {

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.errors;
 
+import com.zutubi.util.logging.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.logging.Level;
+
 /**
  * Decorates all of our controllers with standard exception handling that generates a response body
  * that includes exception details.
@@ -16,6 +19,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler
 {
+    private static final Logger LOG = Logger.getLogger(ApiExceptionHandler.class);
+    private static final Level LOG_LEVEL = Boolean.getBoolean("pulse.development") ? Level.SEVERE : Level.FINE;
+
     @ExceptionHandler
     public final ResponseEntity<Object> handleAny(Exception ex, WebRequest request)
     {
@@ -53,6 +59,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
             // handling here.
             body = new Error(ex);
         }
+
+        LOG.log(LOG_LEVEL, ex.getMessage(), ex);
 
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
