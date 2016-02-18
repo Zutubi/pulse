@@ -1,5 +1,9 @@
 /* Styles for the Zutubi.core JS package. */
 
+#notification {
+    z-index: 222222;
+}
+
 /* Navbar */
 
 #navbar {

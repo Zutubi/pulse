@@ -26,7 +26,7 @@ public class FieldScriptAnnotationHandler implements AnnotationHandler
 {
     private Configuration freemarkerConfiguration;
 
-    static void loadTemplate(Class clazz, FieldModel field, String templateName, Configuration freemarkerConfiguration) throws IOException, TemplateException
+    public static void loadTemplate(Class clazz, FieldModel field, String templateName, Configuration freemarkerConfiguration) throws IOException, TemplateException
     {
         if (StringUtils.stringSet(templateName))
         {
@@ -51,7 +51,6 @@ public class FieldScriptAnnotationHandler implements AnnotationHandler
         newConfig.setTemplateLoader(loader);
         return newConfig;
     }
-
 
     @Override
     public boolean requiresContext(Annotation annotation)

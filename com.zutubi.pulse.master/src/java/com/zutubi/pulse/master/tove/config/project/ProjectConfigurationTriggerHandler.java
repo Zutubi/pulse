@@ -26,6 +26,7 @@ import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.docs.TypeDocs;
+import com.zutubi.tove.ui.forms.FieldScriptAnnotationHandler;
 import com.zutubi.tove.ui.model.ActionModel;
 import com.zutubi.tove.ui.model.forms.CheckboxFieldModel;
 import com.zutubi.tove.ui.model.forms.DropdownFieldModel;
@@ -34,7 +35,11 @@ import com.zutubi.tove.ui.model.forms.TextFieldModel;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +52,8 @@ import static com.zutubi.tove.config.docs.PropertyDocs.createFromUnencodedString
  */
 public class ProjectConfigurationTriggerHandler implements ActionHandler
 {
+    private static final Logger LOG = Logger.getLogger(ProjectConfigurationTriggerHandler.class);
+
     private static final String FIELD_VERSION = "version";
     private static final String LABEL_VERSION = "version";
     private static final String FIELD_MATURITY = "maturity";
@@ -65,6 +72,7 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
     private ProjectManager projectManager;
     private ScmManager scmManager;
     private ObjectFactory objectFactory;
+    private Configuration freemarkerConfiguration;
 
     @Override
     public ActionModel getModel(String path, final String variant)
@@ -95,7 +103,19 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
                 typeDocs.addProperty(createFromUnencodedString(FIELD_REBUILD, LABEL_REBUILD, "If checked, all upstream dependencies will be rebuilt first."));
             }
 
-            form.addField(new TextFieldModel(FIELD_REVISION, "revision"));
+            TextFieldModel revisionField = new TextFieldModel(FIELD_REVISION, "revision");
+            revisionField.addParameter("projectId", project.getProjectId());
+            revisionField.addAction("latest");
+            try
+            {
+                FieldScriptAnnotationHandler.loadTemplate(getClass(), revisionField, "ProjectConfigurationTriggerHandler.getlatest", freemarkerConfiguration);
+            }
+            catch (IOException | TemplateException e)
+            {
+                LOG.warning(e);
+            }
+
+            form.addField(revisionField);
             typeDocs.addProperty(createFromUnencodedString(FIELD_REVISION, LABEL_REVISION, "The build revision, leave blank to build the latest revision at build activation time."));
 
             form.addField(new TextFieldModel(FIELD_PRIORITY, "priority"));
@@ -325,5 +345,10 @@ public class ProjectConfigurationTriggerHandler implements ActionHandler
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
+    }
+
+    public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
+    {
+        this.freemarkerConfiguration = freemarkerConfiguration;
     }
 }
