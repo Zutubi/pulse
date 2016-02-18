@@ -54,7 +54,7 @@
                         },
                         cancel: function()
                         {
-                            // FIXME kendo
+                            Zutubi.core.reportError("Authentication is required");
                         }
                     });
 
