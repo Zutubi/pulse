@@ -14,7 +14,7 @@
         {
             Widget.fn.init.call(this, options);
 
-            Zutubi.admin.registerUnloadListener(this._beforeUnload, this);
+            Zutubi.admin.registerUnloadListener(this.options.name, this._beforeUnload, this);
 
             this.element.append("<div></div>");
             this.contentElement = this.element.children("div");
@@ -39,6 +39,7 @@
 
         destroy: function()
         {
+            Zutubi.admin.unregisterUnloadListener(this.options.name);
             this._saveState();
 
             if (this.actionLists)

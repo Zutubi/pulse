@@ -19,7 +19,7 @@
 
             this.bound = false;
 
-            Zutubi.admin.registerUnloadListener(this._beforeUnload, this);
+            Zutubi.admin.registerUnloadListener(this.options.name + "_" + this.options.namespace, this._beforeUnload, this);
 
             if (options && options.scope)
             {
@@ -86,6 +86,7 @@
 
         destroy: function()
         {
+            Zutubi.admin.unregisterUnloadListener(this.options.name + "_" + this.options.namespace);
             this._saveState();
             TreeView.fn.destroy.call(this);
         },

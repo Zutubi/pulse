@@ -13,6 +13,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
+        NAME = "ZaConfigPanel",
         DELTA ='delta',
         NAVIGATE = 'navigate',
         PATHSELECT = 'pathselect';
@@ -25,17 +26,17 @@
             Observable.fn.init.call(this);
 
             that.view = new kendo.View('<div class="k-outer-split" style="height: 100%; width: 100%">' +
-                                           '<div>' +
+                                           '<div id="config-panel-left">' +
                                                '<div class="k-pane-content k-vbox">' +
                                                    '<div class="k-view-switch"><button class="k-left"><span class="fa fa-angle-left"></span> hierarchy</button></div>' +
                                                    '<div class="k-config-tree k-vbox-grow"></div>' +
                                                '</div>' +
                                            '</div>' +
-                                           '<div>' +
+                                           '<div id="config-panel-center">' +
                                                '<div class="k-center-pane-content k-pane-content">' +
                                                '</div>' +
                                            '</div>' +
-                                           '<div>' +
+                                           '<div id="config-panel-right">' +
                                                '<div class="k-right-pane-content k-pane-content">' +
                                                '</div>' +
                                            '</div>' +
@@ -45,11 +46,13 @@
 
             that.view.element.kendoSplitter({
                 panes: [
-                    { collapsible: true, size: "350px" },
+                    Zutubi.admin.loadPaneState(NAME + ".left", { collapsible: true, size: "350px" }),
                     { collapsible: false },
-                    { collapsible: true, size: "250px" }
+                    Zutubi.admin.loadPaneState(NAME + ".right", { collapsible: true, size: "250px" })
                 ]
             });
+
+            Zutubi.admin.registerUnloadListener(NAME, that._beforeUnload, that);
 
             that.hierarchyButton = that.view.element.find(".k-view-switch button").kendoButton({
                 click: jQuery.proxy(this._openHierarchy, this)
@@ -75,7 +78,20 @@
 
         destroy: function()
         {
+            Zutubi.admin.unregisterUnloadListener(NAME);
+            this._saveState();
             this.view.destroy();
+        },
+
+        _beforeUnload: function()
+        {
+            this._saveState();
+        },
+
+        _saveState: function()
+        {
+            Zutubi.admin.savePaneState("config-panel-left", NAME + ".left");
+            Zutubi.admin.savePaneState("config-panel-right", NAME + ".right");
         },
 
         getRootPath: function()

@@ -9,6 +9,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
+        NAME = "ZaScopePanel",
         SELECT = 'select';
 
     Zutubi.admin.ScopePanel = Observable.extend({
@@ -20,17 +21,17 @@
 
             that.view = new kendo.View(
                 '<div class="k-outer-split" style="height: 100%; width: 100%">' +
-                    '<div>' +
+                    '<div id="scope-panel-left">' +
                         '<div class="k-pane-content k-vbox">' +
                             '<div class="k-view-switch"><button class="k-right">configuration <span class="fa fa-angle-right"></span></button></div>' +
                             '<div class="k-hierarchy-tree k-vbox-grow"></div>' +
                         '</div>' +
                     '</div>' +
-                    '<div>' +
+                    '<div id="scope-panel-centr">' +
                         '<div class="k-center-pane-content k-pane-content">' +
                         '</div>' +
                     '</div>' +
-                    '<div>' +
+                    '<div id="scope-panel-right">' +
                         '<div class="k-right-pane-content k-pane-content">' +
                         '</div>' +
                     '</div>' +
@@ -40,11 +41,13 @@
 
             that.view.element.kendoSplitter({
                 panes: [
-                    { collapsible: true, size: "350px" },
+                    Zutubi.admin.loadPaneState(NAME + ".left", { collapsible: true, size: "350px" }),
                     { collapsible: false },
-                    { collapsible: true, size: "250px" }
+                    Zutubi.admin.loadPaneState(NAME + ".right", { collapsible: true, size: "250px" })
                 ]
             });
+
+            Zutubi.admin.registerUnloadListener(NAME, this._beforeUnload, this);
 
             that.configButton = that.view.element.find(".k-view-switch button").kendoButton({
                 click: jQuery.proxy(this._openConfig, this)
@@ -76,7 +79,20 @@
 
         destroy: function()
         {
+            Zutubi.admin.unregisterUnloadListener(NAME);
+            this._saveState();
             this.view.destroy();
+        },
+
+        _beforeUnload: function()
+        {
+            this._saveState();
+        },
+
+        _saveState: function()
+        {
+            Zutubi.admin.savePaneState("scope-panel-left", NAME + ".left");
+            Zutubi.admin.savePaneState("scope-panel-right", NAME + ".right");
         },
 
         setScope: function(scope, name)

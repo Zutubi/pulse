@@ -7,7 +7,7 @@ if (window.Zutubi.admin === undefined)
     {
         var app = {},
             baseUrl = window.baseUrl,
-            unloadListeners = [],
+            unloadListeners = {},
             BEFORE_UNLOAD = "beforeunload";
 
         function _createNotificationWidget()
@@ -297,11 +297,13 @@ if (window.Zutubi.admin === undefined)
 
         function _unloadHandler()
         {
-            var i;
-
-            for (i = 0; i < unloadListeners.length; i++)
+            var name;
+            for (name in unloadListeners)
             {
-                unloadListeners[i]();
+                if (unloadListeners.hasOwnProperty(name))
+                {
+                    unloadListeners[name]();
+                }
             }
         }
 
@@ -436,9 +438,54 @@ if (window.Zutubi.admin === undefined)
                 delete app.addedPath;
             },
 
-            registerUnloadListener: function(callback, context)
+            registerUnloadListener: function(name, callback, context)
             {
-                unloadListeners.push(jQuery.bind(callback, context));
+                unloadListeners[name] = jQuery.proxy(callback, context);
+            },
+
+            unregisterUnloadListener: function(name)
+            {
+                if (unloadListeners[name])
+                {
+                    delete unloadListeners[name];
+                }
+            },
+
+            savePaneState: function(id, key)
+            {
+                var el = $("#" + id),
+                    pane = el.data("pane"),
+                    options = {};
+                if (pane)
+                {
+                    if (pane.collapsed)
+                    {
+                        options.collapsed = true;
+                        options.size = pane.size;
+                    }
+                    else
+                    {
+                        options.size = String(el.width()) + "px";
+                    }
+
+                    localStorage[key] = JSON.stringify(options);
+                }
+            },
+
+            loadPaneState: function(key, defaults)
+            {
+                var str = localStorage[key],
+                    options;
+                if (typeof str === "undefined")
+                {
+                    return defaults;
+                }
+                else
+                {
+                    options = JSON.parse(str);
+                    options.collapsible = true;
+                    return options;
+                }
             }
         };
     }(jQuery));

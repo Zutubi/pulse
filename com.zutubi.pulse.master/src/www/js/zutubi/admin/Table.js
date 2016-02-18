@@ -127,6 +127,7 @@
             var originalColumns = this.options.structure.columns,
                 columns = [],
                 column,
+                columnOptions,
                 i;
 
             if (templateDecorated)
