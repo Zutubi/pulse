@@ -216,7 +216,7 @@ public class Data implements MasterUserPaths
     {
         try
         {
-            File databaseConfig = new File(getUserConfigRoot(), "database.user.properties");
+            File databaseConfig = getDatabaseUserConfigFile();
             
             // if the database.user.properties file already exists in the database directory, do not over write it.
             // This allows pre-configured database.user.properties files to be used when pulse starts up.
@@ -230,6 +230,11 @@ public class Data implements MasterUserPaths
         {
             throw new StartupException("Failed to create the database configuration file.", e);
         }
+    }
+
+    public File getDatabaseUserConfigFile()
+    {
+        return new File(getUserConfigRoot(), "database.user.properties");
     }
 
     public int getBuildNumber()

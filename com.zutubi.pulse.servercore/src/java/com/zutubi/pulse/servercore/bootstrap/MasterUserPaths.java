@@ -2,9 +2,6 @@ package com.zutubi.pulse.servercore.bootstrap;
 
 import java.io.File;
 
-/**
- * <class-comment/>
- */
 public interface MasterUserPaths extends UserPaths
 {
     /**

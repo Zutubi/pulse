@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.bootstrap;
 
+import com.google.common.io.Files;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.events.EventManager;
@@ -61,6 +62,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -307,6 +309,7 @@ public class DefaultSetupManager implements SetupManager
 
     private void handleDbSetup()
     {
+        ensureHibernatePropertiesUpToDate();
         ensureDriversRegisteredAndLoaded();
         
         File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
@@ -319,6 +322,46 @@ public class DefaultSetupManager implements SetupManager
         }
 
         handleDbMigration();
+    }
+
+    private void ensureHibernatePropertiesUpToDate()
+    {
+        // When upgrading to Hibernate 4, we need to set new properties for the caches.  This can't
+        // be handled by a normal upgrade task because by then the database config is already used.
+        File databaseUserConfig = configurationManager.getData().getDatabaseUserConfigFile();
+        if (databaseUserConfig.exists())
+        {
+            try
+            {
+                List<String> lines = Files.readLines(databaseUserConfig, Charset.defaultCharset());
+                int i = 0;
+                int replaceIndex = -1;
+                for (String line: lines)
+                {
+                    if (line.trim().startsWith("hibernate.cache.provider_class"))
+                    {
+                        replaceIndex = i;
+                        break;
+                    }
+
+                    i++;
+                }
+
+                if (replaceIndex >= 0)
+                {
+                    statusMessage("Replacing old hibernate cache configuration...");
+                    lines.set(replaceIndex, "hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
+                    lines.add(replaceIndex + 1, "hibernate.ejb.naming_strategy=org.hibernate.cfg.DefaultNamingStrategy");
+
+                    Files.asCharSink(databaseUserConfig, Charset.defaultCharset()).writeLines(lines);
+                    statusMessage("Hibernate cache configuration updated.");
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
+        }
     }
 
     public void handleDbMigration()
