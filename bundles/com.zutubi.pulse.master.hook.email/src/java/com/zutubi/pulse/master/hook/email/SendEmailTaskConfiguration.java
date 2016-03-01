@@ -249,6 +249,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
     private void addContactEmails(ProjectConfiguration projectConfig, Set<String> emails)
     {
+        LOG.debug("Adding contact emails for project '" + projectConfig.getName() + "'");
         ProjectContactsConfiguration contacts = projectConfig.getContacts();
         for (GroupConfiguration group: contacts.getGroups())
         {
@@ -278,6 +279,10 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         {
             emails.add(((EmailContactConfiguration) primaryContact).getAddress());
         }
+        else
+        {
+            LOG.debug("Ignoring contact user '" + user.getName() + "' because there is no primary contact email");
+        }
     }
 
     private List<BuildResult> getBuilds(BuildResult result)
@@ -298,12 +303,14 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
     private void addCommitterEmails(ProjectConfiguration projectConfig, Project.State projectState, List<BuildResult> builds, Set<String> emails)
     {
+        LOG.debug("Adding committer emails for project '" + projectConfig.getName() + "' (ignorePulseUsers = " + ignorePulseUsers + ")");
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
             List<PersistentChangelist> changelists = changelistManager.getChangesForBuild(build, 0, true);
             if (includeUpstreamCommitters)
             {
+                LOG.debug("Including upstream committers");
                 BuildResult sinceBuild = buildManager.getPreviousBuildResult(build);
                 List<UpstreamChangelist> upstreamChangelists = changelistManager.getUpstreamChangelists(build, sinceBuild);
                 changelists.addAll(transform(upstreamChangelists, new UpstreamChangelist.ToChangelistFunction()));
@@ -315,6 +322,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
                 // Only bother to map and add if we haven't already done so.
                 if (seenLogins.add(scmLogin))
                 {
+                    LOG.debug("Processing author '" + scmLogin + "'");
                     if (StringUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
                     {
                         String email = getEmail(projectConfig, projectState, scmLogin);
@@ -365,6 +373,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         {
             if (useScmEmails)
             {
+                LOG.debug("Looking up email from SCM");
                 try
                 {
                     email = ScmClientUtils.withScmClient(projectConfig, projectState, scmManager, new ScmClientUtils.ScmContextualAction<String>()
@@ -396,6 +405,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         }
         else
         {
+            LOG.debug("Using configured mapping to email '" + mapping.getEmail() + "'");
             email = mapping.getEmail();
         }
 
