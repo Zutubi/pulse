@@ -364,7 +364,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onRemove: function(evt)
     {
-        var selected, selectedRecord, value;
+        var selected, selectedRecord, value, i, hiddenField;
 
         selected = this.getSelection();
         if(selected >= 0)
@@ -381,8 +381,27 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                 this.combo.store.addSorted(this.optionRecordCache[value]);
             }
 
-            this.hiddenFields[selected].remove();
-            this.hiddenFields.splice(selected, 1);
+            if (this.allowReordering)
+            {
+                this.hiddenFields[selected].remove();
+                this.hiddenFields.splice(selected, 1);
+            }
+            else
+            {
+                // The order of hidden fields does not match the store order, so we need to find the matching hidden
+                // input field and remove it.  Note this assumes we don't allow duplicate values in unordered lists.
+                for(i = 0; i < this.hiddenFields.length; i++)
+                {
+                    hiddenField = this.hiddenFields[i];
+                    if (hiddenField.dom.value === value)
+                    {
+                        // this is the one to remove.
+                        this.hiddenFields[i].remove();
+                        this.hiddenFields.splice(selected, 1);
+                        break;
+                    }
+                }
+            }
 
             this.fireEvent('change', this, evt);
         }
