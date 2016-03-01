@@ -67,6 +67,15 @@ public class BuildProperties
      */
     public static final String PROPERTY_BUILD_NUMBER            = "build.number";
     /**
+     * The time that the build activated, in the format yyyy-MM-dd HH:mm.
+     */
+    public static final String PROPERTY_BUILD_ACTIVATED_TIME    = "build.activated.time";
+    /**
+     * The time that the build commenced, as the number of milliseconds since
+     * midnight, January 1, 1970 UTC.
+     */
+    public static final String PROPERTY_BUILD_ACTIVATED_MILLIS  = "build.activated.time.millis";
+    /**
      * A short string describing the reason that the build was triggered.
      */
     public static final String PROPERTY_BUILD_REASON            = "build.reason";

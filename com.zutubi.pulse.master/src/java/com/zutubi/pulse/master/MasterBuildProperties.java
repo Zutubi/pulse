@@ -54,12 +54,7 @@ public class MasterBuildProperties extends BuildProperties
     public static void addAllBuildProperties(ExecutionContext context, BuildResult result, MasterLocationProvider masterLocationProvider, MasterConfigurationManager configurationManager, String baseUrl)
     {
         addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterLocationProvider.getMasterUrl(), baseUrl);
-        if(result.getRevision() != null)
-        {
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());
-        }
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(result.getStamps().getStartTime()));
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
+        addRevisionProperties(context, result);
         addProjectProperties(context, result.getProject().getConfig(), true);
         addCompletedBuildProperties(context, result, configurationManager);
     }
@@ -115,7 +110,12 @@ public class MasterBuildProperties extends BuildProperties
 
     public static void addRevisionProperties(ExecutionContext context, BuildResult buildResult)
     {
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildResult.getRevision().getRevisionString());
+        if (buildResult.getRevision() != null)
+        {
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildResult.getRevision().getRevisionString());
+        }
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_ACTIVATED_TIME, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(buildResult.getStamps().getQueueTime())));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_ACTIVATED_MILLIS, Long.toString(buildResult.getStamps().getQueueTime()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(buildResult.getStartTime())));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildResult.getStartTime()));
     }
