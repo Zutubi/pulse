@@ -19,6 +19,11 @@
                     structure: structure
                 };
 
+            if (structure.list.length > 9)
+            {
+                kendoOptions.filter = "startswith";
+
+            }
             that.parentForm = options.parentForm;
 
             DropDownList.fn.init.call(this, element, kendoOptions);
