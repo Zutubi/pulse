@@ -20,7 +20,7 @@ import static com.google.common.collect.Iterables.find;
  */
 @SymbolicName("zutubi.userConfig")
 @Form(fieldOrder = {"login", "name", "authenticatedViaLdap"})
-@Table(columns = {"login", "name"})
+@Table(columns = {"login", "name", "active"})
 @Classification(collection = "users")
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {

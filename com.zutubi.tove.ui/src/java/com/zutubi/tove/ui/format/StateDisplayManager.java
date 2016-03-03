@@ -73,7 +73,7 @@ public class StateDisplayManager
      * @param configurationInstance instance to get the fields for
      * @return names of all display fields for the instance
      */
-    public List<String> getDisplayFields(Configuration configurationInstance)
+    private List<String> getDisplayFields(Configuration configurationInstance)
     {
         if (configurationInstance != null && configurationInstance.isConcrete())
         {
@@ -100,9 +100,9 @@ public class StateDisplayManager
      * @param parentInstance instance that owns the collection
      * @return names of all display fields for the instance
      */
-    public List<String> getCollectionDisplayFields(CompositeType type, Collection<? extends Configuration> collection, Configuration parentInstance)
+    private List<String> getCollectionDisplayFields(CompositeType type, Collection<? extends Configuration> collection, Configuration parentInstance)
     {
-        if (parentInstance != null && parentInstance.isConcrete())
+        if (parentInstance == null || parentInstance.isConcrete())
         {
             try
             {
@@ -157,7 +157,7 @@ public class StateDisplayManager
      * @param parentInstance instance that owns the collection
      * @return value of the given field for the given collection of instances
      */
-    public Object formatCollection(String fieldName, CompositeType type, Collection<? extends Configuration> collection, Configuration parentInstance)
+    private Object formatCollection(String fieldName, CompositeType type, Collection<? extends Configuration> collection, Configuration parentInstance)
     {
         StateDisplayFields displayFields = getStateDisplayFields(type);
         if (displayFields.hasCollectionField(fieldName))
