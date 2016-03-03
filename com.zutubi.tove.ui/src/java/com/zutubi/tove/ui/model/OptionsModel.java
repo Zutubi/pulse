@@ -9,6 +9,7 @@ public class OptionsModel
     private String baseName;
     private String symbolicName;
     private String propertyName;
+    private String scopePath;
 
     public String getBaseName()
     {
@@ -38,5 +39,20 @@ public class OptionsModel
     public void setPropertyName(String propertyName)
     {
         this.propertyName = propertyName;
+    }
+
+    /**
+     * @return path of the scope instance to search for options from: used for looking up referenceable instances when
+     *         a dependentOn field is specified in the {@link @Reference} (see
+     *         {@link com.zutubi.tove.ui.forms.ReferenceAnnotationHandler} and the trackdependent script).
+     */
+    public String getScopePath()
+    {
+        return scopePath;
+    }
+
+    public void setScopePath(String scopePath)
+    {
+        this.scopePath = scopePath;
     }
 }

@@ -11,6 +11,9 @@ import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Combobox;
+import com.zutubi.tove.annotations.Dropdown;
+import com.zutubi.tove.annotations.ItemPicker;
+import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -47,8 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Controller to handle invocation of configuration actions.
@@ -57,6 +59,8 @@ import java.util.Map;
 @RequestMapping("/action")
 public class ConfigActionsController
 {
+    private static final Set<Class> OPTION_TYPES = new HashSet<>();
+
     @Autowired
     private ConfigurationTemplateManager configurationTemplateManager;
     @Autowired
@@ -77,6 +81,11 @@ public class ConfigActionsController
     private FormModelBuilder formModelBuilder;
     @Autowired
     private ObjectFactory objectFactory;
+
+    static
+    {
+        OPTION_TYPES.addAll(Arrays.asList(Combobox.class, Dropdown.class, ItemPicker.class, Reference.class));
+    }
 
     @RequestMapping(value = "delete/**", method = RequestMethod.GET)
     public ResponseEntity<CleanupTaskModel> delete(HttpServletRequest request) throws Exception
@@ -111,7 +120,11 @@ public class ConfigActionsController
         }
 
         FormContext context;
-        if (StringUtils.stringSet(body.getBaseName()))
+        if (StringUtils.stringSet(body.getScopePath()))
+        {
+            context = new FormContext(configurationTemplateManager.getInstance(body.getScopePath()));
+        }
+        else if (StringUtils.stringSet(body.getBaseName()))
         {
             context = new FormContext(configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, body.getBaseName())));
         }
@@ -137,13 +150,15 @@ public class ConfigActionsController
 
     private Annotation getOptionAnnotation(TypeProperty property)
     {
-        Combobox annotation = property.getAnnotation(Combobox.class);
-        if (annotation == null)
+        for (Annotation annotation: property.getAnnotations())
         {
-            throw new IllegalArgumentException("Invalid property: not a ComboBox annotation");
+            if (OPTION_TYPES.contains(annotation.annotationType()))
+            {
+                return annotation;
+            }
         }
 
-        return annotation;
+        throw new IllegalArgumentException("Invalid property: no recognised option annotation");
     }
 
     @RequestMapping(value = "validate/**", method = RequestMethod.POST)

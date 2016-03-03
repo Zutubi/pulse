@@ -29,7 +29,7 @@
                             {
                                 Zutubi.core.ajax({
                                     method: "POST",
-                                    url: window.baseUrl + "/api/action/options/" + Zutubi.config.encodePath(formOptions.parentPath),
+                                    url: "/api/action/options/" + Zutubi.config.encodePath(formOptions.parentPath),
                                     data: {
                                         symbolicName: formOptions.symbolicName,
                                         baseName: formOptions.baseName,

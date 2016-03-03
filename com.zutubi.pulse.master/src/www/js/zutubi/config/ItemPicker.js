@@ -14,7 +14,8 @@
                 kendoOptions;
 
             that.structure = structure;
-
+            that.parentForm = options.parentForm;
+            
             kendoOptions = {
                 dataSource: that._removeEmpty(structure.list),
                 dataTextField: structure.listText,
@@ -133,6 +134,13 @@
         getValue: function()
         {
             return this.value();
+        },
+
+        setData: function(list)
+        {
+            this.setDataSource(new kendo.data.DataSource({
+                data: this._removeEmpty(list)
+            }));
         }
     });
 
