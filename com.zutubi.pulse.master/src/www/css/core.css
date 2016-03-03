@@ -78,6 +78,7 @@
 
 .k-selector-popup {
     border-top: none;
+    overflow: auto;
 }
 
 .k-selector-popup-item {
