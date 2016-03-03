@@ -221,8 +221,6 @@
             {
                 that.popup.open();
                 that.popup.element.css("max-height", String($(window).height() - 80) + "px");
-                console.log(String($(window).height() - 80) + "px");
-                console.dir(that.popup.element.css("max-height"));
             }
         },
 
