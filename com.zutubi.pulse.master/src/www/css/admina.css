@@ -10,6 +10,7 @@ body {
 
 .k-hierarchy-popup {
     border-top: none;
+    overflow: auto;
 }
 
 .k-nav-error {
