@@ -250,15 +250,9 @@
             });
 
             contextData = {links: links};
-            if (this.hierarchySelector.getRootName() !== data.key)
+            if (data.refactoringActions)
             {
-                contextData.actions = [{
-                    action: "introduceParent",
-                    label: "introduce parent template"
-                }, {
-                    action: "smartClone",
-                    label: "smart clone"
-                }];
+                contextData.actions = data.refactoringActions;
             }
 
             this.contextPanel.setData(this.scope + "/" + data.key, contextData);

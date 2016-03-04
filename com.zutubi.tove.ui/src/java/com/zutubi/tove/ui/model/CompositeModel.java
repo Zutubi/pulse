@@ -20,6 +20,7 @@ public class CompositeModel extends ConfigModel
     private Map<String, List<String>> validationErrors;
     private List<ActionModel> actions;
     private List<ActionModel> descendantActions;
+    private List<ActionModel> refactoringActions;
     private List<ConfigurationLink> links;
     private StateModel state;
 
@@ -104,6 +105,20 @@ public class CompositeModel extends ConfigModel
             descendantActions = new ArrayList<>();
         }
         descendantActions.add(action);
+    }
+
+    public List<ActionModel> getRefactoringActions()
+    {
+        return refactoringActions;
+    }
+
+    public void addRefactoringAction(ActionModel action)
+    {
+        if (refactoringActions == null)
+        {
+            refactoringActions = new ArrayList<>();
+        }
+        refactoringActions.add(action);
     }
 
     public List<ConfigurationLink> getLinks()

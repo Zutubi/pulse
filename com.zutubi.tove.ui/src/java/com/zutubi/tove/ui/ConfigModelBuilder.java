@@ -51,6 +51,7 @@ public class ConfigModelBuilder
     private ConfigurationDocsManager configurationDocsManager;
     private StateDisplayManager stateDisplayManager;
     private ConfigPropertyFormatter configPropertyFormatter;
+    private ConfigurationRefactoringManager configurationRefactoringManager;
 
     public ConfigModel buildModel(String[] filters, String path, int depth) throws TypeException
     {
@@ -563,9 +564,11 @@ public class ConfigModelBuilder
         String key = null;
         Record parentRecord = null;
         String parentPath = PathUtils.getParentPath(path);
+        boolean templateItem = false;
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
         if (parentType != null && parentType instanceof MapType)
         {
+            templateItem = configurationTemplateManager.isTemplatedCollection(parentPath);
             parentRecord = configurationTemplateManager.getRecord(parentPath);
             key = PathUtils.getBaseName(path);
         }
@@ -612,6 +615,18 @@ public class ConfigModelBuilder
                 String resolvedActionName = ToveUiUtils.resolveActionName(actionName, parentRecord, key);
                 String label = ToveUiUtils.format(messages, resolvedActionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
                 model.addDescendantAction(new ActionModel(actionName, label, null, false));
+            }
+        }
+
+        if (templateItem && configurationSecurityManager.hasPermission(parentPath, AccessManager.ACTION_CREATE))
+        {
+            if (configurationRefactoringManager.canIntroduceParentTemplate(path))
+            {
+                model.addRefactoringAction(new ActionModel("introduceParent", "introduce parent template", null, true));
+            }
+            if (configurationRefactoringManager.canSmartClone(path))
+            {
+                model.addRefactoringAction(new ActionModel("smartClone", "smart clone", null, true));
             }
         }
     }
@@ -797,6 +812,11 @@ public class ConfigModelBuilder
     public void setConfigPropertyFormatter(ConfigPropertyFormatter configPropertyFormatter)
     {
         this.configPropertyFormatter = configPropertyFormatter;
+    }
+
+    public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
+    {
+        this.configurationRefactoringManager = configurationRefactoringManager;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>
