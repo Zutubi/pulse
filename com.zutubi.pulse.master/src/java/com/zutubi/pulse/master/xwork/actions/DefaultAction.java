@@ -2,6 +2,12 @@ package com.zutubi.pulse.master.xwork.actions;
 
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.tove.security.AccessManager;
+
+import java.util.Arrays;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 
 /**
  * The default action controls the page presented to the user when they first arrive at the
@@ -33,6 +39,13 @@ public class DefaultAction extends ActionSupport
      */
     private static final String SETUP_ADMIN = "setupAdmin";
 
+    private boolean configureAllowed = false;
+
+    public boolean isConfigureAllowed()
+    {
+        return configureAllowed;
+    }
+
     public String execute()
     {
         if (userManager.getUserCount() == 0)
@@ -54,6 +67,15 @@ public class DefaultAction extends ActionSupport
             }
             else
             {
+                for (String scope: Arrays.asList(AGENTS_SCOPE, PROJECTS_SCOPE, USERS_SCOPE, GlobalConfiguration.SCOPE_NAME))
+                {
+                    if (accessManager.hasPermission(AccessManager.ACTION_CREATE, scope))
+                    {
+                        configureAllowed = true;
+                        break;
+                    }
+                }
+
                 return user.getPreferences().getDefaultAction();
             }
         }

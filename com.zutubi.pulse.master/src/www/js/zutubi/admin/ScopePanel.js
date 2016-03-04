@@ -62,7 +62,9 @@
             {
                 if (!that.name)
                 {
-                    that._selectItem(that.hierarchySelector.getRootName());
+                    // Directly update our item name to what it should be (no need to notify external observers as to
+                    // them the item is always the empty string when we're on the root).
+                    that.setItem(that.hierarchySelector.getRootName());
                 }
             });
             that.hierarchySelector.bind("nodeselect", function(e)

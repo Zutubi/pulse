@@ -7,17 +7,185 @@
 <head>
     <title>welcome</title>
     <style>
-        table.template-actions, p { width: 770px; }
+        #content {
+            font-family: serif;
+            font-size: 15px;
+            color: #555;
+        }
+
+        #content h1, #content h2, #content h3 {
+            margin: 0.4em 0 0.3em 0;
+            color: #555;
+        }
+
+        #content h1 {
+            font-size: 22px;
+        }
+
+        #content h2 {
+            font-size: 19px;
+        }
+
+        #content h3 {
+            font-size: 16px;
+        }
+
+        #content a, #content a:hover {
+            border-bottom: none;
+        }
+
+        #content p {
+            max-width: 770px;
+        }
+
+        #welcome.heading {
+            margin-top: 0;
+        }
+
+
+        #welcon {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 780px;
+        }
+
+        #welcon > div {
+            box-sizing: border-box;
+            margin: 10px 20px 10px 0;
+            width: 370px;
+            border: solid 1px #ddd;
+        }
+
+        #welcon > div > h1 {
+            margin: 0;
+            padding: 8px;
+            background-color: #ffffe0;
+            color: #333;
+            font-size: 17px;
+            font-weight: bold;
+            border-bottom: solid 1px #ddd;
+        }
+
+        #welcon > div > div {
+            margin: 0;
+            padding: 8px;
+        }
+
+        #welcon p {
+            margin: 0 0 12px 0;
+        }
+
+        #welcon li {
+            margin: 8px 0;
+        }
+
+        #welcon .fa {
+            font-size: 15px;
+            color: #787878;
+            margin-right: 0.4em;
+        }
+
+        .whatnow {
+            max-width: 600px;
+            margin-left: 20px;
+            list-style-type: circle;
+        }
+
+        .whatnow li {
+            padding: 3px 0;
+        }
     </style>
 </head>
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 3.0 Beta!  This is an early access release that is unpolished and expected to be unstable.
-        We've released it early to solicit feedback from customers that are interested in the brand new administration
-        UI.  Highlights of the new UI include:
+        Welcome to <strong>Pulse 3.0 Beta</strong>!  This beta release is unpolished and expected to contain
+        bugs.  As such it is <em>not</em> recommended for production use.  All bug reports and feedback are most
+        welcome!
     </p>
-    <ul style="list-style: circle; width: 720px">
+    <h2>:: getting started :: </h2>
+    <div id="welcon">
+        #if($configureAllowed)
+        <div>
+            <h1>setup</h1>
+            <div>
+                <p>
+                    Configuration is managed in the <a href="$urls.admin()">administration</a> section:
+                </p>
+                <ul>
+                    #auth("path=projects" "action=create")
+                    <li><a href="$urls.adminProjects()"><span class="fa fa-th"></span> add new projects</a></li>
+                    #end
+                    #auth("path=agents" "action=create")
+                    <li><a href="$urls.adminAgents()"><span class="fa fa-server"></span> add new build agents</a></li>
+                    #end
+                    #auth("path=users" "action=create")
+                    <li><a href="$urls.adminUsers()"><span class="fa fa-users"></span> add new user accounts</a></li>
+                    #end
+                    #auth("path=settings" "action=write")
+                    <li><a href="$urls.adminSettings()"><span class="fa fa-cog"></span> configure server settings</a></li>
+                    #end
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h1>learn</h1>
+            <div>
+                <p>
+                    Reference documentation is built in, but see also:
+                </p>
+                <ul>
+                    <li><a href="$helpUrl"><span class="fa fa-home"></span> the documentation home page</a></li>
+                    <li><a href="$helpUrl/Getting+Started+Guide"><span class="fa fa-question-circle"></span> the Getting Started Guide</a></li>
+                    <li><a href="$helpUrl/Introduction"><span class="fa fa-info-circle"></span> key introductory topics</a></li>
+                    <li><a href="$helpUrl/Cookbook"><span class="fa fa-book"></span> how-to style guides</a></li>
+                </ul>
+            </div>
+        </div>
+        #end
+        <div>
+            <h1>explore</h1>
+            <div>
+                <p>
+                    Find your way around the reporting interface:
+                </p>
+                <ul>
+                    <li><a href="$urls.dashboard()"><span class="fa fa-tachometer"></span> start at your personal dashboard</a></li>
+                    <li><a href="$urls.browse()"><span class="fa fa-th"></span> browse builds for all projects</a></li>
+                    <li><a href="$urls.server()"><span class="fa fa-list"></span> view server activity and queues</a></li>
+                    <li><a href="$urls.agents()"><span class="fa fa-server"></span> explore the build agent grid</a></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h1>customize</h1>
+            <div>
+                <p>
+                    To begin customizing your view of the Pulse server:
+                </p>
+                <ul>
+                    <li><a href="$urls.preferences()/dashboard"><span class="fa fa-tachometer"></span> configure your dashboard</a></li>
+                    <li><a href="$urls.preferences()/browseView"><span class="fa fa-th"></span> tweak the browse view</a></li>
+                    <li><a href="$urls.preferences()/subscriptions"><span class="fa fa-envelope"></span> subscribe to build notifications</a></li>
+                    <li><a href="$urls.preferences()"><span class="fa fa-wrench"></span> view all preferences</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h3>got it covered?</h3>
+    <p>
+        You can <a href="$baseUrl/dismissWelcome.action">dismiss</a> this page to make the dashboard your default page,
+        i.e. what you see when you first log in (or when you click the pulse icon in the top left of the UI).  If you
+        change your mind, your default page is set in your <a href="$urls.preferences()">preferences</a>.
+    </p>
+
+    <h1>:: new in 3.0 ::</h1>
+    <p>
+        If you've just upgraded, you'll notice that the administration UI has been completely overhauled.  Highlights
+        include:
+    </p>
+    <ul class="whatnow">
         <li>An all-new HTML5-based implementation.</li>
         <li>Integration with browser history for more convenient navigation.</li>
         <li>A new navigation bar that is used throughout the UI (not just for admin) to save vertical space and match
@@ -28,6 +196,7 @@
         <li>The ability to filter hierarchy trees to easily find a project or agent in a large installation.</li>
         <li>Improved template decoration of forms, making them less busy so important info is easier to spot.</li>
         <li>Drag and drop reordering of collections.</li>
+        <li>Client side memory of panel state, i.e. which panels are collapsed or have custom widths.</li>
         <li>Better visibility of defined, inherited and overriden collection orders, with easy reversion.</li>
         <li>A simpler three-column layout where the main pane no longer includes an extra context column.</li>
         <li>New multi-select and string list widgets that are more compact and usable.</li>
@@ -35,10 +204,6 @@
         <li>All based on a new HTTP-based API that is more efficient (it will become publicly accessible in
             a future major.minor release).</li>
     </ul>
-    <p>
-        Testing has been mainly done in Chrome, with light workouts in other browsers.  Compatibility will be tested
-        with IE 10+, Safari and Firefox for the final release.  All bug reports and feedback are most welcome!
-    </p>
     <p>
         This release also includes major library and framework upgrades under the hood, which you should only notice in
         the form of improved performance and future-proofing.
