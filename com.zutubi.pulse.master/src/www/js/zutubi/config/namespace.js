@@ -128,6 +128,24 @@ if (window.Zutubi.config === undefined)
                 return encodedPath;
             },
 
+            canWrite: function(composite)
+            {
+                var i;
+    
+                if (composite.actions)
+                {
+                    for (i = 0; i < composite.actions.length; i++)
+                    {
+                        if (composite.actions[i].action === "write")
+                        {
+                            return true;
+                        }
+                    }
+                }
+    
+                return false;
+            },
+            
             coerceProperties: function(properties, propertyTypes)
             {
                 var i,

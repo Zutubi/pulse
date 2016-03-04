@@ -19,6 +19,7 @@
                 item: project
             }, that.options, options);
 
+            that.canWrite = Zutubi.config.canWrite(project);
             that.scmTemplate = kendo.template(that.options.scmTemplate);
 
             OverviewPanel.fn.init.call(this, options);
@@ -62,16 +63,34 @@
 
         _addMissingConfigLink: function(cellEl, property)
         {
-            var anchor = $('<a class="k-overview-error">required ' + property + ' configuration is missing, click to configure</a>');
-            cellEl.append(anchor);
-            anchor.on(CLICK, jQuery.proxy(this._editClicked, this, property));
+            var anchor;
+
+            if (this.canWrite)
+            {
+                anchor = $('<a class="k-overview-error">required ' + property + ' configuration is missing, click to configure</a>');
+                cellEl.append(anchor);
+                anchor.on(CLICK, jQuery.proxy(this._editClicked, this, property));
+            }
+            else
+            {
+                cellEl.append('<span class="k-understated">required ' + property + ' configuration is missing</span>');
+            }
         },
 
         _addSuggestedConfigLink: function(parentEl, text, path)
         {
-            var anchor = $('<a class="k-overview-suggestion">' + kendo.htmlEncode(text) + '</a>');
-            parentEl.append(anchor);
-            anchor.on(CLICK, jQuery.proxy(this._editClicked, this, path));
+            var anchor;
+
+            if (this.canWrite)
+            {
+                anchor = $('<a class="k-overview-suggestion">' + kendo.htmlEncode(text) + ', click to configure</a>');
+                parentEl.append(anchor);
+                anchor.on(CLICK, jQuery.proxy(this._editClicked, this, path));
+            }
+            else
+            {
+                parentEl.append('<span class="k-understated">' + kendo.htmlEncode(text) + '</span>');
+            }
         },
 
         _addScmSummary: function(cellEl)
@@ -116,7 +135,7 @@
                     }
                     else if (this.options.project.concrete)
                     {
-                        this._addSuggestedConfigLink(cellEl, "built-in type with no recipes defined, click to configure", "type/recipes");
+                        this._addSuggestedConfigLink(cellEl, "built-in type with no recipes defined", "type/recipes");
                     }
                     else
                     {
@@ -186,7 +205,7 @@
             }
             else if(this.options.project.concrete)
             {
-                this._addSuggestedConfigLink(cellEl, "recipe has no commands defined, click to configure", "type/recipes/" + recipe.properties.name);
+                this._addSuggestedConfigLink(cellEl, "recipe has no commands defined", "type/recipes/" + recipe.properties.name);
             }
             else
             {
@@ -265,7 +284,7 @@
             }
             else if (this.options.project.concrete)
             {
-                this._addSuggestedConfigLink(cellEl, "no build stages defined, click to configure", "stages");
+                this._addSuggestedConfigLink(cellEl, "no build stages defined", "stages");
             }
             else
             {

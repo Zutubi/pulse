@@ -16,7 +16,7 @@
         {
             var that = this,
                 composite = options.composite,
-                writable = that._canWrite(composite),
+                writable = Zutubi.config.canWrite(composite),
                 el;
 
             that.options = options;
@@ -144,7 +144,6 @@
 
         destroy: function()
         {
-            // FIXME moar destruction?
             $("#composite-upwrapper").find("a").off(ns);
             if (this.templateIcon)
             {
@@ -152,24 +151,6 @@
                 this.templateIcon = null;
             }
             this.view.destroy();
-        },
-
-        _canWrite: function(composite)
-        {
-            var i;
-
-            if (composite.actions)
-            {
-                for (i = 0; i < composite.actions.length; i++)
-                {
-                    if (composite.actions[i].action === "write")
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         },
 
         _submitClicked: function(e)
