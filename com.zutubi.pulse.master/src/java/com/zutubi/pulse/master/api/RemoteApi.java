@@ -778,9 +778,11 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-            // Start with the template parent, overwrite with provided struct,
-            // then apply defaults where values are not specified.
-            MutableRecord record = templateParent.flatten(false);
+            // Start with a trivial override of the template parent (this ensures we don't inherit
+            // things we should not, e.g. hidden keys CIB-3328), update with provided struct, then
+            // apply defaults where values are not specified.
+            TemplateRecord trivialOverride = new TemplateRecord(null, templateParent, expectedType, expectedType.createNewRecord(false));
+            MutableRecord record = trivialOverride.flatten(false);
             MutableRecord providedRecord = type.fromXmlRpc(null, config, false);
             // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
             // passwords.  So replace any suppressions with values from the parent.
