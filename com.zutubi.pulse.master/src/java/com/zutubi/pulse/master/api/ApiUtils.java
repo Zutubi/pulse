@@ -154,6 +154,11 @@ public class ApiUtils
         details.put("warningCount", result.getWarningFeatureCount());
 
         TimeStamps timeStamps = result.getStamps();
+        if (timeStamps.hasQueueTime())
+        {
+            details.put("activatedTime", new Date(timeStamps.getQueueTime()));
+            details.put("activatedTimeMillis", Long.toString(timeStamps.getQueueTime()));
+        }
         details.put("startTime", new Date(timeStamps.getStartTime()));
         details.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
         details.put("endTime", new Date(timeStamps.getEndTime()));
