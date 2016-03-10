@@ -54,7 +54,7 @@ public class TailTest extends BaseIOTestCase
         Files.append(lines, f, Charset.defaultCharset());
 
         Tail tail = new Tail(4, f);
-        assertEquals(lines, tail.getTail());
+        assertEquals(lines.replaceAll("\\r", ""), tail.getTail());
     }
 
     public void testNoNewlineAtEndOfFileOverMaxLines() throws IOException
@@ -64,7 +64,7 @@ public class TailTest extends BaseIOTestCase
         Files.append(lines, f, Charset.defaultCharset());
 
         Tail tail = new Tail(4, f);
-        assertEquals(StringUtils.join(SystemUtils.LINE_SEPARATOR, Arrays.asList("2", "3", "4", "5")), tail.getTail());
+        assertEquals(StringUtils.join("\n", Arrays.asList("2", "3", "4", "5")), tail.getTail());
     }
 
     public void testLineLengthFourUnderEstimate() throws IOException
