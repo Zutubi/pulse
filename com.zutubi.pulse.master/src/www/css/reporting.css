@@ -19,7 +19,7 @@
 }
 
 .k-build-context .k-status-warnings,
-.k-build-menu-item.k-status-warnings{
+.k-build-menu-item .k-status-warnings{
     color: #eea;
 }
 
