@@ -59,6 +59,11 @@ public class TimeStamps implements Serializable
         startTime = System.currentTimeMillis();
     }
 
+    public boolean hasQueueTime()
+    {
+        return queueTime != UNINITIALISED_TIME;
+    }
+
     public long getQueueTime()
     {
         return queueTime;

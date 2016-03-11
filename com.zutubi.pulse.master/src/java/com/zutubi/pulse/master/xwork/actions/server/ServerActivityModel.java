@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.build.queue.ActivatedRequest;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildRevision;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
 import com.zutubi.pulse.master.xwork.actions.project.RevisionModel;
@@ -193,11 +195,21 @@ public class ServerActivityModel
     {
         private boolean hidden;
 
-        public ActiveBuildModel(BuildResult buildResult, Urls urls, boolean cancelPermitted)
+        public ActiveBuildModel(ActivatedRequest request, BuildResult buildResult, Urls urls, boolean cancelPermitted)
         {
             super(buildResult, urls, false);
             setCancelPermitted(cancelPermitted);
             hidden = false;
+            // CIB-3330: if the build itself has not yet got a revision, check if the request has a
+            // fixed revision (which will be used by the build on commencement).
+            if (getRevision() == null)
+            {
+                BuildRevision requestRevision = request.getRequest().getRevision();
+                if (requestRevision.isInitialised())
+                {
+                    setRevision(new RevisionModel(requestRevision.getRevision(), buildResult.getProject().getConfig()));
+                }
+            }
         }
 
         public ActiveBuildModel(boolean personal)

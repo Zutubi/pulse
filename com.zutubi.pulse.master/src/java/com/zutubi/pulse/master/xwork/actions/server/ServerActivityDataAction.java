@@ -16,8 +16,10 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.util.Sort;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public class ServerActivityDataAction extends ActionSupport
         model.setCancelAllPermitted(isAdmin);
 
         final List<BuildRequestEvent> queuedBuilds = new LinkedList<BuildRequestEvent>();
-        final List<BuildResult> activeBuilds = new LinkedList<BuildResult>();
+        final List<Pair<ActivatedRequest, BuildResult>> activeBuilds = new LinkedList<Pair<ActivatedRequest, BuildResult>>();
         
         SecurityUtils.runAsSystem(new Runnable()
         {
@@ -68,7 +70,7 @@ public class ServerActivityDataAction extends ActionSupport
                     BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
                     if (buildResult != null && !buildResult.completed())
                     {
-                        activeBuilds.add(buildResult);
+                        activeBuilds.add(new Pair<ActivatedRequest, BuildResult>(activatedRequest, buildResult));
                     }
                 }
             }
@@ -79,7 +81,14 @@ public class ServerActivityDataAction extends ActionSupport
         
         // Ordering by reverse of id makes builds activated first later in the
         // list, giving the effect of builds moving down the page.
-        Collections.sort(activeBuilds, new Sort.InverseComparator<BuildResult>(new EntityComparator<BuildResult>()));
+        final EntityComparator<BuildResult> buildComparator = new EntityComparator<BuildResult>();
+        Collections.sort(activeBuilds, new Sort.InverseComparator<Pair<ActivatedRequest, BuildResult>>(new Comparator<Pair<ActivatedRequest, BuildResult>>()
+        {
+            public int compare(Pair<ActivatedRequest, BuildResult> o1, Pair<ActivatedRequest, BuildResult> o2)
+            {
+                return buildComparator.compare(o1.second, o2.second);
+            }
+        }));
         
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         for (BuildRequestEvent requestEvent: queuedBuilds)
@@ -94,16 +103,16 @@ public class ServerActivityDataAction extends ActionSupport
                 model.addQueued(new ServerActivityModel.QueuedBuildModel(requestEvent instanceof PersonalBuildRequestEvent));
             }
         }
-        for (BuildResult active: activeBuilds)
+        for (Pair<ActivatedRequest, BuildResult> active: activeBuilds)
         {
             if (accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, active))
             {
                 boolean cancelPermitted = accessManager.hasPermission(actor, ProjectConfigurationActions.ACTION_CANCEL_BUILD, active);
-                model.addActive(new ServerActivityModel.ActiveBuildModel(active, urls, cancelPermitted));
+                model.addActive(new ServerActivityModel.ActiveBuildModel(active.first, active.second, urls, cancelPermitted));
             }
             else
             {
-                model.addActive(new ServerActivityModel.ActiveBuildModel(active.isPersonal()));
+                model.addActive(new ServerActivityModel.ActiveBuildModel(active.second.isPersonal()));
             }
         }
 

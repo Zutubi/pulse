@@ -121,6 +121,11 @@ public class BuildModel extends ResultModel
         return revision;
     }
 
+    public void setRevision(RevisionModel revision)
+    {
+        this.revision = revision;
+    }
+
     public String getLink()
     {
         return link;
