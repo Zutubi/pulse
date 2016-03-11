@@ -30,13 +30,12 @@ import static com.google.common.collect.Lists.reverse;
  * <p/>
  * Two requests can be assimilated under the following conditions:
  * <lu>
- * <li>The request source fields must be the same</li>
- * <li>The trigger options replaceable field must be true</li>
- * <li>The build revision can not be fixed</li>
- * <li>The requests belong to the same project</li>
- * <li>The requests are adjacent requests of the same owner and source in the queue</li>
+ * <li>The requests are adjacent requests of the same project and source in the queue (i.e. owner
+ * and source both match, and the target is last with this property in the current queue)</li>
+ * <li>The trigger options replaceable field must be true for both requests</li>
+ * <li>The existing/target request build must not have commenced</li>
  * <li>For extended builds with multiple related requests, all of the requests must be
- * assimilated or non of them will be assimilated.</li>
+ * assimilated or none of them will be assimilated.</li>
  * </lu>
  */
 public class BuildQueue
