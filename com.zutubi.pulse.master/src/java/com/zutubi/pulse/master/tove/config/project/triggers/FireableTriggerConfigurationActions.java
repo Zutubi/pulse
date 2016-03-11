@@ -10,11 +10,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.api.ActionVariant;
 
+import java.util.Collections;
 import java.util.List;
 
-/**
- */
 public class FireableTriggerConfigurationActions extends TriggerConfigurationActions
 {
     public static final String ACTION_FIRE = "fire";
@@ -39,6 +39,20 @@ public class FireableTriggerConfigurationActions extends TriggerConfigurationAct
             TriggerOptions options = new TriggerOptions(reason, ProjectManager.TRIGGER_CATEGORY_MANUAL);
             options.setProperties(config.getProperties().values());
             projectManager.triggerBuild(projectConfiguration, options, null);
+        }
+    }
+
+    public List<ActionVariant> variantsOfFire(FireableTriggerConfiguration config)
+    {
+        // There is only one variant, but it may or may not require a prompt.
+        ProjectConfiguration projectConfiguration = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
+        if (projectConfiguration != null)
+        {
+            return Collections.singletonList(new ActionVariant("fire now", config.prompt()));
+        }
+        else
+        {
+            return Collections.emptyList();
         }
     }
 

@@ -11,7 +11,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  */
 @Form(fieldOrder = { "name", "prompt", "rebuildUpstreamDependencies" })
 @SymbolicName("zutubi.manualTriggerConfig")
-public class ManualTriggerConfiguration extends TriggerConfiguration
+public class ManualTriggerConfiguration extends FireableTriggerConfiguration
 {
     private boolean prompt = true;
     private boolean rebuildUpstreamDependencies = false;
@@ -40,5 +40,17 @@ public class ManualTriggerConfiguration extends TriggerConfiguration
     public Trigger newTrigger()
     {
         return new NoopTrigger(getName(), Trigger.DEFAULT_GROUP);
+    }
+
+    @Override
+    public boolean prompt()
+    {
+        return isPrompt();
+    }
+
+    @Override
+    public boolean rebuildUpstream()
+    {
+        return rebuildUpstreamDependencies;
     }
 }
