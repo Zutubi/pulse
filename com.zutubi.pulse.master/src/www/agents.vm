@@ -1,6 +1,6 @@
 #helpTag("Agents+Section")
 #authorisationTags($principle)
-<content tag="selectedTab">agents</content>
+<content tag="selectedTab">grid</content>
 <content tag="header.javascript">
     zutubi/pulse/agent/AgentsPanel.js
 </content>

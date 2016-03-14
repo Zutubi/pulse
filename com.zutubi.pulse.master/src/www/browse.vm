@@ -1,6 +1,6 @@
 #helpTag("Browse+Section")
 #authorisationTags($principle)
-<content tag="selectedTab">projects</content>
+<content tag="selectedTab">browse</content>
 <content tag="header.javascript">
     ext/StatusBar.js
     zutubi/config/package.js

@@ -19,7 +19,7 @@
 ## Outputs sitemesh content tags for the project links on the header bar
 ##
 #macro(projectTags $project)
-    <content tag="selectedTab">projects</content>
+    <content tag="selectedTab">browse</content>
 #end
 
 ##
@@ -56,7 +56,7 @@
 ## Outputs sitemesh content tags for the agent links on the header bar
 ##
 #macro(agentTags)
-    <content tag="selectedTab">agents</content>
+    <content tag="selectedTab">grid</content>
 #end
 
 ##
