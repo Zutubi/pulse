@@ -367,6 +367,10 @@ table.k-form {
     padding-left: 0;
 }
 
+.k-form td.k-field-action-cell {
+    vertical-align: top;
+}
+
 .k-form td.k-submit {
     text-align: center;
 }
