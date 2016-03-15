@@ -29,7 +29,7 @@
         function configureSettings()
         {
             var popup = new Zutubi.reporting.project.TailSettingsWindow({
-                username: '#jss($loggedInUser.name)',
+                username: '#jss($loggedInUser.login)',
                 tailLines: $maxLines,
                 tailRefreshInterval: $tailRefreshInterval
             });
