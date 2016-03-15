@@ -25,6 +25,12 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <mvc:interceptors>
+        <bean id="webContentInterceptor" class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+            <property name="cacheSeconds" value="0" />
+        </bean>
+    </mvc:interceptors>
+
     <context:component-scan base-package="com.zutubi.pulse.master.rest.errors"/>
     <context:component-scan base-package="com.zutubi.pulse.master.rest.controllers.core"/>
     <context:component-scan base-package="com.zutubi.pulse.master.rest.controllers.setup"/>
