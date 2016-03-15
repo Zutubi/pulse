@@ -26,7 +26,7 @@ then
 fi
 
 RELEASE=$1
-RELEASE_DIR="/var/pulse2/projects/pulse $RELEASE release"
+RELEASE_DIR="/cygdrive/c/.pulse2/data/projects/pulse $RELEASE release"
 if [[ ! -d "$RELEASE_DIR" ]]
 then
     echo "Could not find release stream $RELEASE."
@@ -60,13 +60,8 @@ then
     exit 2
 fi
 
-echo "Opening connection to zutubi.com..."
-CTL="-o ControlPath=$SSH_CTL"
-ssh -NfM $CTL root@zutubi.com
-echo "Connection open."
-
 echo "Publishing packages..."
-scp $CTL "$PACKAGES_DIR"/pulse-* root@zutubi.com:/var/www/zutubi.com
+scp "$PACKAGES_DIR"/pulse-* root@zutubi.com:/var/www/zutubi.com
 echo "Packages published."
 
 echo "Publishing javadoc..."
@@ -75,13 +70,13 @@ cd "$OUTPUT_DIR/00000004-javadoc"
 ARCHIVE=$SCRATCH/javadoc.tgz
 tar zcf $ARCHIVE javadoc
 echo "  Uploading..."
-scp $CTL $ARCHIVE root@zutubi.com:/var/www/doc/pulse
+scp $ARCHIVE root@zutubi.com:/var/www/doc/pulse
 echo "  Unpacking and moving into place..."
-ssh $CTL root@zutubi.com "cd /var/www/doc/pulse; tar zxf javadoc.tgz; mv javadoc $RELEASE.$BUILD; rm -f $RELEASE; ln -s $RELEASE.$BUILD $RELEASE; chown -R www-data:www-data $RELEASE $RELEASE.$BUILD; rm javadoc.tgz"
+ssh root@zutubi.com "cd /var/www/doc/pulse; tar zxf javadoc.tgz; mv javadoc $RELEASE.$BUILD; rm -f $RELEASE; ln -s $RELEASE.$BUILD $RELEASE; chown -R www-data:www-data $RELEASE $RELEASE.$BUILD; rm javadoc.tgz"
 echo "Javadoc published."
 
 echo "Updating Ivy repository..."
-ssh $CTL root@zutubi.com "cd /var/www/ivy; svn up"
+ssh root@zutubi.com "cd /var/www/ivy; svn up"
 echo "Ivy updated."
 
 echo "Release $RELEASE build $BUILD published!"
