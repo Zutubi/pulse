@@ -63,13 +63,18 @@
                         // simpler if we could just access the node).  So we don't need to
                         // wastefully pass the path from the server, we construct it client side in
                         // our success callback.
-                        var url = window.apiPath + "/fs/" + that.fs + "/" + Zutubi.config.encodePath(that.basePath),
+                        var url = window.apiPath + "/fs/" + that.fs + "/",
                             path = null;
+
+                        if (options.basePath)
+                        {
+                            url += Zutubi.config.encodePath(that.basePath) + "/";
+                        }
 
                         if (options.data && options.data.path)
                         {
                             path = options.data.path;
-                            url += "/" + Zutubi.config.encodePath(path);
+                            url += Zutubi.config.encodePath(path);
                             delete options.data.path;
                         }
 

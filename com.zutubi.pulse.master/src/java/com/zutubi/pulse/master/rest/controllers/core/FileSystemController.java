@@ -20,6 +20,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -119,6 +120,15 @@ public class FileSystemController implements EventListener
         FileModel[] models;
         if (StringUtils.stringSet(pathString))
         {
+            if (SystemUtils.IS_WINDOWS && pathString.endsWith(":"))
+            {
+                // The path C: refers to the current working directory, we need to force the
+                // trailing slash to list the root.  This is ugly (particularly since we also
+                // explicitly strip the slash when listing the root as below), but keeps the
+                // client JS simpler and presents the user with the root name they expect.
+                pathString += "/";
+            }
+
             Path path = fileSystem.getPath(pathString);
             if (Files.isDirectory(path))
             {
@@ -158,8 +168,14 @@ public class FileSystemController implements EventListener
                 @Override
                 public FileModel apply(Path input)
                 {
-                    Path fileName = input.getFileName();
-                    return new FileModel(fileName == null ? "/" : fileName.toString(), true);
+                    String path = input.toString();
+                    if (SystemUtils.IS_WINDOWS && path.endsWith("\\"))
+                    {
+                        // Just get the drive name, i.e. C: instead of C:\.  On Unix-style systems
+                        // we keep the slash (the only part of the path).
+                        path = path.substring(0, path.length() - 1);
+                    }
+                    return new FileModel(path, true);
                 }
             }), FileModel.class);
         }
