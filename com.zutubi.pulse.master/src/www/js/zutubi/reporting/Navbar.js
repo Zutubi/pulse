@@ -129,7 +129,7 @@
                     tip = "this build";
                 }
 
-                el.kendoTooltip({content: tip});
+                el.kendoTooltip({callout: false, content: tip, showAfter: 1000});
             }
         },
 

@@ -355,14 +355,6 @@
 
                 helpElement.appendTo(fieldElement.closest("td"));
 
-                if (fieldDocs.brief && fieldDocs.verbose && fieldDocs.brief !== fieldDocs.verbose)
-                {
-                    helpElement.find(".k-field-help-brief").kendoTooltip({
-                        content: fieldDocs.verbose,
-                        width: 400
-                    });
-                }
-
                 if (fieldDocs.examples && fieldDocs.examples.length > 0)
                 {
                     examplesList = $('<div class="k-field-help-examples"><h3>examples</h3><ul></ul></div>').appendTo(helpElement).find("ul");

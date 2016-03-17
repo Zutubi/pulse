@@ -560,8 +560,10 @@ div.k-wizard-window {
 .k-field-help-brief {
     font-size: 0.85em;
     font-style: italic;
+}
+
+.k-field-help-brief:not(:empty) {
     padding: 0.2em 0;
-    cursor: help;
 }
 
 .k-field-help-verbose {
