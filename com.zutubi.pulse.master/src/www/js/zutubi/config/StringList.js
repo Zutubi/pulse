@@ -27,7 +27,7 @@
                               '<ul class="k-reset">' +
                               '</ul>' +
                               '<button id="#: id #-add"><span class="k-sprite"></span></button>' +
-                              '<input class="k-input" type="text" autocomplete="off" placeholder="enter text">' +
+                              '<input class="k-input" type="text" autocomplete="off">' +
                           '</div>' +
                       '</div>',
             tagTemplate: '<li class="k-button" unselectable="on">' +
