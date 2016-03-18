@@ -76,7 +76,7 @@
 
         bindValue: function(value)
         {
-            if (!this.listView.isBound())
+            if (!this.listView.bound())
             {
                 // A shortcut allowed because lazy loading only supports strings (i.e. text === value).
                 this.input.val(value);
@@ -89,7 +89,7 @@
 
         getValue: function()
         {
-            if (!this.listView.isBound())
+            if (!this.listView.bound())
             {
                 // A shortcut allowed because lazy loading only supports strings (i.e. text === value).
                 return this.input.val();
