@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.admin.debug;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.config.health.ConfigurationHealthReport;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -17,6 +18,7 @@ public class ConfigurationCheckAction extends ActionSupport
     @Override
     public String execute() throws Exception
     {
+        accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
         ConfigurationHealthReport report = configurationHealthChecker.checkAll();
         if (report.isHealthy())
         {
@@ -33,6 +35,7 @@ public class ConfigurationCheckAction extends ActionSupport
 
     public String healAll() throws Exception
     {
+        accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
         ConfigurationHealthReport report = configurationHealthChecker.healAll();
         if (report.isHealthy())
         {

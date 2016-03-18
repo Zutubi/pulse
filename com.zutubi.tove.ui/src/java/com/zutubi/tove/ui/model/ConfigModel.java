@@ -21,6 +21,7 @@ public abstract class ConfigModel
     private final String key;
     private final String label;
     private boolean concrete;
+    private boolean skeleton;
     private String templateOwner;
     private String templateOriginator;
     private final boolean deeplyValid;
@@ -75,6 +76,11 @@ public abstract class ConfigModel
         return concrete;
     }
 
+    public boolean isSkeleton()
+    {
+        return skeleton;
+    }
+
     public String getTemplateOwner()
     {
         return templateOwner;
@@ -85,9 +91,10 @@ public abstract class ConfigModel
         return templateOriginator;
     }
 
-    public void decorateWithTemplateDetails(boolean concrete, String templateOwner, String templateOriginator)
+    public void decorateWithTemplateDetails(boolean concrete, boolean skeleton, String templateOwner, String templateOriginator)
     {
         this.concrete = concrete;
+        this.skeleton = skeleton;
         this.templateOwner = templateOwner;
         this.templateOriginator = templateOriginator;
     }

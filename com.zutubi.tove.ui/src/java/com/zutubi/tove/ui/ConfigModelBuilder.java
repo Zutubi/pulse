@@ -279,7 +279,7 @@ public class ConfigModelBuilder
             }
 
             String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(closestExistingPath);
-            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(closestExistingPath), PathUtils.getSuffix(templateOwnerPath, 1), null);
+            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(closestExistingPath), true, PathUtils.getSuffix(templateOwnerPath, 1), null);
         }
         else
         {
@@ -494,7 +494,7 @@ public class ConfigModelBuilder
             TemplateRecord templateRecord = (TemplateRecord) record;
             String templateOriginator = getTemplateOriginator(templateRecord);
 
-            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(path), templateRecord.getOwner(), templateOriginator);
+            model.decorateWithTemplateDetails(configurationTemplateManager.isConcrete(path), templateRecord.isSkeleton(), templateRecord.getOwner(), templateOriginator);
         }
     }
 

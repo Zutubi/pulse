@@ -303,6 +303,14 @@
         </action>
     </package>
 
+    <package name="support" namespace="/support" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="configCheck" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ConfigurationCheckAction">
+            <result name="success" type="httpheader">200</result>
+        </action>
+    </package>
+
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxReadOnlyStack"/>
 
