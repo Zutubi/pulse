@@ -1,10 +1,11 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
+// dependency: ./Tree.js
 
 (function($)
 {
     var ui = kendo.ui,
-        TreeView = ui.TreeView,
+        Tree = Zutubi.admin.Tree,
         PATHSELECT = "pathselect",
         READY = "ready",
 
@@ -80,10 +81,10 @@
         return data;
     }
 
-    Zutubi.admin.ConfigTree = TreeView.extend({
+    Zutubi.admin.ConfigTree = Tree.extend({
         init: function(element, options)
         {
-            TreeView.fn.init.call(this, element, options);
+            Tree.fn.init.call(this, element, options);
 
             this.bound = false;
 
@@ -113,6 +114,7 @@
                     kendo.ui.progress(this.element, false);
                     this.bound = true;
                     this.trigger(READY);
+                    this._applyFilter();
                     this._selectConfigNode();
                 }
             },
@@ -222,7 +224,7 @@
         _infoForConfigPath: function(configPath)
         {
             var that = this,
-                root = that.wrapper.find(".k-item:first"),
+                root = that.getRoot(),
                 dataItem = that.dataItem(root),
                 path = that.rootPath,
                 keys = [],
@@ -305,7 +307,7 @@
         _selectConfigNode: function()
         {
             var that = this,
-                root = that.wrapper.find(".k-item:first"),
+                root = that.getRoot(),
                 info = that._infoForConfigPath(that.configPath);
 
             that.expand(root);
@@ -317,6 +319,46 @@
             else
             {
                 that.select(root);
+            }
+        },
+
+        filterTrivial: function(filter)
+        {
+            this.filtered = filter;
+            if (this.bound)
+            {
+                this._applyFilter();
+            }
+        },
+
+        _applyFilter: function()
+        {
+            this.setFilter(this.filtered ? jQuery.proxy(this._filter, this) : null);
+        },
+
+        _filter: function(node)
+        {
+            var item = this.dataItem(node),
+                parentItem = item.parentNode();
+
+            if (item.templateOriginator === item.templateOwner)
+            {
+                if (parentItem && parentItem.templateOriginator === item.templateOriginator)
+                {
+                    return this.FILTER_VISIBLE;
+                }
+                else
+                {
+                    return this.FILTER_REVEAL;
+                }
+            }
+            else if (item.skeleton === false)
+            {
+                return this.FILTER_REVEAL;
+            }
+            else
+            {
+                return this.FILTER_HIDE;
             }
         },
 
@@ -432,6 +474,8 @@
                     this._addModel(data, info.item);
                 }
             }
+
+            this._applyFilter();
         },
 
         _parentDataSource: function(item)
@@ -588,6 +632,8 @@
                     }
                 }
             }
+
+            this._applyFilter();
         }
     });
 

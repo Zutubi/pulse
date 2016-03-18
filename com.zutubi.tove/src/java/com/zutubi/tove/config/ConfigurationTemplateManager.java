@@ -2060,6 +2060,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         return false;
     }
+
     boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);

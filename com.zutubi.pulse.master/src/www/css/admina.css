@@ -23,6 +23,7 @@ body {
 
 .k-view-switch {
     box-sizing: border-box;
+    flex-shrink: 0;
     width: 100%;
 }
 
@@ -36,7 +37,6 @@ body {
 
 .k-view-switch .k-button {
     box-sizing: border-box;
-    width: 100%;
     border-width: 0 0 1px 0;
     padding: 4px 7px;
     margin-bottom: 0.25em;
@@ -44,6 +44,32 @@ body {
 
 .k-view-switch span.fa {
     margin: 0 0.3em;
+}
+
+.k-toggle-filter.k-state-active, .k-toggle-filter.k-state-active:focus:not(.k-state-disabled):not([disabled]),
+.k-toggle-filter:hover:not(.k-state-disabled):not([disabled]), .k-toggle-filter.k-state-active:hover:not(.k-state-disabled):not([disabled]),
+.k-toggle-filter, .k-toggle-filter:focus:not(.k-state-disabled):not([disabled]) {
+    box-shadow: none;
+    border-color: #dbdbdb;
+}
+
+.k-toggle-filter.k-state-active,
+.k-toggle-filter.k-state-active:focus,
+.k-toggle-filter.k-state-active:focus {
+    background: #ff8c00;
+    color: #fff;
+}
+
+.k-toggle-filter:active:hover,
+.k-toggle-filter:hover:not(.k-state-disabled):not([disabled]),
+.k-toggle-filter:hover:not(.k-state-disabled):not([disabled]) {
+    background: #ffa500;
+    color: #fff;
+}
+
+.k-toggle-filter, .k-toggle-filter:focus {
+    background: #fff;
+    color: #787878;
 }
 
 /* Hierarchy tree */
@@ -152,13 +178,18 @@ ul.k-overview-validation-errors {
     color: #1b376c;
 }
 
-/* Vertical flexbox layout */
+/* Basic flexbox layout */
 
 .k-vbox {
     display: flex;
     flex-direction: column;
 }
+.k-hbox {
+    display: flex;
+    flex-direction: row;
+}
 
-.k-vbox-grow {
+.k-vbox-grow, .k-hbox-grow  {
     flex-grow: 1;
 }
+

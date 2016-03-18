@@ -1,10 +1,11 @@
 // dependency: ./namespace.js
 // dependency: zutubi/config/package.js
+// dependency: ./Tree.js
 
 (function($)
 {
     var ui = kendo.ui,
-        TreeView = ui.TreeView,
+        Tree = Zutubi.admin.Tree,
         BOUND = "bound",
         DATABOUND = "dataBound",
         DRAG = "drag",
@@ -12,10 +13,10 @@
         NODESELECT = "nodeselect",
         SELECT = "select";
 
-    Zutubi.admin.HierarchyTree = TreeView.extend({
+    Zutubi.admin.HierarchyTree = Tree.extend({
         init: function(element, options)
         {
-            TreeView.fn.init.call(this, element, options);
+            Tree.fn.init.call(this, element, options);
 
             this.bound = false;
 
@@ -47,7 +48,7 @@
                 if (!this.bound && !e.node)
                 {
                     kendo.ui.progress(this.element, false);
-                    this.expand(this._getRoot());
+                    this.expand(this.getRoot());
                     this.bound = true;
                     this._updateSelected();
                     this.trigger(BOUND);
@@ -88,7 +89,7 @@
         {
             Zutubi.admin.unregisterUnloadListener(this.options.name + "_" + this.options.namespace);
             this._saveState();
-            TreeView.fn.destroy.call(this);
+            Tree.fn.destroy.call(this);
         },
 
         _beforeUnload: function()
@@ -311,11 +312,6 @@
             this.setDataSource(dataSource);
         },
 
-        _getRoot: function()
-        {
-            return this.wrapper.find(".k-item:first");
-        },
-
         getRootName: function()
         {
             return this.dataSource.at(0).name;
@@ -333,7 +329,7 @@
         _updateSelected: function()
         {
             var that = this,
-                root = that._getRoot(),
+                root = that.getRoot(),
                 node;
 
             if (that.item)
@@ -354,51 +350,12 @@
 
         prefixFilter: function(s)
         {
-            if (s)
-            {
-                this._prefixFilterSubtree(this.root.children("li").first(), this.dataSource.at(0), s.toLowerCase());
-            }
-            else
-            {
-                this.root.find("li").css("display", "");
-            }
+            this.setFilter(s ? jQuery.proxy(this._filter, this, s.toLowerCase()) : null);
         },
 
-        _prefixFilterSubtree: function(root, dataItem, text)
+        _filter: function(text, node)
         {
-            var visible = root.find(".k-in").first().text().toLowerCase().indexOf(text) === 0,
-                nested,
-                childVisible = false,
-                children,
-                items,
-                child,
-                item,
-                i;
-
-            nested = root.children("ul");
-            if (nested.length > 0)
-            {
-                children = dataItem.children.data();
-                items = nested.children("li");
-
-                for (i = 0; i < items.length; i++)
-                {
-                    item = items.eq(i);
-                    child = children[i];
-
-                    childVisible = this._prefixFilterSubtree(item, child, text) || childVisible;
-                }
-
-                if (childVisible && !dataItem.expanded)
-                {
-                    this._toggle(root, dataItem, true);
-                }
-
-                visible = visible || childVisible;
-            }
-
-            root.css("display", visible ? "" : "none");
-            return visible;
+            return node.find(".k-in").first().text().toLowerCase().indexOf(text) === 0 ? this.FILTER_REVEAL : this.FILTER_HIDE;
         },
 
         applyDelta: function(delta)

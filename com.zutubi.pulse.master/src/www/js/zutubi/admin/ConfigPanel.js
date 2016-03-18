@@ -21,14 +21,19 @@
     Zutubi.admin.ConfigPanel = Observable.extend({
         init: function (container)
         {
-            var that = this;
+            var that = this, filterEl;
+
+            that.filter = false;
 
             Observable.fn.init.call(this);
 
             that.view = new kendo.View('<div class="k-outer-split" style="height: 100%; width: 100%">' +
                                            '<div id="config-panel-left">' +
                                                '<div class="k-pane-content k-vbox">' +
-                                                   '<div class="k-view-switch"><button class="k-left"><span class="fa fa-angle-left"></span> hierarchy</button></div>' +
+                                                   '<div class="k-view-switch k-hbox">' +
+                                                       '<button class="k-left k-hbox-grow"><span class="fa fa-angle-left"></span> hierarchy</button>' +
+                                                       '<button class="k-toggle-filter k-right"><span class="fa fa-filter"></span></button>' +
+                                                   '</div>' +
                                                    '<div class="k-config-tree k-vbox-grow"></div>' +
                                                '</div>' +
                                            '</div>' +
@@ -54,9 +59,21 @@
 
             Zutubi.admin.registerUnloadListener(NAME, that._beforeUnload, that);
 
-            that.hierarchyButton = that.view.element.find(".k-view-switch button").kendoButton({
+            that.toolbarEl = that.view.element.find(".k-view-switch");
+            that.toolbarEl.find("button.k-left").kendoButton({
                 click: jQuery.proxy(this._openHierarchy, this)
             });
+
+            filterEl = that.toolbarEl.find("button.k-right");
+            that.filterButton = filterEl.kendoButton({
+                click: jQuery.proxy(this._toggleFilter, this)
+            }).data("kendoButton");
+            that.filterTooltip = filterEl.kendoTooltip({
+                callout: false,
+                delay: 500,
+                content: "hide inherited"
+            }).data("kendoTooltip");
+
             that.configTree = that.view.element.find(".k-config-tree").kendoZaConfigTree().data("kendoZaConfigTree");
             that.configTree.bind("pathselect", function(e)
             {
@@ -112,11 +129,11 @@
 
             if (scope === "projects" || scope === "agents")
             {
-                that.hierarchyButton.show();
+                that.toolbarEl.show();
             }
             else
             {
-                that.hierarchyButton.hide();
+                that.toolbarEl.hide();
             }
 
             if (configPath && configPath.length > 0)
@@ -148,6 +165,28 @@
         _openHierarchy: function()
         {
             Zutubi.admin.openHierarchyPath(this.configTree.getRootPath());
+        },
+        
+        _toggleFilter: function()
+        {
+            var tip;
+
+            if (this.filter)
+            {
+                this.filter = false;
+                this.filterButton.element.removeClass("k-state-active");
+                tip = "hide inherited";
+            }
+            else
+            {
+                this.filter = true;
+                this.filterButton.element.addClass("k-state-active");
+                tip = "show inherited";
+            }
+
+            this.filterTooltip.options.content = tip;
+            this.filterTooltip.refresh();
+            this.configTree.filterTrivial(this.filter);
         },
 
         /**
