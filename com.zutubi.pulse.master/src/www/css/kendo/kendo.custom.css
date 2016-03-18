@@ -219,7 +219,7 @@ div.k-filebrowser-dropzone em,
 .k-tiles li.k-state-selected {
   border-color: #3e4e6a;
 }
-.k-grid td.k-state-selected.k-state-focused {
+.k-grid td.k-state-selected.k-state-focused, .k-grid td.k-state-selected:hover, .k-grid tr:hover {
   color: #fff;
   background-color: #445574;
 }
