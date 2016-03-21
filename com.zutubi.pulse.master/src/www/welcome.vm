@@ -190,6 +190,7 @@
             maintaining your relative location in the configuration.</li>
         <li>The ability to filter hierarchy trees to easily find a project or agent in a large installation.</li>
         <li>Improved template decoration of forms, making them less busy so important info is easier to spot.</li>
+        <li>The ability to filter project (and agent) trees to show only new and overridden configuration.</li>
         <li>Drag and drop reordering of collections.</li>
         <li>Client side memory of panel state, i.e. which panels are collapsed or have custom widths.</li>
         <li>Better visibility of defined, inherited and overriden collection orders, with easy reversion.</li>
