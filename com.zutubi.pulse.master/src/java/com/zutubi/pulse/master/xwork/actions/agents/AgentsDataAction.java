@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -22,9 +21,12 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.File;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.any;
 
 /**
  * An action to display all agents attached to this master, including local
@@ -78,7 +80,7 @@ public class AgentsDataAction extends ActionSupport
         List<AgentRowModel> rows = new LinkedList<AgentRowModel>();
         for (Agent agent: agents)
         {
-            AgentRowModel rowModel = new AgentRowModel(agent.getId(), agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent), new CommentSummaryModel(agent.getComments()));
+            AgentRowModel rowModel = new AgentRowModel(agent.getId(), agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent), agent.getRecipeId(), new CommentSummaryModel(agent.getComments()));
             addExecutingBuild(agent, rowModel, urls);
             addActions(agent, rowModel, messages);
             rows.add(rowModel);
@@ -101,14 +103,21 @@ public class AgentsDataAction extends ActionSupport
         long recipeId = agent.getRecipeId();
         if (recipeId != HostStatus.NO_RECIPE)
         {
-            BuildResult buildResult = buildManager.getByRecipeId(recipeId);
-            if (buildResult != null)
+            try
             {
-                RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
-                if (node != null)
+                BuildResult buildResult = buildManager.getByRecipeId(recipeId);
+                if (buildResult != null)
                 {
-                    rowModel.setExecutingStage(new ExecutingStageModel(buildResult, node, urls));
+                    RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
+                    if (node != null)
+                    {
+                        rowModel.setExecutingStage(new ExecutingStageModel(buildResult, node, urls));
+                    }
                 }
+            }
+            catch (AccessDeniedException e)
+            {
+                // Skip this build, the user is not allowed to see it
             }
         }
     }

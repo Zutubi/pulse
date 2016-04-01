@@ -111,7 +111,10 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
                       Zutubi.pulse.project.renderers.buildId(stage.number, stage) + ' :: ' +
                       Zutubi.pulse.project.renderers.stageName(stage.name, stage);
             }
-            else
+            else if (agent.executing)
+            {
+                return '<span class="understated">no permission to view stage</span>';
+            }
             {
                 return 'none';
             }
