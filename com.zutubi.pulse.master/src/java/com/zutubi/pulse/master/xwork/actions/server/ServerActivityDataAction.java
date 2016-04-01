@@ -105,7 +105,7 @@ public class ServerActivityDataAction extends ActionSupport
         }
         for (Pair<ActivatedRequest, BuildResult> active: activeBuilds)
         {
-            if (accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, active))
+            if (accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, active.second))
             {
                 boolean cancelPermitted = accessManager.hasPermission(actor, ProjectConfigurationActions.ACTION_CANCEL_BUILD, active);
                 model.addActive(new ServerActivityModel.ActiveBuildModel(active.first, active.second, urls, cancelPermitted));

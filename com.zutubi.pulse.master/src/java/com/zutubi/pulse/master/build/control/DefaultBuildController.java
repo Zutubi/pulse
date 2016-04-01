@@ -173,7 +173,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
                 else if (event instanceof BuildTerminationRequestEvent)
                 {
-                    return ((BuildTerminationRequestEvent)event).getBuildId() == buildResult.getId();
+                    return ((BuildTerminationRequestEvent)event).isTerminationRequested(buildResult.getId());
                 }
                 else
                 {
