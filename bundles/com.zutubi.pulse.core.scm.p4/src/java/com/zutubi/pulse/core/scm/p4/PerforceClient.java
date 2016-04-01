@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +51,14 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
      * one go, lest we hit some command or OS limit.
      */
     private static final int FILE_LIMIT = 32;
+    /**
+     * Older versions of Perforce don't support the -m flag to limit the number
+     * of files reported by p4 describe.  The exact version it was introduced
+     * is unclear due to bad docs, so instead of parsing versions we just
+     * assume it works until we get an error stating otherwise.  In that case
+     * this flag is set to false and we don't try using it again.
+     */
+    private static final AtomicBoolean DESCRIBE_SUPPORTS_LIMIT = new AtomicBoolean(true);
 
     private PerforceConfiguration configuration;
     private PerforceCore core;
@@ -128,14 +137,34 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         // we can determine if the entire change should be filtered out.
         boolean fileListingRequired = includeFiles || configuration.filtersPaths();
         // When we don't need to list the files, we set max files to 1 (0 doesn't work, it appears to mean "no limit").
-        int fileLimit = fileListingRequired ? Integer.getInteger("pulse.p4.changelist.file.limit", -1) : 1;
+        int fileLimit = -1;
+        if (DESCRIBE_SUPPORTS_LIMIT.get())
+        {
+            fileLimit = fileListingRequired ? Integer.getInteger("pulse.p4.changelist.file.limit", -1) : 1;
+        }
+
         if (fileLimit <= 0)
         {
             result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
         }
         else
         {
-            result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, FLAG_MAXIMUM, Integer.toString(fileLimit), Long.toString(number));
+            try
+            {
+                result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, FLAG_MAXIMUM, Integer.toString(fileLimit), Long.toString(number));
+            }
+            catch (ScmException e)
+            {
+                if (e.getMessage().contains("Invalid option: -m"))
+                {
+                    DESCRIBE_SUPPORTS_LIMIT.set(false);
+                    return getChangelist(clientName, number, includeFiles);
+                }
+                else
+                {
+                    throw new ScmException(e.getMessage(), e);
+                }
+            }
         }
 
         if (result.stderr.length() > 0)
