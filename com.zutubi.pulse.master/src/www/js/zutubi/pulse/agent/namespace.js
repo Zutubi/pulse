@@ -115,6 +115,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             {
                 return '<span class="understated">no permission to view stage</span>';
             }
+            else
             {
                 return 'none';
             }
