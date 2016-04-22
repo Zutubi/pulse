@@ -14,6 +14,7 @@ public class PulseXmlRpcWorker extends XmlRpcWorker
     public PulseXmlRpcWorker(XmlRpcHandlerMapping handlerMapping)
     {
         super(handlerMapping);
+        responseProcessor = new PulseXmlRpcResponseProcessor();
     }
 
     protected static Object invokeHandler(Object handler, XmlRpcServerRequest request, XmlRpcContext context) throws Exception
