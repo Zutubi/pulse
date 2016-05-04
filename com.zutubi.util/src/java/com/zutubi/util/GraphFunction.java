@@ -10,8 +10,10 @@ public interface GraphFunction<T>
      * Called when an edge is traversed, before the node is processed.
      *
      * @param edge label of the edge traversed
+     * @return true to process the node traversed to, false to ignore it and continue to the next
+     *         sibling (note if false is returned no matching call to {@link #pop()} will be made)
      */
-    void push(String edge);
+    boolean push(String edge);
 
     /**
      * Called to process a node.

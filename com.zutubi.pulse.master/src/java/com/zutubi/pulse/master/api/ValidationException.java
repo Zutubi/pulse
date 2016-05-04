@@ -46,9 +46,10 @@ public class ValidationException extends Exception
         private StringBuilder message = new StringBuilder();
         private Stack<String> context = new Stack<String>();
 
-        public void push(String edge)
+        public boolean push(String edge)
         {
             context.push(edge);
+            return true;
         }
 
         public void process(Object o)

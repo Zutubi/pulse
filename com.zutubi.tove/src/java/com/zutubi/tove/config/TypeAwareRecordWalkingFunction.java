@@ -25,12 +25,21 @@ abstract class TypeAwareRecordWalkingFunction implements GraphFunction<Record>
         this.path = path;
     }
 
-    public void push(String edge)
+    public boolean push(String edge)
     {
         path = PathUtils.getPath(path, edge);
         Record record = (Record) recordStack.peek().get(edge);
-        typeStack.push((ComplexType) typeStack.peek().getActualPropertyType(edge, record));
-        recordStack.push(record);
+        ComplexType type = (ComplexType) typeStack.peek().getActualPropertyType(edge, record);
+        if (type != null)
+        {
+            typeStack.push(type);
+            recordStack.push(record);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public void process(Record record)

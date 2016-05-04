@@ -1737,9 +1737,10 @@ public class ConfigurationRefactoringManager
             this.path = path;
         }
 
-        public void push(String edge)
+        public boolean push(String edge)
         {
             path = PathUtils.getPath(path, edge);
+            return true;
         }
 
         public void process(Record record)
@@ -1770,9 +1771,10 @@ public class ConfigurationRefactoringManager
             this.path = path;
         }
 
-        public void push(String edge)
+        public boolean push(String edge)
         {
             path = PathUtils.getPath(path, edge);
+            return true;
         }
 
         public void process(Record record)
@@ -2385,7 +2387,7 @@ public class ConfigurationRefactoringManager
                 recordStack.push(toRecord);
             }
 
-            public void push(String edge)
+            public boolean push(String edge)
             {
                 MutableRecord currentRecord = recordStack.peek();
                 MutableRecord record = (MutableRecord) currentRecord.get(edge);
@@ -2403,6 +2405,7 @@ public class ConfigurationRefactoringManager
                 }
 
                 recordStack.push(record);
+                return true;
             }
 
             public void process(Record record)

@@ -192,11 +192,13 @@ public abstract class AbstractRecord implements Record
     public void forEach(GraphFunction<Record> f)
     {
         f.process(this);
-        for(String key: nestedKeySet())
+        for (String key: nestedKeySet())
         {
-            f.push(key);
-            ((Record) get(key)).forEach(f);
-            f.pop();
+            if (f.push(key))
+            {
+                ((Record) get(key)).forEach(f);
+                f.pop();
+            }
         }
     }
 }

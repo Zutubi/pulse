@@ -90,7 +90,7 @@ public class ConfigModelBuilder
             }
         }
 
-        if (depth != 0 && record != null)
+        if (depth != 0 && record != null && type != null)
         {
             model.setNested(getNested(filters, path, type, record, depth - 1));
         }
@@ -337,9 +337,23 @@ public class ConfigModelBuilder
     private CompositeModel createCompositeModel(String path, CompositeType type, String label, boolean keyed, Record record, String[] filters) throws TypeException
     {
         String baseName = PathUtils.getBaseName(path);
-        Configuration instance = configurationTemplateManager.getInstance(path);
         boolean deeplyValid = configurationTemplateManager.isDeeplyValid(path);
         CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed, deeplyValid);
+        if (type == null)
+        {
+            // If this record has a type that is not recognised, it's most likely due to a missing plugin.  Show the
+            // user an error to this effect to help them recover.
+            CompositeTypeModel typeModel = new CompositeTypeModel();
+            typeModel.setSymbolicName(record.getSymbolicName());
+            typeModel.setForm(new FormModel());
+            model.setType(typeModel);
+            Map<String, List<String>> errors = new HashMap<>();
+            errors.put("", Collections.singletonList("Record has unrecognised type '" + record.getSymbolicName() + "', likely due to a missing plugin. Restore the plugin or delete this record to reconfigure."));
+            model.setValidationErrors(errors);
+            return model;
+        }
+
+        Configuration instance = configurationTemplateManager.getInstance(path);
         if (isFieldSelected(filters, "properties"))
         {
             model.setProperties(getProperties(configurationTemplateManager.getTemplateOwnerPath(path), type, record));

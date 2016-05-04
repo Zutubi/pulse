@@ -1176,8 +1176,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             type.forEachComplex(instance, new GraphFunction<Object>()
             {
-                public void push(String edge)
+                public boolean push(String edge)
                 {
+                    return true;
                 }
 
                 public void process(Object o)
