@@ -81,10 +81,13 @@ public class ActionManager
 
                     if (configurationRefactoringManager.canPullUp(path))
                     {
+                        // The pull up action checks permission to create in target ancestors, as it is the only way to
+                        // know if the action is valid.  (This contrasts with other cRM.can* methods which don't do
+                        // permission checks, it's a bit messy really.)
                         result.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
                     }
 
-                    if (configurationRefactoringManager.canPushDown(path))
+                    if (configurationRefactoringManager.canPushDown(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                     {
                         result.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
                     }
