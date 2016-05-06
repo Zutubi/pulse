@@ -906,7 +906,7 @@
             return false;
         },
 
-        _ignoreFieldNamed: function(form, fieldName)
+        _setIgnoreForFieldNamed: function(form, fieldName, ignore)
         {
             var i,
                 field;
@@ -916,12 +916,19 @@
                 field = form.fields[i];
                 if (field.name === fieldName)
                 {
-                    if (field.parameters)
+                    if (!field.parameters)
                     {
                         field.parameters = {};
                     }
 
-                    field.parameters[PARAMETER_IGNORE] = true;
+                    if (ignore)
+                    {
+                        field.parameters[PARAMETER_IGNORE] = true;
+                    }
+                    else
+                    {
+                        delete field.parameters[PARAMETER_IGNORE];
+                    }
                 }
             }
         },
@@ -933,20 +940,14 @@
                 values = step.valuesByType[0],
                 concrete = this.steps[0].getValue().properties.isTemplate === false,
                 ignoreDefaultRecipe = true,
+                ignoreDefaultStage,
                 projectType,
                 typeStep,
                 recipes,
                 stages;
 
-            if (this._hasTriggerOfType(parentProject, "zutubi.scmTriggerConfig"))
-            {
-                this._ignoreFieldNamed(form, "addScmTrigger");
-            }
-
-            if (this._hasTriggerOfType(parentProject, "zutubi.dependentBuildTriggerConfig"))
-            {
-                this._ignoreFieldNamed(form, "addDependenciesTrigger");
-            }
+            this._setIgnoreForFieldNamed(form, "addScmTrigger", this._hasTriggerOfType(parentProject, "zutubi.scmTriggerConfig"));
+            this._setIgnoreForFieldNamed(form, "addDependenciesTrigger", this._hasTriggerOfType(parentProject, "zutubi.dependentBuildTriggerConfig"));
 
             projectType = this._findNested(parentProject, "type");
             if (projectType && projectType.type.symbolicName === "zutubi.multiRecipeTypeConfig")
@@ -966,10 +967,11 @@
                 }
             }
 
+            this._setIgnoreForFieldNamed(form, "addDefaultRecipe", ignoreDefaultRecipe);
+            this._setIgnoreForFieldNamed(form, "recipeName", ignoreDefaultRecipe);
             if (ignoreDefaultRecipe)
             {
-                this._ignoreFieldNamed(form, "addDefaultRecipe");
-                this._ignoreFieldNamed(form, "recipeName");
+                delete values.addDefaultRecipe;
             }
             else
             {
@@ -977,10 +979,12 @@
             }
 
             stages = this._findNested(parentProject, "stages");
-            if (stages && stages.nested && stages.nested.length > 0)
+            ignoreDefaultStage = stages && stages.nested && stages.nested.length > 0;
+            this._setIgnoreForFieldNamed(form, "addDefaultStage", ignoreDefaultStage);
+            this._setIgnoreForFieldNamed(form, "stageName", ignoreDefaultStage);
+            if (ignoreDefaultStage)
             {
-                this._ignoreFieldNamed(form, "addDefaultStage");
-                this._ignoreFieldNamed(form, "stageName");
+                delete values.addDefaultStage;
             }
             else
             {
