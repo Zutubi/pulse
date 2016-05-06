@@ -17,14 +17,16 @@ h2 {
 #container {
     height: auto;
     display: flex;
+    flex-wrap: wrap;
 }
 
 #left-column {
     flex: 1 1 auto;
+    padding: 0 1em;
 }
 
 #right-column {
-    flex: 0 0 340px;
+    flex: 0 1 340px;
 }
 
 /* Content */
