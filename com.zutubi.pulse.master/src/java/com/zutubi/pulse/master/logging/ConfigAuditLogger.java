@@ -36,7 +36,7 @@ public class ConfigAuditLogger implements EventListener
 
     private void handleRecordUpdated(RecordUpdatedEvent event)
     {
-        LOG.info(getUser() + ": updated: " + event.getPath() + ": " + getValues(event.getNewRecord()));
+        LOG.info(getUser() + ": updated: " + event.getPath() + ": " + getValues(event.getOriginalRecord()) + " -> " + getValues(event.getNewRecord()));
     }
 
     private String getUser()
