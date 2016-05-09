@@ -790,7 +790,11 @@ public class RemoteApi
             record.update(providedRecord, true, true);
             record.update(type.createNewRecord(true), true, false);
             configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
-            if (!template)
+            if (template)
+            {
+                configurationTemplateManager.markAsTemplate(record);
+            }
+            else
             {
                 record.removeMeta(TemplateRecord.TEMPLATE_KEY);
             }
