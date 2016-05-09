@@ -94,9 +94,8 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to <strong>Pulse 3.0 Beta</strong>!  This beta release is unpolished and expected to contain
-        bugs.  As such it is <em>not</em> recommended for production use.  All bug reports and feedback are most
-        welcome!
+        Welcome to <strong>Pulse 3.0</strong>!  This release is the largest update to Pulse in years, with a full
+        refresh of the administration interface and many updated backend libraries.
     </p>
     <h2>:: getting started :: </h2>
     <div id="welcon">
