@@ -29,14 +29,14 @@ import static com.google.common.collect.Lists.reverse;
  * avoid redundant builds showing up in the queue snapshot.
  * <p/>
  * Two requests can be assimilated under the following conditions:
- * <lu>
+ * <ul>
  * <li>The requests are adjacent requests of the same project and source in the queue (i.e. owner
  * and source both match, and the target is last with this property in the current queue)</li>
  * <li>The trigger options replaceable field must be true for both requests</li>
  * <li>The existing/target request build must not have commenced</li>
  * <li>For extended builds with multiple related requests, all of the requests must be
  * assimilated or none of them will be assimilated.</li>
- * </lu>
+ * </ul>
  */
 public class BuildQueue
 {
