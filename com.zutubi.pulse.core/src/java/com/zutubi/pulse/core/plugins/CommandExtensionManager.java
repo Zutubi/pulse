@@ -40,8 +40,6 @@ public class CommandExtensionManager extends AbstractExtensionManager
         String name = config.getAttribute(ATTRIBUTE_NAME);
         String cls = config.getAttribute(ATTRIBUTE_CLASS);
 
-        System.out.printf("Initialising command '%s': class '%s'\n", name, cls);
-
         Class<?> clazz = loadClass(extension, cls);
         if(clazz == null)
         {
