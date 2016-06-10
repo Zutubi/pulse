@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 import com.zutubi.pulse.master.security.Principle;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -25,9 +26,9 @@ import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
@@ -39,6 +40,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 {
     private UserDao userDao;
     private PasswordEncoder passwordEncoder;
+    private org.springframework.security.authentication.encoding.PasswordEncoder legacyPasswordEncoder;
 
     private LicenseManager licenseManager;
     private BuildManager buildManager;
@@ -349,15 +351,40 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return getPrinciple(user);
     }
 
-    public boolean checkPassword(UserConfiguration user, String password)
+    public boolean checkPassword(final UserConfiguration user, final String password)
     {
-        String encodedPassword = passwordEncoder.encodePassword(password, null);
-        return Objects.equal(user.getPassword(), encodedPassword);
+        if (passwordEncoder.matches(password, user.getPassword()))
+        {
+            return true;
+        }
+        else
+        {
+            // Previously user passwords were stored with a weaker hashing scheme.  We can't
+            // upgrade them in one go as we don't know the original passwords, so instead we do
+            // them one-by-one as the user logs in.  To do so, check passwords that fail with the
+            // new encoder to see if they work with the old one.  If so case we re-encode,
+            // upgrading that password to the new scheme.  Otherwise it was a true login failure.
+            String encodedPassword = legacyPasswordEncoder.encodePassword(password, null);
+            if (Objects.equal(user.getPassword(), encodedPassword))
+            {
+                SecurityUtils.runAsSystem(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        setPassword(user, password);
+                    }
+                });
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void setPassword(UserConfiguration user, String rawPassword)
     {
-        String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);
+        String encodedPassword = passwordEncoder.encode(rawPassword);
         user = configurationProvider.deepClone(user);
         user.setPassword(encodedPassword);
         configurationProvider.save(user);
@@ -383,6 +410,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
     {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public void setLegacyPasswordEncoder(org.springframework.security.authentication.encoding.PasswordEncoder legacyPasswordEncoder)
+    {
+        this.legacyPasswordEncoder = legacyPasswordEncoder;
     }
 
     public void setUserDao(UserDao userDao)

@@ -16,6 +16,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
+import java.util.regex.Pattern;
+
 import static com.google.common.collect.Iterables.find;
 
 /**
@@ -33,6 +35,8 @@ import static com.google.common.collect.Iterables.find;
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 {
     private static final Logger LOG = Logger.getLogger(CustomAuthenticationProvider.class);
+
+    private Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
 
     private UserManager userManager;
     private LdapManager ldapManager;
@@ -158,10 +162,23 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
             ldapManager.addLdapRoles(user);
         }
-        else
+        else if (BCRYPT_PATTERN.matcher(userDetails.getPassword()).matches())
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via stored password");
             super.additionalAuthenticationChecks(userDetails, authentication);
+        }
+        else
+        {
+            // User's stored password appears to be using legacy hashing, ask for help.
+            LOG.debug("Attempting legacy password upgrade for user '" + user.getUsername() + "'");
+            String presentedPassword = authentication.getCredentials().toString();
+            UserConfiguration userConfig = userManager.getUserConfig(userDetails.getUsername());
+            if (userConfig == null || !userManager.checkPassword(userConfig, presentedPassword))
+            {
+                throw new BadCredentialsException(messages.getMessage(
+                        "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                        "Bad credentials"));
+            }
         }
     }
 

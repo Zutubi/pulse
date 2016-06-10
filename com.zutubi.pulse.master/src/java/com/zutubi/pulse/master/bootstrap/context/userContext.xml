@@ -5,7 +5,8 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd"
        default-autowire="byName">
 
-    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+    <bean id="legacyPasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
 
     <util:properties id="defaultTransactionAttributes">
         <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
