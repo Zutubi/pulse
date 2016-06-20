@@ -336,22 +336,43 @@ public class DefaultSetupManager implements SetupManager
                 List<String> lines = Files.readLines(databaseUserConfig, Charset.defaultCharset());
                 int i = 0;
                 int replaceIndex = -1;
+                int lastHibernateIndex = lines.size() - 1;
+                boolean newPropertyFound = false;
                 for (String line: lines)
                 {
-                    if (line.trim().startsWith("hibernate.cache.provider_class"))
+                    String trimmed = line.trim();
+                    if (trimmed.startsWith("hibernate."))
                     {
-                        replaceIndex = i;
-                        break;
+                        lastHibernateIndex = i;
+
+                        if (trimmed.startsWith("hibernate.cache.provider_class"))
+                        {
+                            replaceIndex = i;
+                        }
+                        else if (trimmed.startsWith("hibernate.cache.region.factory_class"))
+                        {
+                            newPropertyFound = true;
+                        }
                     }
 
                     i++;
                 }
 
-                if (replaceIndex >= 0)
+                if (!newPropertyFound)
                 {
                     statusMessage("Replacing old hibernate cache configuration...");
-                    lines.set(replaceIndex, "hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
-                    lines.add(replaceIndex + 1, "hibernate.ejb.naming_strategy=org.hibernate.cfg.DefaultNamingStrategy");
+                    if (replaceIndex >= 0)
+                    {
+                        lines.set(replaceIndex, "hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
+                        lines.add(replaceIndex + 1, "hibernate.ejb.naming_strategy=org.hibernate.cfg.DefaultNamingStrategy");
+
+                        Files.asCharSink(databaseUserConfig, Charset.defaultCharset()).writeLines(lines);
+                    }
+                    else
+                    {
+                        lines.add(lastHibernateIndex + 1, "hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
+                        lines.add(lastHibernateIndex + 2, "hibernate.ejb.naming_strategy=org.hibernate.cfg.DefaultNamingStrategy");
+                    }
 
                     Files.asCharSink(databaseUserConfig, Charset.defaultCharset()).writeLines(lines);
                     statusMessage("Hibernate cache configuration updated.");
