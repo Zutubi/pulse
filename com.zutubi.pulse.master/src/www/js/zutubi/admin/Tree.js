@@ -19,7 +19,31 @@
         {
             return this.wrapper.find(".k-item:first");
         },
-        
+
+        eachItem: function(fn)
+        {
+            this._depthFirstEach(this.dataSource, fn);
+        },
+
+        _depthFirstEach: function(dataSource, fn)
+        {
+            var i, data, item;
+
+            if (dataSource)
+            {
+                data = dataSource.data();
+                for (i = 0; i < data.length; i++)
+                {
+                    item = data[i];
+                    fn(item);
+                    if (item.hasChildren)
+                    {
+                        this._depthFirstEach(data[i].children, fn);
+                    }
+                }
+            }
+        },
+
         setFilter: function(fn)
         {
             if (fn)

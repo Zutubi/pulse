@@ -109,15 +109,14 @@
 
             if (that.bound)
             {
-                that.element.find(".k-item").each(function()
+                that.eachItem(function(item)
                 {
-                    var item = that.dataItem(this);
                     if (item.expanded)
                     {
                         expandedItems.push(item.handle);
                     }
                 });
-
+                
                 localStorage[that._stateKey()] = JSON.stringify(expandedItems);
             }
         },
