@@ -187,7 +187,7 @@
 
             row = {
                 key: item.key,
-                actions: jQuery.grep(item.actions, function(action)
+                actions: jQuery.grep(item.actions || [], function(action)
                 {
                     return action.label !== "configure";
                 })
