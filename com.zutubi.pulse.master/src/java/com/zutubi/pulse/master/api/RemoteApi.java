@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.api;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
@@ -1805,8 +1804,8 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            List<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-            Collection<ProjectConfiguration> concreteProjects = Collections2.filter(allProjects, ProjectPredicates.concrete());
+            Iterable<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
+            Iterable<ProjectConfiguration> concreteProjects = Iterables.filter(allProjects, ProjectPredicates.concrete());
             return getConfigNames(concreteProjects);
         }
         finally
@@ -2175,10 +2174,10 @@ public class RemoteApi
         }
     }
 
-    private Vector<String> getConfigNames(Collection<ProjectConfiguration> projects)
+    private Vector<String> getConfigNames(Iterable<ProjectConfiguration> projects)
     {
-        Vector<String> result = new Vector<String>(projects.size());
-        result.addAll(transform(projects, Configurations.toConfigurationName()));
+        Vector<String> result = new Vector<String>();
+        Iterables.addAll(result, Iterables.transform(projects, Configurations.toConfigurationName()));
 
         return result;
     }

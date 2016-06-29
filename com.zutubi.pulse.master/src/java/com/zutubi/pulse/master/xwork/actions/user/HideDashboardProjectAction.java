@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
@@ -39,7 +40,7 @@ public class HideDashboardProjectAction extends UserActionSupport
             if(dashboardConfig.isShowAllProjects())
             {
                 dashboardConfig.setShowAllProjects(false);
-                dashboardConfig.getShownProjects().addAll(projectManager.getAllProjectConfigs(true));
+                Iterables.addAll(dashboardConfig.getShownProjects(), projectManager.getAllProjectConfigs(true));
             }
 
             dashboardConfig.getShownProjects().remove(p.getConfig());

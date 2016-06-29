@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
+import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.PulseScope;
@@ -48,7 +49,7 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
         TreeNode<String> result = new TreeNode<String>(null);
         boolean incompatibilityFound = false;
         //ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement();
-        List<ProjectConfiguration> configs = new LinkedList<ProjectConfiguration>(projectManager.getAllProjectConfigs(false));
+        List<ProjectConfiguration> configs = Lists.newArrayList(projectManager.getAllProjectConfigs(false));
         Collections.sort(configs, new NamedConfigurationComparator());
         for (ProjectConfiguration project: configs)
         {

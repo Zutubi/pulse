@@ -63,6 +63,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -104,7 +105,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
      * cache lock (read or write).
      */
     private Map<Long, ProjectConfiguration> idToConfig = new ConcurrentHashMap<Long, ProjectConfiguration>();
-    private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
+    /**
+     * We expect the set of invalid projects to be small, in fact usually empty.  So it will rarely be mutated (most
+     * removes are ignored as the element is not there) and is fast to copy in any case.
+     */
+    private Set<Long> invalidProjectHandles = new CopyOnWriteArraySet<Long>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
     /**
      * Maps from a project to the handles of those projects that directly
@@ -154,7 +159,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     nameToConfig.remove(instance.getName());
                     idToConfig.remove(instance.getProjectId());
-                    validConfigs.remove(instance);
+                    invalidProjectHandles.remove(instance.getHandle());
                     removeFromLabelMap(instance);
                     reloadDownstreamProjects(instance);
                     refreshDownstreamCache();
@@ -178,7 +183,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     if(old != null)
                     {
                         nameToConfig.remove(old.getName());
-                        validConfigs.remove(old);
+                        invalidProjectHandles.remove(old.getHandle());
                         removeFromLabelMap(old);
                         reloadDownstreamProjects(old);
                     }
@@ -228,7 +233,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     ProjectConfiguration cachedConfig = idToConfig.remove(config.getProjectId());
                     if (cachedConfig != null)
                     {
-                        validConfigs.remove(cachedConfig);
+                        invalidProjectHandles.remove(cachedConfig.getHandle());
                         nameToConfig.remove(cachedConfig.getName());
                         removeFromLabelMap(cachedConfig);
                         registerProjectConfig(config, false);
@@ -777,8 +782,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 checkProjectLifecycle(projectConfig);
             }
 
-            validConfigs.add(projectConfig);
-
             for (LabelConfiguration label: projectConfig.getLabels())
             {
                 Set<ProjectConfiguration> projects = labelToConfigs.get(label.getLabel());
@@ -790,6 +793,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
                 projects.add(projectConfig);
             }
+        }
+        else
+        {
+            invalidProjectHandles.add(projectConfig.getHandle());
         }
     }
 
@@ -838,7 +845,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }));
     }
 
-    public void checkProjectLifecycle(ProjectConfiguration projectConfig)
+    private void checkProjectLifecycle(ProjectConfiguration projectConfig)
     {
         long id = projectConfig.getProjectId();
         Project project = getProject(id, false);
@@ -888,19 +895,24 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         projectDao.save(project);
     }
 
-    public List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
+    public Iterable<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
         cacheLock.readLock().lock();
         try
         {
-            if(allowInvalid)
+            Iterable<ProjectConfiguration> result = nameToConfig.values();
+            if (!allowInvalid && invalidProjectHandles.size() > 0)
             {
-                return Collections.unmodifiableList(new LinkedList<ProjectConfiguration>(nameToConfig.values()));
+                result = Iterables.filter(result, new Predicate<ProjectConfiguration>()
+                {
+                    public boolean apply(ProjectConfiguration project)
+                    {
+                        return !invalidProjectHandles.contains(project.getHandle());
+                    }
+                });
             }
-            else
-            {
-                return Collections.unmodifiableList(validConfigs);
-            }
+
+            return result;
         }
         finally
         {

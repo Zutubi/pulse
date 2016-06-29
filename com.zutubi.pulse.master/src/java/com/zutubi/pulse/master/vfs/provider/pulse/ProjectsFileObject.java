@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.api.Configurations;
@@ -8,13 +9,8 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
-import java.util.List;
+import static com.google.common.collect.Iterables.transform;
 
-import static com.google.common.collect.Collections2.transform;
-
-/**
- * <class comment/>
- */
 public class ProjectsFileObject extends AbstractPulseFileObject implements AddressableFileObject
 {
     public ProjectsFileObject(final FileName name, final AbstractFileSystem fs)
@@ -66,8 +62,8 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
 
     protected String[] doListChildren() throws Exception
     {
-        List<ProjectConfiguration> configs = projectManager.getAllProjectConfigs(false);
-        return UriParser.encode(transform(configs, Configurations.<ProjectConfiguration>toConfigurationName()).toArray(new String[configs.size()]));
+        Iterable<ProjectConfiguration> configs = projectManager.getAllProjectConfigs(false);
+        return UriParser.encode(Iterables.toArray(transform(configs, Configurations.<ProjectConfiguration>toConfigurationName()), String.class));
     }
 
     public boolean isLocal()

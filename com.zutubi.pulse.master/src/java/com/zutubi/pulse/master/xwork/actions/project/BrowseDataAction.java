@@ -16,7 +16,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Action to load the projects data for the browse view.
@@ -77,7 +80,7 @@ public class BrowseDataAction extends ProjectActionSupport
                 final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
                 Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
-                Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
+                Iterable<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
 
                 // Filter invalid projects into a separate list.
                 List<String> invalidProjects = new LinkedList<String>();

@@ -23,7 +23,7 @@ public interface ProjectManager extends EntityManager<Project>
     String DEFAULT_TRIGGER_NAME    = "trigger build";
 
     @SecureResult
-    List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
+    Iterable<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
 
     @SecureResult
     ProjectConfiguration getProjectConfig(String name, boolean allowInvalid);
