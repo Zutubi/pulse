@@ -826,23 +826,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
         for (ProjectConfiguration config: idToConfig.values())
         {
-            for (ProjectConfiguration upstream: getDependentProjectConfigs(config))
+            for (DependencyConfiguration dependency: config.getDependencies().getDependencies())
             {
-                configToDownstreamConfigHandles.put(upstream, config.getHandle());
+                configToDownstreamConfigHandles.put(dependency.getProject(), config.getHandle());
             }
         }
-    }
-
-    private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
-    {
-        List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
-        return newArrayList(transform(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
-        {
-            public ProjectConfiguration apply(DependencyConfiguration dependencyConfiguration)
-            {
-                return dependencyConfiguration.getProject();
-            }
-        }));
     }
 
     private void checkProjectLifecycle(ProjectConfiguration projectConfig)
