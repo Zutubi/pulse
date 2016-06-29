@@ -2982,23 +2982,31 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     private void markDirty(String path)
     {
+        markDirty(path, true);
+    }
+
+    private void markDirty(String path, boolean walkTemplateDescendants)
+    {
         if (instances.markDirty(path))
         {
             for (String referencingPath: instances.getInstancePathsReferencing(path))
             {
-                markDirty(referencingPath);
+                markDirty(referencingPath, true);
             }
 
-            for (String descendantPath: getDescendantPaths(path, true, false, true))
+            if (walkTemplateDescendants)
             {
-                markDirty(descendantPath);
+                for (String descendantPath: getDescendantPaths(path, true, false, true))
+                {
+                    markDirty(descendantPath, false);
+                }
             }
         }
 
         String parentPath = PathUtils.getParentPath(path);
         if (parentPath != null)
         {
-            markDirty(parentPath);
+            markDirty(parentPath, true);
         }
     }
 
