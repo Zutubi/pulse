@@ -1,6 +1,10 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A hierarchy of template configuration meta-data, used to display the
@@ -12,11 +16,23 @@ public class TemplateHierarchy
 {
     private String scope;
     private TemplateNode root;
+    /**
+     * Looking up nodes by id happens frequently, so to make it fast we cache a mapping.
+     */
+    private Map<String, TemplateNode> nodesById = new HashMap<String, TemplateNode>();
 
     public TemplateHierarchy(String scope, TemplateNode root)
     {
         this.scope = scope;
         this.root = root;
+        root.forEachDescendant(new Function<TemplateNode, Boolean>()
+        {
+            public Boolean apply(TemplateNode input)
+            {
+                nodesById.put(input.getId(), input);
+                return true;
+            }
+        }, false, null);
     }
 
     public String getScope()
@@ -48,6 +64,6 @@ public class TemplateHierarchy
 
     public TemplateNode getNodeById(String id)
     {
-        return root.findNodeById(id);
+        return nodesById.get(id);
     }
 }
