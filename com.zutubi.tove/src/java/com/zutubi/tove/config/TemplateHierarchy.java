@@ -25,14 +25,17 @@ public class TemplateHierarchy
     {
         this.scope = scope;
         this.root = root;
-        root.forEachDescendant(new Function<TemplateNode, Boolean>()
+        if (root != null)
         {
-            public Boolean apply(TemplateNode input)
+            root.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                nodesById.put(input.getId(), input);
-                return true;
-            }
-        }, false, null);
+                public Boolean apply(TemplateNode input)
+                {
+                    nodesById.put(input.getId(), input);
+                    return true;
+                }
+            }, false, null);
+        }
     }
 
     public String getScope()

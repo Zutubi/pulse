@@ -1010,13 +1010,17 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         if (isPersistent(path))
         {
-            Record subject = getRecord(path);
-            return isConcrete(PathUtils.getParentPath(path), subject);
+            String[] elements = PathUtils.getPathElements(path);
+            if (configurationPersistenceManager.getScopeInfo(elements[0]).isTemplated())
+            {
+                // We don't need to get the full TemplateRecord here, so avoid the cost of creating it by getting the
+                // raw Record instead.
+                String ownerPath = (elements.length == 2 ? path : PathUtils.getPath(elements[0], elements[1]));
+                return isConcreteOwner(recordManager.select(ownerPath));
+            }
         }
-        else
-        {
-            return true;
-        }
+
+        return true;
     }
 
     /**
@@ -1042,9 +1046,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 }
                 else
                 {
-                    // Load the owner to see if it is marked as a template
+                    // Load the owner to see if it is marked as a template (we don't need a full TemplateRecord, save
+                    // time by using the raw Record).
                     String ownerPath = PathUtils.getPath(elements[0], elements[1]);
-                    Record ownerRecord = getRecord(ownerPath);
+                    Record ownerRecord = recordManager.select(ownerPath);
                     return isConcreteOwner(ownerRecord);
                 }
             }
@@ -2921,7 +2926,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         else
         {
             String[] elements = PathUtils.getPathElements(path);
-            return configurationPersistenceManager.getScopeInfo(elements[0]) != null && getRecord(path) != null;
+            return configurationPersistenceManager.getScopeInfo(elements[0]) != null && recordManager.containsRecord(path);
         }
     }
 
