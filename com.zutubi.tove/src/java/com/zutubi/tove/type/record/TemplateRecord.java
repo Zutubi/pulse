@@ -37,6 +37,17 @@ public class TemplateRecord extends AbstractRecord
     private ComplexType type;
     private Record moi;
 
+    /**
+     * Cached copy of the meta key set, created on first use.  We can safely cache it as template
+     * records are effectively immutable.
+     */
+    private Set<String> metaKeySet;
+    /**
+     * Cached copy of the key set, created on first use.  We can safely cache it as template
+     * records are effectively immutable.
+     */
+    private Set<String> keySet;
+
     public TemplateRecord(String owner, TemplateRecord parent, ComplexType type, Record moi)
     {
         this.owner = owner;
@@ -164,25 +175,31 @@ public class TemplateRecord extends AbstractRecord
 
     public Set<String> keySet()
     {
-        Set<String> result = new LinkedHashSet<String>(moi.keySet());
-        if(parent != null)
+        if (keySet == null)
         {
-            result.addAll(parent.keySet());
+            keySet = new LinkedHashSet<String>(moi.keySet());
+            if(parent != null)
+            {
+                keySet.addAll(parent.keySet());
+            }
+
+            keySet.removeAll(getHiddenKeys());
         }
-        
-        result.removeAll(getHiddenKeys());
-        return result;
+        return keySet;
     }
 
     public Set<String> metaKeySet()
     {
-        Set<String> set = parent == null ? new HashSet<String>() : new HashSet<String>(parent.metaKeySet());
-        for(String key: NO_INHERIT_META_KEYS)
+        if (metaKeySet == null)
         {
-            set.remove(key);
+            metaKeySet = parent == null ? new HashSet<String>() : new HashSet<String>(parent.metaKeySet());
+            for(String key: NO_INHERIT_META_KEYS)
+            {
+                metaKeySet.remove(key);
+            }
+            metaKeySet.addAll(moi.metaKeySet());
         }
-        set.addAll(moi.metaKeySet());
-        return set;
+        return metaKeySet;
     }
 
     public Collection<Object> values()
