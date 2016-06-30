@@ -188,7 +188,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                         reloadDownstreamProjects(old);
                     }
 
-                    registerProjectConfig(instance, true);
+                    registerProjectConfig(instance, false);
                     refreshDownstreamCache();
                 }
                 finally
