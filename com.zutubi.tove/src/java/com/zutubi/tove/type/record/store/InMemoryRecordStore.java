@@ -3,7 +3,10 @@ package com.zutubi.tove.type.record.store;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
 import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
-import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.MutableRecordImpl;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.HashSet;
@@ -72,8 +75,7 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record select()
     {
-        // Ensure the internal integrity by returning an immutable reference to the record.
-        return new ImmutableRecord(state.get(false).record);
+        return state.get(false).record;
     }
 
     public Record exportRecords()

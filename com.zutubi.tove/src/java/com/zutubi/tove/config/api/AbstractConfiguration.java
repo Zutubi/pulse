@@ -8,6 +8,8 @@ import java.util.*;
 public abstract class AbstractConfiguration implements Configuration
 {
     private Map<String, String> meta = new HashMap<String, String>();
+    // As the handle is used so frequently we cache here to avoid multiple lookups (and parses) from the meta map.
+    private long handle = UNDEFINED;
     private String configurationPath;
     private boolean concrete;
     // This takes advantage of the pseudo-immutability of Configuration instances.  Instances should be constructed and
@@ -25,6 +27,10 @@ public abstract class AbstractConfiguration implements Configuration
     public void putMeta(String key, String value)
     {
         meta.put(key, value);
+        if (key.equals(HANDLE_KEY))
+        {
+            handle = Long.parseLong(value);
+        }
     }
 
     public Set<String> metaKeySet()
@@ -34,13 +40,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     public long getHandle()
     {
-        String m = getMeta(HANDLE_KEY);
-        if(m == null)
-        {
-            return UNDEFINED;
-        }
-        
-        return Long.parseLong(m);
+        return handle;
     }
 
     public void setHandle(long handle)
@@ -156,22 +156,27 @@ public abstract class AbstractConfiguration implements Configuration
 
     public int hashCode()
     {
-        return new Long(getHandle()).hashCode();
+        return (int)(handle ^ (handle >>> 32));
     }
 
     public boolean equals(Object obj)
     {
-        if(obj == null)
+        if (obj == null)
         {
             return false;
         }
 
-        if(!(obj instanceof AbstractConfiguration))
+        if (obj == this)
+        {
+            return true;
+        }
+
+        if (!(obj instanceof AbstractConfiguration))
         {
             return false;
         }
 
         AbstractConfiguration otherConfig = (AbstractConfiguration) obj;
-        return otherConfig.getHandle() != UNDEFINED && otherConfig.getHandle() == getHandle();
+        return otherConfig.handle != UNDEFINED && otherConfig.handle == handle;
     }
 }

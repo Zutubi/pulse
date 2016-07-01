@@ -17,6 +17,7 @@ import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.mockito.Matchers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,11 +33,14 @@ public class PulseFileSystemTest extends PulseTestCase
     private ProjectManager projectManager;
     private ScmManager scmManager;
 
+    private List<ProjectConfiguration> projects = new ArrayList<ProjectConfiguration>();
+
     protected void setUp() throws Exception
     {
         super.setUp();
 
         projectManager = mock(ProjectManager.class);
+        stub(projectManager.getAllProjectConfigs(anyBoolean())).toReturn(projects);
         scmManager = mock(ScmManager.class);
 
         objectFactory = new WiringObjectFactory();
@@ -48,11 +52,6 @@ public class PulseFileSystemTest extends PulseTestCase
         fileSystemManager = new DefaultFileSystemManager();
         fileSystemManager.addProvider("pulse", fileProvider);
         fileSystemManager.init();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
     }
 
     public void testListingProjectsWithNoChildren() throws FileSystemException
@@ -69,7 +68,10 @@ public class PulseFileSystemTest extends PulseTestCase
 
         FileObject obj = fileSystemManager.resolveFile("pulse:///projects");
         assertTrue(obj.exists());
-        assertEquals(0, obj.getChildren().length);
+        // Historically we expected 0 as the projects file object didn't support listing.  But for a long time we have
+        // supported it and this test has been wrong, only passing due to incomplete stubbing.  Now I've fixed the
+        // stubbing, this test is fixed too!
+        assertEquals(1, obj.getChildren().length);
     }
 
     public void testResolveNonExistantProject() throws FileSystemException
@@ -127,7 +129,7 @@ public class PulseFileSystemTest extends PulseTestCase
 
     private Project createProject(long id)
     {
-        ProjectConfiguration projectConfig = new ProjectConfiguration();
+        ProjectConfiguration projectConfig = new ProjectConfiguration(Long.toString(id));
         projectConfig.setProjectId(id);
         Project project = new Project();
         project.setId(id);
@@ -138,6 +140,7 @@ public class PulseFileSystemTest extends PulseTestCase
 
     private void registerProject(Project project)
     {
+        projects.add(project.getConfig());
         stub(projectManager.getProject(eq(project.getId()), Matchers.anyBoolean())).toReturn(project);
         stub(projectManager.getProjectConfig(eq(project.getId()), Matchers.anyBoolean())).toReturn(project.getConfig());
     }

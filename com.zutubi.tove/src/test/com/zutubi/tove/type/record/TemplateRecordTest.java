@@ -157,10 +157,13 @@ public class TemplateRecordTest extends ZutubiTestCase
         MutableRecord parentRecord = new MutableRecordImpl();
         parentRecord.put("foo", "bar");
         TemplateRecord parent = new TemplateRecord("parent", null, null, parentRecord);
-        MutableRecordImpl childRecord = new MutableRecordImpl();
+        MutableRecord childRecord = new MutableRecordImpl();
         TemplateRecord child = new TemplateRecord("child", parent, null, childRecord);
         assertTrue(child.containsKey("foo"));
+
+        childRecord = childRecord.copy(true, true);
         TemplateRecord.hideItem(childRecord, "foo");
+        child = new TemplateRecord("child", parent, null, childRecord);
         assertFalse(child.containsKey("foo"));
     }
 }

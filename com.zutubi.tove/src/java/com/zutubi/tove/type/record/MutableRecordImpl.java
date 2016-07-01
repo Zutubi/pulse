@@ -100,27 +100,36 @@ public class MutableRecordImpl extends AbstractMutableRecord
     public MutableRecord copy(boolean deep, boolean preserveHandles)
     {
         MutableRecordImpl clone = new MutableRecordImpl();
-
-        for (Map.Entry<String, String> entry : getMeta().entrySet())
+        if (meta != null)
         {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (preserveHandles || !key.equals(HANDLE_KEY))
+            clone.meta = new HashMap<String, String>(meta);
+            if (!preserveHandles)
             {
-                clone.putMeta(key, value);
+                clone.meta.remove(HANDLE_KEY);
             }
         }
 
-        for (Map.Entry<String, Object> entry : getData().entrySet())
+        if (data != null)
         {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            if (deep && value instanceof Record)
+            if (deep)
             {
-                value = ((Record) value).copy(deep, preserveHandles);
+                for (Map.Entry<String, Object> entry : data.entrySet())
+                {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    if (value instanceof Record)
+                    {
+                        value = ((Record) value).copy(true, preserveHandles);
+                    }
+                    clone.put(key, value);
+                }
             }
-            clone.put(key, value);
+            else
+            {
+                clone.data = new HashMap<String, Object>(data);
+            }
         }
+
         return clone;
     }
 
