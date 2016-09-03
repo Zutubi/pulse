@@ -13,11 +13,12 @@ public class PersistentTestSuiteResultTest extends PulseTestCase
     public void testConflictsAppend() throws IOException
     {
         PersistentTestSuiteResult tests = getTests(NameConflictResolution.APPEND);
-        assertEquals(5, tests.getTotal());
+        assertEquals(6, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>2"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>3"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>4"));
         assertTrue(tests.hasCase(" <TEST COMMAND2>"));
     }
 
@@ -64,11 +65,12 @@ public class PersistentTestSuiteResultTest extends PulseTestCase
     public void testConflictsPrepend() throws IOException
     {
         PersistentTestSuiteResult tests = getTests(NameConflictResolution.PREPEND);
-        assertEquals(5, tests.getTotal());
+        assertEquals(6, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
         assertTrue(tests.hasCase("2 <TEST COMMAND1>"));
         assertTrue(tests.hasCase("3 <TEST COMMAND1>"));
+        assertTrue(tests.hasCase("4 <TEST COMMAND1>"));
         assertTrue(tests.hasCase(" <TEST COMMAND2>"));
     }
 
@@ -80,6 +82,9 @@ public class PersistentTestSuiteResultTest extends PulseTestCase
         suite.addCase(new TestCaseResult(" <TEST COMMAND1>", TestStatus.ERROR));
         suite.addCase(new TestCaseResult(" <TEST COMMAND1>", TestStatus.FAILURE));
         suite.addCase(new TestCaseResult(" <TEST COMMAND2>"));
-        return new PersistentTestSuiteResult(suite, resolution);
+
+        PersistentTestSuiteResult result = new PersistentTestSuiteResult(suite, resolution);
+        result.add(new PersistentTestCaseResult(" <TEST COMMAND1>", 1, TestStatus.FAILURE, "failed"));
+        return result;
     }
 }

@@ -108,6 +108,11 @@ public class PersistentTestSuiteResult extends PersistentTestResult
             {
                 cases.put(childCase.getName(), childCase);
             }
+            else if (conflictResolution.isUniqueNameGenerated())
+            {
+                String name = generateUniqueCaseName(childCase.getName());
+                cases.put(name, new PersistentTestCaseResult(name, childCase.getDuration(), childCase.getStatus(), childCase.getMessage()));
+            }
         }
     }
 
@@ -339,16 +344,21 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         String name = caseResult.getName();
         if (conflictResolution.isUniqueNameGenerated() && hasCase(name))
         {
-            int addition = 2;
-            while (hasCase(makeCaseName(name, addition)))
-            {
-                addition++;
-            }
-
-            name = makeCaseName(name, addition);
+            name = generateUniqueCaseName(name);
         }
 
         return new PersistentTestCaseResult(name, caseResult.getDuration(), caseResult.getStatus(), caseResult.getMessage());
+    }
+
+    private String generateUniqueCaseName(String name)
+    {
+        int addition = 2;
+        while (hasCase(makeCaseName(name, addition)))
+        {
+            addition++;
+        }
+
+        return makeCaseName(name, addition);
     }
 
     private String makeCaseName(String name, int addition)
