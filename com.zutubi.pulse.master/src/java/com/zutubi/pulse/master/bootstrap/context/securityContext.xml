@@ -212,6 +212,9 @@ based upon the Spring Security system.
         <property name="authenticationEntryPoint">
             <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
         </property>
+        <property name="requestCache">
+            <bean class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+        </property>
     </bean>
 
     <!--
