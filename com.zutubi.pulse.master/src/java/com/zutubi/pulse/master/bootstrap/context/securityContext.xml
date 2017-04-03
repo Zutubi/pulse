@@ -243,6 +243,9 @@ based upon the Spring Security system.
         <constructor-arg>
             <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
         </constructor-arg>
+        <property name="requestCache">
+            <bean class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+        </property>
     </bean>
 
     <!--

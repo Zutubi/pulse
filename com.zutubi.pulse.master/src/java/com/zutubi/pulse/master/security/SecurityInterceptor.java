@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.security;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -35,7 +37,7 @@ public class SecurityInterceptor implements MethodInterceptor
         {
             if (annotation instanceof SecureResult)
             {
-                result = secureResult(((SecureResult) annotation).value(), result);
+                result = secureResult(((SecureResult) annotation).value(), methodInvocation.getMethod().getReturnType(), result);
             }
         }
 
@@ -135,7 +137,7 @@ public class SecurityInterceptor implements MethodInterceptor
         }
     }
 
-    Object secureResult(String action, Object result)
+    Object secureResult(String action, Class<?> resultType, Object result)
     {
         if (result != null)
         {
@@ -163,6 +165,10 @@ public class SecurityInterceptor implements MethodInterceptor
 
                     result = filtered;
                 }
+            }
+            else if (resultType.isAssignableFrom(Iterable.class))
+            {
+                result = Iterables.filter((Iterable) result, new CheckAccessPredicate(action));
             }
             else if (result.getClass().isArray())
             {
@@ -223,5 +229,20 @@ public class SecurityInterceptor implements MethodInterceptor
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    private class CheckAccessPredicate implements Predicate<Object>
+    {
+        private final String action;
+
+        CheckAccessPredicate(String action)
+        {
+            this.action = action;
+        }
+
+        public boolean apply(Object resource)
+        {
+            return checkAccess(resource, action);
+        }
     }
 }
