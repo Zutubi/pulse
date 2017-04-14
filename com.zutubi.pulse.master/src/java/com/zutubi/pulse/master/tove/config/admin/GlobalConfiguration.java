@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
-import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.notifications.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.master.restore.BackupConfiguration;
 import com.zutubi.tove.annotations.Classification;
@@ -40,7 +39,6 @@ public class GlobalConfiguration extends AbstractConfiguration
     private EmailConfiguration email = new EmailConfiguration();
     private LDAPConfiguration ldap = new LDAPConfiguration();
     private JabberConfiguration jabber = new JabberConfiguration();
-    private LicenseConfiguration license = new LicenseConfiguration();
     private BackupConfiguration backup = new BackupConfiguration();
     private RepositoryConfiguration repository = new RepositoryConfiguration();
     private AgentPingConfiguration agentPing = new AgentPingConfiguration();
@@ -190,16 +188,6 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setBackup(BackupConfiguration backup)
     {
         this.backup = backup;
-    }
-
-    public LicenseConfiguration getLicense()
-    {
-        return license;
-    }
-
-    public void setLicense(LicenseConfiguration license)
-    {
-        this.license = license;
     }
 
     public RepositoryConfiguration getRepository()

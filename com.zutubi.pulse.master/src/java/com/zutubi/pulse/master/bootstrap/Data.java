@@ -32,7 +32,7 @@ import java.util.Properties;
  *     projects/    build artifacts
  *     backups/     backups directory.     
  *
- * pulse.config.properties: core configuration properties, contain version and license details amongst other things
+ * pulse.config.properties: core configuration properties, contains version details amongst other things
  * </pre>
  *
  * </p>

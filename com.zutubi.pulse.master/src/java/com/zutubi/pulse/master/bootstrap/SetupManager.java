@@ -30,8 +30,6 @@ public interface SetupManager
 
     void setDatabaseType(SetupDatabaseTypeConfiguration db) throws IOException;
 
-    void setLicense(SetupLicenseConfiguration license);
-
     void executeMigrate(MigrateDatabaseTypeConfiguration config);
 
     void abortMigrate();

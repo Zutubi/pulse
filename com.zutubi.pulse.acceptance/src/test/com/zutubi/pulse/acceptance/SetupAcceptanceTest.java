@@ -2,8 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.acceptance.pages.PulseToolbar;
-import com.zutubi.pulse.master.license.LicenseHelper;
-import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -21,19 +19,6 @@ import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
  */
 public class SetupAcceptanceTest extends AcceptanceTestBase
 {
-    public String licenseKey;
-    public String expiredLicenseKey;
-    public String invalidLicenseKey;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        licenseKey = LicenseHelper.newLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
-        expiredLicenseKey = LicenseHelper.newExpiredLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
-        invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
-    }
-
     public void testSetupProcess() throws Exception
     {
         getBrowser().open(urls.base() + "setup/setupData!input.action");
@@ -61,7 +46,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
     protected void checkPostPulseData()
     {
         checkSetupDatabase();
-        checkLicenseDetails();
         checkCreateAdmin();
         checkServerSettings();
 
@@ -80,33 +64,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
-    }
-
-    private void checkLicenseDetails()
-    {
-        PulseLicenseForm licenseForm = getBrowser().createForm(PulseLicenseForm.class);
-        licenseForm.waitFor();
-
-        // check that license is required.
-        licenseForm.nextFormElements("");
-        licenseForm.waitFor();
-        assertTrue(licenseForm.checkFormValues(""));
-        getBrowser().waitForTextPresent("license key requires a value");
-
-        // check that license validation works.
-        licenseForm.nextFormElements(invalidLicenseKey);
-        licenseForm.waitFor();
-        assertTrue(licenseForm.checkFormValues(invalidLicenseKey));
-        getBrowser().waitForTextPresent("invalid");
-
-        // check that an expired license is not accepted.
-        licenseForm.nextFormElements(expiredLicenseKey);
-        licenseForm.waitFor();
-        assertTrue(licenseForm.checkFormValues(expiredLicenseKey));
-        getBrowser().waitForTextPresent("expired");
-
-        // enter a valid license.
-        licenseForm.nextFormElements(licenseKey);
     }
 
     private void checkCreateAdmin()

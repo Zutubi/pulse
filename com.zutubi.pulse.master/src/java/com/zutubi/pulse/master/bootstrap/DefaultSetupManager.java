@@ -12,8 +12,6 @@ import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;
-import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.model.Role;
@@ -90,7 +88,6 @@ public class DefaultSetupManager implements SetupManager
     private MigrationManager migrationManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
-    private LicenseManager licenseManager;
     private ThreadFactory threadFactory;
 
     /**
@@ -115,8 +112,6 @@ public class DefaultSetupManager implements SetupManager
      * Contexts for Stage C: restore
      */
     private List<String> restoreContexts = new ArrayList<>();
-
-    private List<String> licenseContexts = new ArrayList<>();
 
     /**
      * Contexts for Stage D: the upgrade system.
@@ -616,19 +611,7 @@ public class DefaultSetupManager implements SetupManager
 
             initialiseConfigurationPersistence();
 
-            loadContexts(licenseContexts);
-
-            statusMessage("Checking license...");
-            if (isLicenseRequired())
-            {
-                statusMessage("No valid license found, requesting via web UI...");
-                //TODO: we need to provide some feedback to the user about what / why there current license
-                //TODO: (if one exists) is not sufficient.
-                state = SetupState.LICENSE;
-                showPrompt();
-                return;
-            }
-            requestLicenseComplete();
+            checkUpgrade();
         }
         catch (Exception e)
         {
@@ -655,28 +638,10 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    @Override
-    public void setLicense(final SetupLicenseConfiguration license)
-    {
-        SecurityUtils.runAsSystem(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                String licenseKey = license.getLicense().replaceAll("\n", "");
-                licenseManager.installLicense(licenseKey);
-                requestLicenseComplete();
-            }
-        });
-    }
-
-    private void requestLicenseComplete()
+    private void checkUpgrade()
     {
         try
         {
-            statusMessage("License accepted.");
-
-            // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
             databaseConsole.postSchemaHook();
             loadContexts(upgradeContexts);
 
@@ -1041,12 +1006,6 @@ public class DefaultSetupManager implements SetupManager
         return configurationManager.getData() == null;
     }
 
-    private boolean isLicenseRequired()
-    {
-        // if we are not licensed, then request that a license be provided.
-        return !LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE);
-    }
-
     private boolean isUpgradeRequired()
     {
         return upgradeManager.isUpgradeRequired();
@@ -1336,11 +1295,6 @@ public class DefaultSetupManager implements SetupManager
         this.dataContextsB = dataContexts;
     }
 
-    public void setLicenseContexts(List<String> licenseContexts)
-    {
-        this.licenseContexts = licenseContexts;
-    }
-
     public void setRestoreContexts(List<String> restoreContexts)
     {
         this.restoreContexts = restoreContexts;
@@ -1384,11 +1338,6 @@ public class DefaultSetupManager implements SetupManager
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
-    }
-
-    public void setLicenseManager(LicenseManager licenseManager)
-    {
-        this.licenseManager = licenseManager;
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)

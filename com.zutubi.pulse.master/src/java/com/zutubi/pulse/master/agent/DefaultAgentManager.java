@@ -8,8 +8,6 @@ import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.agent.statistics.AgentStatisticsManager;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.events.*;
-import com.zutubi.pulse.master.license.LicenseManager;
-import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
@@ -72,8 +70,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private AgentSynchronisationService agentSynchronisationService;
     private HostManager hostManager;
 
-    private LicenseManager licenseManager;
-
     private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
         agentSynchronisationService.init(this);
@@ -117,11 +113,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         startStatisticsManager();
 
         refreshAgents();
-
-        // register the canAddAgent license authorisation.
-        AddAgentAuthorisation addAgentAuthorisation = new AddAgentAuthorisation();
-        addAgentAuthorisation.setAgentManager(this);
-        licenseManager.addAuthorisation(addAgentAuthorisation);
 
         // ensure that we create the default master agent.
         ensureDefaultAgentsDefined();
@@ -558,8 +549,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             try
             {
                 addAgent(agentConfig, true, false);
-
-                licenseManager.refreshAuthorisations();
             }
             finally
             {
@@ -593,7 +582,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             hostManager.agentDeleted(agentConfig);
             removeAgent(agentConfig.getHandle(), false);
-            licenseManager.refreshAuthorisations();
         }
         finally
         {
@@ -640,11 +628,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         this.eventManager = eventManager;
         eventManager.register(this);
-    }
-
-    public void setLicenseManager(LicenseManager licenseManager)
-    {
-        this.licenseManager = licenseManager;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

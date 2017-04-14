@@ -35,11 +35,6 @@
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/restoreContext.xml</value>
             </list>
         </property>
-        <property name="licenseContexts">
-            <list>
-                <value>classpath:/com/zutubi/pulse/master/bootstrap/context/licenseContext.xml</value>
-            </list>
-        </property>
         <property name="upgradeContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/master/bootstrap/context/upgradeContext.xml</value>

@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.security.ldap;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
@@ -40,8 +39,6 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.*;
-
-import static com.zutubi.pulse.master.license.LicenseHolder.AUTH_ADD_USER;
 
 /**
  * LDAP integration.
@@ -256,7 +253,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     public synchronized boolean canAutoAdd()
     {
-        return enabled && initialised && configuration.getAutoAddUsers()  && LicenseHolder.hasAuthorization(AUTH_ADD_USER);
+        return enabled && initialised && configuration.getAutoAddUsers();
     }
 
     public synchronized String getStatusMessage()

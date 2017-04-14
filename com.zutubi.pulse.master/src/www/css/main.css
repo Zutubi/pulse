@@ -1473,22 +1473,6 @@ td.clearbar
     font-size: 10px;
 }
 
-.license-status
-{
-    margin: 1em;
-    padding: 0.5em;
-    border: 1px solid #c00000;
-    color: #000;
-    background-color: #ffdddd;
-    text-align: center;
-}
-
-.license-status a
-{
-    color: #000;
-    border-color: #000;
-}
-
 /*------------------------------
 Two-pane, "explorer style" view
 */
@@ -1811,12 +1795,6 @@ table.template-actions
 .x-tree-node-collapsed .config-security-icon, .x-tree-node-expanded .config-security-icon, .x-tree-node-leaf .config-security-icon
 {
     background-image: url(../images/key.gif);
-    width: 20px;
-}
-
-.x-tree-node-collapsed .config-license-icon, .x-tree-node-expanded .config-license-icon, .x-tree-node-leaf .config-license-icon
-{
-    background-image: url(../images/page_key.gif);
     width: 20px;
 }
 

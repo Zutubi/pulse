@@ -6,8 +6,6 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.license.License;
-import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
@@ -111,14 +109,6 @@ public class CustomVelocityManager extends VelocityManager
                 
                 context.put("principle", user);
                 context.put("canLogout", SecurityUtils.canLogout());
-            }
-
-            License license = LicenseHolder.getLicense();
-            if (license != null)
-            {
-                context.put("license", license);
-                context.put("licenseExceeded", license.isExceeded(projectManager.getProjectCount(true), agentManager.getAgentCount(), userManager.getUserCount()));
-                context.put("licenseCanRunVersion", license.canRunVersion(v));
             }
         }
 

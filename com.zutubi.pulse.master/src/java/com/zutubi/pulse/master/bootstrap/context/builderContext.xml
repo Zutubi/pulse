@@ -195,8 +195,6 @@
 
     <bean id="jabberManager" class="com.zutubi.pulse.master.notifications.jabber.JabberManager"/>
 
-    <bean id="licenseMonitor" class="com.zutubi.pulse.master.license.LicenseMonitor" init-method="init"/>
-
     <bean id="postProcessorManager" class="com.zutubi.pulse.master.PostProcessorManager"/>
 
     <bean id="guestAccessManager" class="com.zutubi.pulse.master.GuestAccessManager"/>

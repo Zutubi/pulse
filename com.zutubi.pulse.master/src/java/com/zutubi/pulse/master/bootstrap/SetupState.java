@@ -10,7 +10,6 @@ public enum SetupState
     DATABASE,
     MIGRATE,
     RESTORE,
-    LICENSE,
     UPGRADE,
     ADMIN,
     SETTINGS,

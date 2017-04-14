@@ -25,8 +25,6 @@ import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
-import com.zutubi.pulse.master.license.LicenseManager;
-import com.zutubi.pulse.master.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
@@ -85,7 +83,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
     private ScmManager scmManager;
-    private LicenseManager licenseManager;
     private WorkDirectoryCleanupService workDirectoryCleanupService;
 
     private ConfigurationProvider configurationProvider;
@@ -149,7 +146,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     cacheLock.writeLock().unlock();
                 }
-                licenseManager.refreshAuthorisations();
             }
 
             public void postDelete(ProjectConfiguration instance)
@@ -168,7 +164,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     cacheLock.writeLock().unlock();
                 }
-                licenseManager.refreshAuthorisations();
             }
 
             public void postSave(ProjectConfiguration instance, boolean nested)
@@ -318,11 +313,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
         changelistIsolator.setScmManager(scmManager);
-
-        // register the canAddProject authorisation with the license manager.
-        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
-        addProjectAuthorisation.setProjectManager(this);
-        licenseManager.addAuthorisation(addProjectAuthorisation);
 
         initialiseProjects();
 
@@ -1539,11 +1529,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             clearResponsibility(project);
         }
-    }
-
-    public void setLicenseManager(LicenseManager licenseManager)
-    {
-        this.licenseManager = licenseManager;
     }
 
     public void setEventManager(EventManager eventManager)

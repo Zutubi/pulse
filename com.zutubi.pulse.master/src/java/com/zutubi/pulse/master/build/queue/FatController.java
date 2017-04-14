@@ -5,21 +5,13 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
-import com.zutubi.pulse.master.license.License;
-import com.zutubi.pulse.master.license.LicenseHolder;
-import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
-import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -33,9 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * The fat controller is responsible for managing the scheduling system.
  *
- * This includes its initialisation, startup and shutdown, monitoring the
- * license etc etc.  Essentially, the scheduling systems integration with
- * the rest of pulse.
+ * This includes its initialisation, startup and shutdown, etc.  Essentially,
+ * the scheduling systems integration with the rest of pulse.
  */
 public class FatController implements EventListener, Stoppable
 {
@@ -203,13 +194,6 @@ public class FatController implements EventListener, Stoppable
 
     private void requestBuild(BuildRequestEvent request)
     {
-        if (isDisabled())
-        {
-            buildRequestRegistry.requestRejected(request, I18N.format("rejected.license.exceeded"));
-            LOG.warning("Build request ignored as license is expired or exceeded.");
-            return;
-        }
-
         lock.lock();
         try
         {
@@ -323,14 +307,10 @@ public class FatController implements EventListener, Stoppable
     }
 
     /**
-     * This listener is responsible for managing the enabled/disabled state of the controller
-     * based on the installed license.
+     * This listener is responsible for managing the enabled/disabled state of the controller.
      */
     public static class ControllerStateListener implements EventListener
     {
-        private ProjectManager projectManager;
-        private UserManager userManager;
-        private AgentManager agentManager;
         private FatController controller;
 
         public void handleEvent(Event event)
@@ -342,48 +322,12 @@ public class FatController implements EventListener, Stoppable
                 // are available. Moving this outside the FatController will resolve this.
                 SpringComponentContext.autowire(this);
             }
-            checkLicense();
-        }
-
-        private void checkLicense()
-        {
-            // the type or detail of the event does not matter at this stage.
-            if (licensedToBuild())
-            {
-                controller.enable();
-            }
-            else
-            {
-                controller.disable();
-            }
-        }
-
-        private boolean licensedToBuild()
-        {
-            // First check we can run (handles eval expiry and illegal upgrades
-            // for commercial license) and then ensure we are within our limits.
-            License license = LicenseHolder.getLicense();
-            return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(true), agentManager.getAgentCount(), userManager.getUserCount());
+            controller.enable();
         }
 
         public Class[] getHandledEvents()
         {
-            return new Class[]{LicenseExpiredEvent.class, LicenseUpdateEvent.class, SystemStartedEvent.class};
-        }
-
-        public void setProjectManager(ProjectManager projectManager)
-        {
-            this.projectManager = projectManager;
-        }
-
-        public void setUserManager(UserManager userManager)
-        {
-            this.userManager = userManager;
-        }
-
-        public void setAgentManager(AgentManager agentManager)
-        {
-            this.agentManager = agentManager;
+            return new Class[]{SystemStartedEvent.class};
         }
 
         public void setController(FatController controller)

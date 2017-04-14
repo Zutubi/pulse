@@ -48,7 +48,6 @@ public class DevAcceptanceTestSuite
         addClassToSuite(suite, ProjectPermissionsAcceptanceTest.class);
         addClassToSuite(suite, AnonymousAccessAcceptanceTest.class);
         addClassToSuite(suite, UserAccessAcceptanceTest.class);
-        addClassToSuite(suite, LicenseAcceptanceTest.class);
         addClassToSuite(suite, DashboardAcceptanceTest.class);
         addClassToSuite(suite, ProjectHomeAcceptanceTest.class);
         addClassToSuite(suite, ProjectHistoryAcceptanceTest.class);

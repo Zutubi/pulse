@@ -44,8 +44,6 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.ui.ConfigModelBuilder;
 import com.zutubi.tove.ui.ToveUiUtils;
 import com.zutubi.tove.ui.model.*;
-import com.zutubi.util.StringUtils;
-import org.apache.xmlrpc.XmlRpcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +58,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -103,9 +100,6 @@ public class SetupController
                 break;
             case DATABASE:
                 model.setInput(configModelBuilder.buildTransientModel(SetupDatabaseTypeConfiguration.class, null));
-                break;
-            case LICENSE:
-                model.setInput(configModelBuilder.buildTransientModel(SetupLicenseConfiguration.class, null));
                 break;
             case MIGRATE:
                 fillMigrateModel(model);
@@ -291,35 +285,6 @@ public class SetupController
         SetupDatabaseTypeConfiguration instance = convertAndValidate(SetupDatabaseTypeConfiguration.class, model);
         setupManager.setDatabaseType(instance);
         return get();
-    }
-
-    @RequestMapping(value = "/license", method = RequestMethod.POST)
-    public ResponseEntity<SetupModel[]> postLicense(@RequestBody CompositeModel model) throws Exception
-    {
-        SetupLicenseConfiguration instance = convertAndValidate(SetupLicenseConfiguration.class, model);
-        setupManager.setLicense(instance);
-        return get();
-    }
-
-    @RequestMapping(value = "/requestLicense", method = RequestMethod.POST)
-    public ResponseEntity<ActionResultModel> postRequestLicense(@RequestBody CompositeModel model) throws Exception
-    {
-        RequestLicenseConfiguration instance = convertAndValidate(RequestLicenseConfiguration.class, model);
-        try
-        {
-            XmlRpcClient client = new XmlRpcClient("http://zutubi.com/xmlrpc/");
-            Vector<String> args = new Vector<>(2);
-            args.add(instance.getFullName());
-            args.add(instance.getEmail());
-
-            String license = (String) client.execute("evaluation", args);
-            license = StringUtils.wrapString(license.replaceAll("\\s", ""), 42, null);
-            return new ResponseEntity<>(new ActionResultModel(true, license, null), HttpStatus.OK);
-        }
-        catch (Exception e)
-        {
-            return new ResponseEntity<>(new ActionResultModel(false, e.getMessage(), null), HttpStatus.OK);
-        }
     }
 
     @RequestMapping(value = "/admin", method = RequestMethod.POST)

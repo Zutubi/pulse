@@ -166,79 +166,6 @@ if (window.Zutubi.setup === undefined)
             });
         }
 
-        function _requestLicense(form)
-        {
-            kendo.ui.progress(app.mainView, true);
-            Zutubi.core.ajax({
-                method: 'POST',
-                url: '/setup-api/setup/requestLicense',
-                data: {
-                    kind: "composite",
-                    properties: form.getValues()
-                },
-                success: function(data)
-                {
-                    kendo.ui.progress(app.mainView, false);
-                    if (data.success)
-                    {
-                        app.panel.form.getFieldNamed("license").bindValue(data.message);
-                    }
-                    else
-                    {
-                        Zutubi.core.reportError("Could not request license: " + data.message);
-                    }
-                },
-                error: function(jqXHR)
-                {
-                    var details = Zutubi.config.getValidationErrors(jqXHR);
-
-                    kendo.ui.progress(app.mainView, false);
-                    if (details)
-                    {
-                        form.showValidationErrors(details.validationErrors);
-                    }
-                    else
-                    {
-                        Zutubi.core.reportError("Could not request license: " + Zutubi.core.ajaxError(jqXHR));
-                    }
-                }
-            });
-        }
-
-        function _showLicensePanel()
-        {
-            var view, form;
-
-            view = new kendo.View('<div id="request-license" class="k-check-wrapper">' +
-                                      '<h1>request evaluation license</h1>' +
-                                      '<p>enter your detail below to request a free, 30-day evaluation license</p>' +
-                                      '<div id="request-license-form">' +
-                                      '</div>' +
-                                  '</div>', {wrap: false});
-            view.render("#input");
-
-            form = $("#request-license-form").kendoZaForm({
-                formName: "request license",
-                structure: {
-                    fields: [{
-                        name: 'fullName',
-                        required: true,
-                        label: 'full name'
-                    }, {
-                        name: 'email',
-                        required: true,
-                        label: 'email address'
-                    }]
-                },
-                submits: ["request license"]
-            }).data("kendoZaForm");
-
-            form.bind("buttonClicked", function()
-            {
-                _requestLicense(form);
-            });
-        }
-
         function _showMigratePanel(data)
         {
             var existingDb = $('<div><h2>Existing Database Properties</h2><div id="db-table-wrapper"></div></div>');
@@ -402,11 +329,6 @@ if (window.Zutubi.setup === undefined)
                 else if (data.input)
                 {
                     _showInputPanel(data);
-
-                    if (data.status === "license")
-                    {
-                        _showLicensePanel();
-                    }
 
                     if (data.properties && propertyRenderers.hasOwnProperty(data.status))
                     {

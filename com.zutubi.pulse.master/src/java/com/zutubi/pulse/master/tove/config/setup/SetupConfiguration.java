@@ -14,8 +14,6 @@ public class SetupConfiguration extends AbstractConfiguration
     private SetupDataConfiguration data;
     private SetupDatabaseTypeConfiguration databaseType;
     private MigrateDatabaseTypeConfiguration migrateDatabaseType;
-    private SetupLicenseConfiguration license;
-    private RequestLicenseConfiguration requestLicense;
     private AdminUserConfiguration admin;
     private ServerSettingsConfiguration server;
 
@@ -47,26 +45,6 @@ public class SetupConfiguration extends AbstractConfiguration
     public void setMigrateDatabaseType(MigrateDatabaseTypeConfiguration migrateDatabaseType)
     {
         this.migrateDatabaseType = migrateDatabaseType;
-    }
-
-    public SetupLicenseConfiguration getLicense()
-    {
-        return license;
-    }
-
-    public void setLicense(SetupLicenseConfiguration license)
-    {
-        this.license = license;
-    }
-
-    public RequestLicenseConfiguration getRequestLicense()
-    {
-        return requestLicense;
-    }
-
-    public void setRequestLicense(RequestLicenseConfiguration requestLicense)
-    {
-        this.requestLicense = requestLicense;
     }
 
     public AdminUserConfiguration getAdmin()

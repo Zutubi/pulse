@@ -5,8 +5,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.license.LicenseManager;
-import com.zutubi.pulse.master.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.security.SecurityUtils;
@@ -42,7 +40,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     private PasswordEncoder passwordEncoder;
     private org.springframework.security.authentication.encoding.PasswordEncoder legacyPasswordEncoder;
 
-    private LicenseManager licenseManager;
     private BuildManager buildManager;
     private LdapManager ldapManager;
     private ProjectManager projectManager;
@@ -72,7 +69,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             public void postInsert(UserConfiguration instance)
             {
                 userConfigsById.put(instance.getUserId(), instance);
-                licenseManager.refreshAuthorisations();
             }
 
             public void postDelete(UserConfiguration instance)
@@ -81,7 +77,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
                 initGroupsByUser();
 
                 userConfigsById.remove(instance.getUserId());
-                licenseManager.refreshAuthorisations();
             }
 
             public void postSave(UserConfiguration instance, boolean nested)
@@ -95,11 +90,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public void init()
     {
-        // register the canAddUser license authorisation
-        AddUserAuthorisation addUserAuthorisation = new AddUserAuthorisation();
-        addUserAuthorisation.setUserManager(this);
-        licenseManager.addAuthorisation(addUserAuthorisation);
-
         initGroupsByUser();
         initUsersById();
     }
@@ -420,11 +410,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public void setUserDao(UserDao userDao)
     {
         this.userDao = userDao;
-    }
-
-    public void setLicenseManager(LicenseManager licenseManager)
-    {
-        this.licenseManager = licenseManager;
     }
 
     public void setProjectManager(ProjectManager projectManager)
